@@ -1,0 +1,41 @@
+---
+import type { EmsHomeOrderProcessContent } from '../../types/ems-home';
+import { getAssetPath } from '../../lib/assets';
+
+export interface Props {
+  data: EmsHomeOrderProcessContent;
+}
+
+const { data } = Astro.props;
+---
+
+<section class="bg-white py-16 sm:py-20">
+  <div class="mx-auto max-w-[1485px] px-6">
+    <div class="text-center">
+      <h2 class="text-4xl font-semibold tracking-tight text-black sm:text-5xl">
+        {data.title}
+      </h2>
+    </div>
+
+    <div class="relative mt-12">
+      <div class="absolute left-[56px] right-[56px] top-[48px] hidden h-0.5 bg-[#ea543f] lg:block"></div>
+
+      <ol class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-8 lg:gap-0">
+        {data.steps.map((step, idx) => (
+          <li class="flex flex-col items-center text-center">
+            <div class="flex h-[97px] w-[97px] items-center justify-center rounded-full bg-[#ea543f] shadow-[0_9px_14px_-3px_rgba(0,0,0,0.10),0_4px_6px_-4px_rgba(0,0,0,0.10)]">
+              <img src={getAssetPath(step.icon_url)} alt="" class="h-[45px] w-[45px]" />
+            </div>
+            <p class="mt-4 text-[13px] font-bold leading-[19px] tracking-[-0.14px] text-[#ea543f]">
+              STEP {idx + 1}
+            </p>
+            <p class="mt-2 text-[13px] font-medium leading-4 tracking-[-0.14px] text-slate-700">
+              {step.title}
+            </p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
+</section>
+

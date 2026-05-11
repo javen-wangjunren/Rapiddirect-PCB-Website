@@ -1,0 +1,13 @@
+---
+import type { ReviewsContent } from '../../types/reviews';
+import { ReviewsSection as ReviewsSectionReact } from './ReviewsSection';
+
+export interface Props {
+  data: ReviewsContent;
+}
+
+const { data } = Astro.props;
+---
+
+<ReviewsSectionReact data={data} client:load />
+

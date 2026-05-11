@@ -1,0 +1,11 @@
+---
+import { QuoteFormSection as QuoteFormSectionReact } from './QuoteFormSection';
+
+export interface Props {
+  data: unknown;
+}
+
+const { data } = Astro.props;
+---
+
+<QuoteFormSectionReact data={data as any} client:load />

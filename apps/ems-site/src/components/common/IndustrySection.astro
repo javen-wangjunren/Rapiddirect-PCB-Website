@@ -1,0 +1,13 @@
+---
+import type { EmsHomeIndustryContent } from '../../types/ems-home';
+import { IndustrySection as IndustrySectionReact } from './IndustrySection';
+
+export interface Props {
+  data: EmsHomeIndustryContent;
+}
+
+const { data } = Astro.props;
+---
+
+<IndustrySectionReact data={data} client:load />
+

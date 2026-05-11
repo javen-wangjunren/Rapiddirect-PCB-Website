@@ -1,0 +1,109 @@
+---
+import '../styles/global.css';
+import '../styles/admin.css';
+import AdminSidebar from '../components/admin/AdminSidebar.astro';
+import AdminTopbar from '../components/admin/AdminTopbar.astro';
+
+export interface Props {
+  title?: string;
+  showSidebar?: boolean;
+}
+
+const { title = 'EMS Admin', showSidebar = true } = Astro.props;
+const activePath = Astro.url.pathname;
+const sidebarDialogId = 'admin-sidebar-dialog';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+  </head>
+  <body class="admin-shell">
+    <div class="h-screen overflow-hidden min-[1200px]:flex">
+      {showSidebar ? (
+        <>
+          <div class="hidden h-full min-[1200px]:block">
+            <AdminSidebar activePath={activePath} />
+          </div>
+          <dialog
+            id={sidebarDialogId}
+            class="m-0 h-screen w-[min(320px,85vw)] border-0 bg-transparent p-0 backdrop:bg-black/30 min-[1200px]:hidden"
+          >
+            <div class="h-full">
+              <AdminSidebar activePath={activePath} variant="drawer" />
+            </div>
+          </dialog>
+        </>
+      ) : null}
+
+      <div class="min-w-0 flex-1 overflow-y-auto">
+        <AdminTopbar title={title} sidebarDialogId={showSidebar ? sidebarDialogId : undefined} />
+        <main class="mx-auto max-w-[var(--admin-page-max)] px-[var(--admin-page-px)] py-[var(--admin-page-py)]">
+          <slot />
+        </main>
+      </div>
+    </div>
+
+    <script is:inline>
+      {String.raw`
+      (() => {
+        const key = 'admin.sidebarCollapsed';
+        const body = document.body;
+        const sidebar = document.querySelector('.admin-sidebar[data-variant="static"]');
+        const toggleBtn = document.querySelector('[data-admin-toggle-sidebar]');
+        const apply = (collapsed) => {
+          body.classList.toggle('is-sidebar-collapsed', collapsed);
+          if (sidebar instanceof HTMLElement) {
+            sidebar.classList.toggle('is-collapsed', collapsed);
+          }
+          if (toggleBtn instanceof HTMLElement) toggleBtn.setAttribute('aria-pressed', collapsed ? 'true' : 'false');
+
+          const icon = sidebar instanceof HTMLElement ? sidebar.querySelector('.admin-sidebar-toggle-icon') : null;
+          const label = sidebar instanceof HTMLElement ? sidebar.querySelector('.admin-sidebar-toggle-label') : null;
+          if (icon instanceof HTMLElement) icon.textContent = collapsed ? '▶' : '◀';
+          if (label instanceof HTMLElement) label.textContent = collapsed ? 'Expand Menu' : 'Collapse Menu';
+        };
+        try {
+          apply(localStorage.getItem(key) === '1');
+        } catch {}
+
+        toggleBtn?.addEventListener('click', () => {
+          const next = !body.classList.contains('is-sidebar-collapsed');
+          apply(next);
+          try {
+            localStorage.setItem(key, next ? '1' : '0');
+          } catch {}
+        });
+
+        const openBtn = document.querySelector('[data-admin-open-sidebar]');
+        const dialogId = openBtn?.getAttribute('data-admin-open-sidebar');
+        const dialog = dialogId ? document.getElementById(dialogId) : null;
+        if (!dialog || !(dialog instanceof HTMLDialogElement)) return;
+
+        const open = () => {
+          if (dialog.open) return;
+          dialog.showModal();
+        };
+        const close = () => {
+          if (!dialog.open) return;
+          dialog.close();
+        };
+
+        openBtn?.addEventListener('click', open);
+
+        dialog.addEventListener('click', (e) => {
+          const target = e.target;
+          if (!(target instanceof HTMLElement)) return;
+          // click on backdrop area closes the dialog
+          if (target === dialog) close();
+          // any nav click marked with data-admin-close-sidebar closes as well
+          if (target.closest('[data-admin-close-sidebar]')) close();
+        });
+      })();
+      `}
+    </script>
+  </body>
+</html>

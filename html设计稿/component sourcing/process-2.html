@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Sourcing Process - Horizontal Stepper</title>
+<style>
+    :root {
+        --primary-color: #ef533f;
+        --primary-hover: #d64734;
+        --bg-light: #F5F5F5;
+        --card-bg: #ffffff;
+        --text-dark: #1a1a1a;
+        --text-gray: #666666;
+        --border-color: #e5e7eb;
+        --img-placeholder-bg: #e2e8f0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+
+    .process-section {
+        background-color: var(--bg-light);
+        padding: 100px 20px;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    /* =========================================
+       1. 模块标题区
+       ========================================= */
+    .section-header {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+
+    .section-header h2 {
+        font-size: 36px;
+        font-weight: 800;
+        color: var(--text-dark);
+        margin-bottom: 16px;
+        letter-spacing: -0.5px;
+    }
+
+    .section-header p {
+        font-size: 18px;
+        color: var(--text-gray);
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    /* =========================================
+       2. 横向进度条导航 (Stepper Navigation)
+       ========================================= */
+    .stepper-nav {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        margin-bottom: 40px;
+        max-width: 1000px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* 背景连接线 */
+    .stepper-nav::before {
+        content: '';
+        position: absolute;
+        top: 24px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background-color: var(--border-color);
+        z-index: 1;
+    }
+
+    .step-btn {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        background: none;
+        border: none;
+        width: 120px; /* 固定宽度保证文字居中对其 */
+    }
+
+    /* 步骤数字圆点 */
+    .step-dot {
+        width: 48px;
+        height: 48px;
+        background-color: var(--card-bg);
+        border: 2px solid var(--border-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        font-weight: 800;
+        color: #94a3b8;
+        transition: all 0.3s ease;
+    }
+
+    /* 步骤标题文字 */
+    .step-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: #94a3b8;
+        text-align: center;
+        line-height: 1.3;
+        transition: all 0.3s ease;
+    }
+
+    /* 激活态 (Active) 与 悬停态 (Hover) */
+    .step-btn:hover .step-dot {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+    }
+    .step-btn:hover .step-label {
+        color: var(--text-dark);
+    }
+
+    .step-btn.active .step-dot {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: #ffffff;
+        box-shadow: 0 0 0 6px rgba(239, 83, 63, 0.15);
+    }
+    .step-btn.active .step-label {
+        color: var(--text-dark);
+        font-weight: 800;
+    }
+
+    /* =========================================
+       3. 详情展示面板 (动态切换内容)
+       ========================================= */
+    .content-display-wrapper {
+        background: var(--card-bg);
+        border-radius: 20px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+        overflow: hidden;
+        min-height: 420px; /* 固定最小高度，防止切换时页面跳动 */
+        position: relative;
+    }
+
+    .step-panel {
+        display: none; /* 默认隐藏 */
+        padding: 40px;
+        animation: fadeIn 0.4s ease forwards;
+    }
+
+    .step-panel.active {
+        display: flex;
+        gap: 40px;
+        align-items: center;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 左侧：文字详情区 */
+    .panel-text {
+        flex: 0 0 45%;
+    }
+
+    .panel-text .step-badge {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--primary-color);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 12px;
+        display: block;
+    }
+
+    .panel-text h3 {
+        font-size: 28px;
+        font-weight: 800;
+        color: var(--text-dark);
+        margin-bottom: 20px;
+        line-height: 1.2;
+    }
+
+    .panel-text p {
+        font-size: 16px;
+        color: var(--text-gray);
+        line-height: 1.6;
+        margin-bottom: 24px;
+    }
+
+    /* 右侧：实景图片区 */
+    .panel-visual {
+        flex: 1;
+        aspect-ratio: 16/10;
+        background-color: var(--img-placeholder-bg);
+        border-radius: 12px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--border-color);
+        position: relative;
+    }
+
+    .img-placeholder-text {
+        color: #64748b;
+        font-size: 14px;
+        font-weight: 600;
+        text-align: center;
+        padding: 20px;
+        max-width: 80%;
+    }
+
+    .panel-visual img {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0; /* 替换为真图时删除此行 */
+    }
+
+    /* =========================================
+       移动端自适应 (Responsive)
+       ========================================= */
+    @media (max-width: 992px) {
+        .stepper-nav {
+            overflow-x: auto;
+            padding-bottom: 20px;
+            justify-content: flex-start;
+            gap: 20px;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none; /* Firefox 隐藏滚动条 */
+        }
+        .stepper-nav::-webkit-scrollbar { display: none; } /* Chrome 隐藏滚动条 */
+        
+        .stepper-nav::before { width: 800px; } /* 保证连接线不断 */
+        .step-btn { flex: 0 0 100px; scroll-snap-align: start; }
+        
+        .step-panel.active { flex-direction: column; padding: 30px 20px; gap: 30px; }
+        .panel-text { flex: none; width: 100%; }
+        .panel-visual { width: 100%; }
+        .content-display-wrapper { min-height: auto; }
+    }
+</style>
+</head>
+<body>
+
+<section class="process-section">
+    <div class="container">
+        
+        <div class="section-header">
+            <h2>Our Sourcing Process</h2>
+            <p>A transparent and controlled 7-step workflow ensuring original parts and on-time delivery.</p>
+        </div>
+
+        <div class="stepper-nav">
+            <button class="step-btn active" data-target="step-1">
+                <div class="step-dot">1</div>
+                <div class="step-label">Submit BOM</div>
+            </button>
+            <button class="step-btn" data-target="step-2">
+                <div class="step-dot">2</div>
+                <div class="step-label">Review & RFQ</div>
+            </button>
+            <button class="step-btn" data-target="step-3">
+                <div class="step-dot">3</div>
+                <div class="step-label">Supplier Matching</div>
+            </button>
+            <button class="step-btn" data-target="step-4">
+                <div class="step-dot">4</div>
+                <div class="step-label">Price & Lead Time</div>
+            </button>
+            <button class="step-btn" data-target="step-5">
+                <div class="step-dot">5</div>
+                <div class="step-label">Order Procurement</div>
+            </button>
+            <button class="step-btn" data-target="step-6">
+                <div class="step-dot">6</div>
+                <div class="step-label">IQC Inspection</div>
+            </button>
+            <button class="step-btn" data-target="step-7">
+                <div class="step-dot">7</div>
+                <div class="step-label">Delivery / PCBA</div>
+            </button>
+        </div>
+
+        <div class="content-display-wrapper">
+            
+            <div class="step-panel active" id="step-1">
+                <div class="panel-text">
+                    <span class="step-badge">Step 01</span>
+                    <h3>Submit Your BOM</h3>
+                    <p>Upload your Bill of Materials (BOM) in Excel or CSV format. Our intelligent system and procurement engineers will instantly begin analyzing your part numbers for availability and lifecycle status.</p>
+                </div>
+                <div class="panel-visual">
+                    <div class="img-placeholder-text">[ Real Photo: A clear engineering BOM file displayed on a high-res laptop screen ]</div>
+                </div>
+            </div>
+
+            <div class="step-panel" id="step-2">
+                <div class="panel-text">
+                    <span class="step-badge">Step 02</span>
+                    <h3>BOM Review & RFQ</h3>
+                    <p>Our senior procurement engineers meticulously review every line item, verifying MPNs (Manufacturer Part Numbers) and packaging types to provide a precise Request for Quote without any ambiguity.</p>
+                </div>
+                <div class="panel-visual">
+                    <div class="img-placeholder-text">[ Real Photo: A senior procurement engineer reviewing technical specs on dual monitors ]</div>
+                </div>
+            </div>
+
+            <div class="step-panel" id="step-3">
+                <div class="panel-text">
+                    <span class="step-badge">Step 03</span>
+                    <h3>Supplier Matching</h3>
+                    <p>We leverage our vetted global supply chain network to match your needs with authorized manufacturers and Tier-1 distributors, ensuring 100% original component sourcing and mitigating counterfeit risks.</p>
+                </div>
+                <div class="panel-visual">
+                    <div class="img-placeholder-text">[ Real Photo: Close-up of professional procurement software dashboard matching suppliers ]</div>
+                </div>
+            </div>
+
+            <div class="step-panel" id="step-4">
+                <div class="panel-text">
+                    <span class="step-badge">Step 04</span>
+                    <h3>Price & Lead Time Confirmation</h3>
+                    <p>You will receive a comprehensive report detailing real-time pricing and confirmed lead times. For long-lead items, we proactively offer reliable, cost-down cross-reference alternatives for your approval.</p>
+                </div>
+                <div class="panel-visual">
+                    <div class="img-placeholder-text">[ Real Photo: A formal quotation report document showing transparent price breakdowns ]</div>
+                </div>
+            </div>
+
+            <div class="step-panel" id="step-5">
+                <div class="panel-text">
+                    <span class="step-badge">Step 05</span>
+                    <h3>Order & Procurement</h3>
+                    <p>Upon your final confirmation, our purchasing department executes the orders immediately. Our advanced ERP system tracks the logistics of every single reel and tray until it reaches our secure facility.</p>
+                </div>
+                <div class="panel-visual">
+                    <div class="img-placeholder-text">[ Real Photo: Purchasing staff executing orders with PO documents on the desk ]</div>
+                </div>
+            </div>
+
+            <div class="step-panel" id="step-6">
+                <div class="panel-text">
+                    <span class="step-badge">Step 06</span>
+                    <h3>IQC Incoming Inspection</h3>
+                    <p>The most crucial stage. We conduct 100% incoming quality control (IQC) in our ESD-safe labs, utilizing X-ray anti-counterfeit testing, visual verification, and exact quantity counts before inventory storage.</p>
+                </div>
+                <div class="panel-visual">
+                    <div class="img-placeholder-text">[ Real Photo: IQC inspector wearing anti-static gloves using a digital microscope ]</div>
+                </div>
+            </div>
+
+            <div class="step-panel" id="step-7">
+                <div class="panel-text">
+                    <span class="step-badge">Step 07</span>
+                    <h3>Delivery or PCBA Transfer</h3>
+                    <p>Verified components are either professionally vacuum-packed with desiccant for worldwide shipment, or seamlessly transferred directly to our internal SMT production lines for immediate PCB assembly.</p>
+                </div>
+                <div class="panel-visual">
+                    <div class="img-placeholder-text">[ Real Photo: Vacuum-sealed component reels with professional traceability labels ]</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const stepBtns = document.querySelectorAll('.step-btn');
+        const stepPanels = document.querySelectorAll('.step-panel');
+
+        stepBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // 1. 移除所有按钮的激活状态
+                stepBtns.forEach(b => b.classList.remove('active'));
+                // 2. 激活当前点击的按钮
+                btn.classList.add('active');
+
+                // 3. 获取目标面板 ID
+                const targetId = btn.getAttribute('data-target');
+
+                // 4. 隐藏所有面板并显示目标面板
+                stepPanels.forEach(panel => {
+                    panel.classList.remove('active');
+                    if (panel.id === targetId) {
+                        panel.classList.add('active');
+                    }
+                });
+
+                // 移动端：点击后将当前项平滑滚动到视图中间
+                if(window.innerWidth <= 992) {
+                    btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,10 @@
+---
+export const prerender = false;
+
+import AdminLayout from '../layouts/AdminLayout.astro';
+import AdminLogin from '../components/admin/AdminLogin';
+---
+
+<AdminLayout title="后台登录" showSidebar={false}>
+  <AdminLogin client:load />
+</AdminLayout>

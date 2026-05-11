@@ -1,0 +1,36 @@
+---
+import AdminUserMenu from './AdminUserMenu';
+
+export interface Props {
+  title?: string;
+  /**
+   * When provided, render a mobile menu button that toggles a <dialog> with this id.
+   * (Used by AdminLayout for responsive sidebar)
+   */
+  sidebarDialogId?: string;
+}
+
+const { title = 'EMS Admin', sidebarDialogId } = Astro.props;
+---
+
+<header class="sticky top-0 z-40 border-b border-[var(--admin-border)] bg-[var(--admin-surface)]">
+  <div class="mx-auto flex h-[var(--admin-topbar-h)] max-w-[var(--admin-page-max)] items-center justify-between px-[var(--admin-page-px)]">
+    <div class="flex min-w-0 items-center gap-3">
+      {sidebarDialogId ? (
+        <button
+          type="button"
+          class="inline-flex h-[var(--admin-control-md)] w-[var(--admin-control-md)] items-center justify-center rounded-[var(--admin-radius-sm)] border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-fg)] hover:bg-[var(--admin-surface-muted)] min-[1200px]:hidden"
+          aria-label="Open menu"
+          data-admin-open-sidebar={sidebarDialogId}
+        >
+          ☰
+        </button>
+      ) : null}
+      <div class="min-w-0">
+        <div class="truncate text-sm font-semibold text-[var(--admin-fg)]">{title}</div>
+        <div class="mt-0.5 hidden text-xs text-[var(--admin-fg-muted)] sm:block">RapidDirect / EMS Admin</div>
+      </div>
+    </div>
+    <AdminUserMenu client:load />
+  </div>
+</header>

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Deliverables - Grouped List</title>
+<style>
+    :root {
+        --primary-color: #ef533f;
+        --accent-blue: #0066FF;
+        --bg-light: #F5F5F5;
+        --card-bg: #ffffff;
+        --text-dark: #1a1a1a;
+        --text-gray: #555555;
+        --border-color: #e5e7eb;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    .deliverables-section {
+        background-color: var(--bg-light);
+        padding: 100px 20px;
+    }
+
+    .container {
+        max-width: 1000px; /* 列表版稍微收窄更易阅读 */
+        margin: 0 auto;
+    }
+
+    /* --- 标题区 --- */
+    .section-header {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+
+    .section-header h2 {
+        font-size: 36px;
+        font-weight: 800;
+        color: var(--text-dark);
+        margin-bottom: 16px;
+    }
+
+    .section-header p {
+        font-size: 18px;
+        color: var(--text-gray);
+    }
+
+    /* --- 分组列表容器 --- */
+    .deliverables-group {
+        background: var(--card-bg);
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.02);
+        margin-bottom: 40px;
+        overflow: hidden;
+    }
+
+    .group-header {
+        background-color: #f8fafc;
+        padding: 20px 30px;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .group-header svg {
+        color: var(--primary-color);
+        width: 24px;
+        height: 24px;
+    }
+
+    .group-header h3 {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-dark);
+    }
+
+    /* --- 列表项 (左右结构) --- */
+    .list-item {
+        display: flex;
+        align-items: center;
+        padding: 24px 30px;
+        border-bottom: 1px solid var(--border-color);
+        transition: background-color 0.3s ease;
+    }
+
+    .list-item:last-child {
+        border-bottom: none;
+    }
+
+    .list-item:hover {
+        background-color: #fdfdfd;
+    }
+
+    /* 左列：图标 + 标题 + 格式 */
+    .item-left {
+        flex: 0 0 40%;
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .item-icon {
+        color: #333333;
+        width: 24px;
+        height: 24px;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+
+    .item-title-box h4 {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 6px;
+    }
+
+    .format-tag {
+        font-size: 12px;
+        color: #64748b;
+        background: #f1f5f9;
+        padding: 3px 8px;
+        border-radius: 4px;
+    }
+
+    /* 右列：用途说明 */
+    .item-right {
+        flex: 1;
+        padding-left: 30px;
+        border-left: 1px dashed var(--border-color); /* 浅灰分隔线 */
+    }
+
+    .item-right p {
+        font-size: 15px;
+        color: var(--text-gray);
+        line-height: 1.6;
+    }
+
+    .highlight-blue {
+        color: var(--accent-blue);
+        font-weight: 600;
+    }
+
+    /* --- 移动端适配 --- */
+    @media (max-width: 768px) {
+        .list-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+        .item-left {
+            flex: 0 0 100%;
+        }
+        .item-right {
+            padding-left: 0;
+            border-left: none;
+            padding-top: 16px;
+            border-top: 1px dashed var(--border-color);
+            width: 100%;
+        }
+    }
+</style>
+</head>
+<body>
+
+<section class="deliverables-section">
+    <div class="container">
+        
+        <div class="section-header">
+            <h2>Project Deliverables</h2>
+            <p>Everything you need for seamless prototyping and mass production.</p>
+        </div>
+
+        <div class="deliverables-group">
+            <div class="group-header">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                <h3>Design Source Files</h3>
+            </div>
+            
+            <div class="list-item">
+                <div class="item-left">
+                    <svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <div class="item-title-box">
+                        <h4>Schematic Files</h4>
+                        <span class="format-tag">Native + PDF</span>
+                    </div>
+                </div>
+                <div class="item-right">
+                    <p>Complete circuit logic diagrams showing <span class="highlight-blue">power, signals, and control paths</span>, for review and future iteration.</p>
+                </div>
+            </div>
+
+            <div class="list-item">
+                <div class="item-left">
+                    <svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg>
+                    <div class="item-title-box">
+                        <h4>PCB Layout Files</h4>
+                        <span class="format-tag">Altium / Cadence</span>
+                    </div>
+                </div>
+                <div class="item-right">
+                    <p>Editable PCB design files with <span class="highlight-blue">full layer and routing data</span>, ready for later modifications.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="deliverables-group">
+            <div class="group-header">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                <h3>Production-Ready Files</h3>
+            </div>
+            
+            <div class="list-item">
+                <div class="item-left">
+                    <svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                    <div class="item-title-box">
+                        <h4>Gerber Files</h4>
+                        <span class="format-tag">RS-274X Standard</span>
+                    </div>
+                </div>
+                <div class="item-right">
+                    <p>Universal industry-standard files for <span class="highlight-blue">all PCB layers</span>, explicitly required for manufacturing.</p>
+                </div>
+            </div>
+
+            <div class="list-item">
+                <div class="item-left">
+                    <svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+                    <div class="item-title-box">
+                        <h4>NC Drill & Pick-and-Place</h4>
+                        <span class="format-tag">Excellon / CSV</span>
+                    </div>
+                </div>
+                <div class="item-right">
+                    <p>Coordinate files for <span class="highlight-blue">hole drilling and SMT automated assembly</span>, listing exact positions and orientations.</p>
+                </div>
+            </div>
+
+            <div class="list-item">
+                <div class="item-left">
+                    <svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                    <div class="item-title-box">
+                        <h4>BOM & Assembly Drawings</h4>
+                        <span class="format-tag">Excel / PDF</span>
+                    </div>
+                </div>
+                <div class="item-right">
+                    <p>Detailed component list and visual guides for <span class="highlight-blue">procurement, component placement, polarity</span>, and inspection.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="deliverables-group">
+            <div class="group-header">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <h3>Optional Deliverables</h3>
+            </div>
+            
+            <div class="list-item">
+                <div class="item-left">
+                    <svg class="item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                    <div class="item-title-box">
+                        <h4>Physical Prototypes</h4>
+                        <span class="format-tag">Bare / Assembled</span>
+                    </div>
+                </div>
+                <div class="item-right">
+                    <p>Optional <span class="highlight-blue">physical PCBs for testing</span>, available as an add-on service to validate the design before full production.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+</body>
+</html>

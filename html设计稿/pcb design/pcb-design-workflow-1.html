@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PCB Design Workflow - Sticky Timeline</title>
+<style>
+    :root {
+        --primary-color: #ef533f;
+        --primary-hover: #d64734;
+        --bg-light: #F5F5F5; /* 整体浅灰背景 */
+        --card-bg: #ffffff;
+        --text-dark: #1a1a1a;
+        --text-gray: #555555;
+        --border-color: #e5e7eb;
+        
+        /* 柔和的阶段卡片背景色 (参考你的文档思路) */
+        --bg-idea: #F8F4FF; /* 柔和浅紫 */
+        --bg-design: #F2FBF5; /* 柔和浅绿 */
+        --bg-validation: #F0F8FF; /* 柔和浅蓝 */
+        --bg-gerber: #FFFFFF; /* 纯白 */
+        --bg-mfg: #111111; /* 深色转化结尾 */
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    /* 平滑滚动行为 */
+    html {
+        scroll-behavior: smooth;
+    }
+
+    .workflow-section {
+        background-color: var(--bg-light);
+        padding: 100px 20px;
+        color: var(--text-dark);
+    }
+
+    .container {
+        max-width: 1280px;
+        margin: 0 auto;
+        display: flex;
+        align-items: flex-start; /* 关键：允许左侧 sticky 吸顶 */
+        gap: 60px;
+    }
+
+    /* =========================================
+       左侧：粘性时间轴导航 (Sticky Sidebar)
+       ========================================= */
+    .sidebar {
+        width: 300px;
+        flex-shrink: 0;
+        position: sticky;
+        top: 120px; /* 吸顶时距离顶部的距离 */
+    }
+
+    .sidebar h2 {
+        font-size: 36px;
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: 12px;
+        letter-spacing: -1px;
+    }
+
+    .sidebar p {
+        font-size: 15px;
+        color: var(--text-gray);
+        line-height: 1.5;
+        margin-bottom: 40px;
+    }
+
+    .timeline-nav {
+        border-left: 2px solid var(--border-color);
+        padding-left: 24px;
+        list-style: none;
+    }
+
+    .nav-item {
+        position: relative;
+        margin-bottom: 32px;
+    }
+
+    .nav-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .nav-link {
+        font-size: 16px;
+        font-weight: 600;
+        color: #94a3b8;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: block;
+    }
+
+    .nav-link:hover {
+        color: var(--text-dark);
+    }
+
+    /* 时间轴节点的小圆点 */
+    .nav-item::before {
+        content: '';
+        position: absolute;
+        left: -31px; /* 居中于边框线 */
+        top: 4px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: var(--border-color);
+        transition: all 0.3s ease;
+        z-index: 2;
+    }
+
+    /* 激活状态 */
+    .nav-item.active .nav-link {
+        color: var(--primary-color);
+    }
+
+    .nav-item.active::before {
+        background-color: var(--primary-color);
+        box-shadow: 0 0 0 5px rgba(239, 83, 63, 0.15);
+    }
+
+    /* =========================================
+       右侧：内容滚动区 (Scroll Content Area)
+       ========================================= */
+    .content-area {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 40px;
+    }
+
+    /* 阶段卡片统一样式 */
+    .stage-card {
+        border-radius: 20px;
+        padding: 50px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 10px 40px rgba(0,0,0,0.02);
+        scroll-margin-top: 100px; /* 点击锚点时顶部留白 */
+    }
+
+    .stage-header {
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .stage-header h3 {
+        font-size: 28px;
+        font-weight: 800;
+        color: var(--text-dark);
+    }
+
+    /* 内部具体步骤 */
+    .step-item {
+        margin-bottom: 35px;
+    }
+
+    .step-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .step-meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .step-num {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--primary-color);
+        background: rgba(239, 83, 63, 0.1);
+        padding: 4px 10px;
+        border-radius: 50px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .step-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-dark);
+    }
+
+    .step-desc {
+        font-size: 15px;
+        color: var(--text-gray);
+        line-height: 1.6;
+        padding-left: 2px;
+    }
+
+    /* =========================================
+       各阶段专属卡片背景色
+       ========================================= */
+    #stage-idea { background-color: var(--bg-idea); }
+    #stage-design { background-color: var(--bg-design); }
+    #stage-validation { background-color: var(--bg-validation); }
+    #stage-gerber { background-color: var(--bg-gerber); }
+
+    /* 最后一个 Manufacturing CTA 卡片 */
+    #stage-mfg {
+        background-color: var(--bg-mfg);
+        color: #ffffff;
+        border: none;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 80px 40px;
+    }
+
+    #stage-mfg .stage-header {
+        border-bottom: none;
+        padding-bottom: 0;
+        margin-bottom: 20px;
+    }
+
+    #stage-mfg .stage-header h3 { color: #ffffff; }
+
+    #stage-mfg p {
+        font-size: 16px;
+        color: #aaaaaa;
+        max-width: 600px;
+        line-height: 1.6;
+        margin-bottom: 30px;
+    }
+
+    .mfg-btn {
+        background-color: var(--primary-color);
+        color: #ffffff;
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: 700;
+        padding: 16px 36px;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 20px rgba(239, 83, 63, 0.2);
+    }
+
+    .mfg-btn:hover {
+        background-color: var(--primary-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 15px 30px rgba(239, 83, 63, 0.3);
+    }
+
+    /* =========================================
+       移动端自适应 (Responsive)
+       ========================================= */
+    @media (max-width: 992px) {
+        .container {
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        /* 移动端将左侧导航变为顶部横向滑动 */
+        .sidebar {
+            width: 100%;
+            position: relative;
+            top: 0;
+        }
+
+        .timeline-nav {
+            display: flex;
+            overflow-x: auto;
+            border-left: none;
+            border-bottom: 2px solid var(--border-color);
+            padding-left: 0;
+            padding-bottom: 20px;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none; /* Firefox */
+        }
+        
+        .timeline-nav::-webkit-scrollbar { display: none; } /* Chrome */
+
+        .nav-item {
+            margin-bottom: 0;
+            margin-right: 40px;
+            scroll-snap-align: start;
+        }
+
+        .nav-link {
+            white-space: nowrap;
+        }
+
+        .nav-item::before {
+            left: 50%;
+            bottom: -26px;
+            top: auto;
+            transform: translateX(-50%);
+        }
+    }
+
+    @media (max-width: 600px) {
+        .stage-card {
+            padding: 40px 24px;
+        }
+        #stage-mfg {
+            padding: 60px 24px;
+        }
+        .step-meta {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+    }
+</style>
+</head>
+<body>
+
+<section class="workflow-section">
+    <div class="container">
+        
+        <div class="sidebar">
+            <h2>PCB Design Workflow</h2>
+            <p>From Idea to Production, Every Step Standardized & Transparent.</p>
+            
+            <ul class="timeline-nav" id="timeline-nav">
+                <li class="nav-item active"><a href="#stage-idea" class="nav-link" data-target="stage-idea">01. Idea</a></li>
+                <li class="nav-item"><a href="#stage-design" class="nav-link" data-target="stage-design">02. PCB Design</a></li>
+                <li class="nav-item"><a href="#stage-validation" class="nav-link" data-target="stage-validation">03. Validation & Sim</a></li>
+                <li class="nav-item"><a href="#stage-gerber" class="nav-link" data-target="stage-gerber">04. Gerber Output</a></li>
+                <li class="nav-item"><a href="#stage-mfg" class="nav-link" data-target="stage-mfg">05. Manufacturing</a></li>
+            </ul>
+        </div>
+
+        <div class="content-area">
+            
+            <div class="stage-card" id="stage-idea">
+                <div class="stage-header">
+                    <h3>Idea & Definition</h3>
+                </div>
+                <div class="step-item">
+                    <div class="step-meta">
+                        <span class="step-num">Step 1</span>
+                        <h4 class="step-title">Project Requirement & Alignment</h4>
+                    </div>
+                    <p class="step-desc">Deeply align with customers on project goals, application scenarios, performance metrics, cost, and delivery requirements. Output the "Project Requirement Specification" to clarify key constraints (e.g., high-speed signals, EMC, layer stackup) ensuring the design is 100% matched to your needs.</p>
+                </div>
+            </div>
+
+            <div class="stage-card" id="stage-design">
+                <div class="stage-header">
+                    <h3>PCB Design</h3>
+                </div>
+                <div class="step-item">
+                    <div class="step-meta">
+                        <span class="step-num">Step 2</span>
+                        <h4 class="step-title">Schematic Design & Review</h4>
+                    </div>
+                    <p class="step-desc">Complete the circuit schematic design based on requirements, including power supply, signal chain, and control logic. Conduct concurrent DRC and cross-team reviews to eliminate functional defects and logic loopholes early on.</p>
+                </div>
+                <div class="step-item">
+                    <div class="step-meta">
+                        <span class="step-num">Step 3</span>
+                        <h4 class="step-title">PCB Layout & Component Placement</h4>
+                    </div>
+                    <p class="step-desc">Perform PCB layout and routing based on the schematic. Optimize component placement, signal routing, and power delivery networks (PDN). Focus on high-speed signals, impedance control, differential pairs, and EMC routing while balancing performance, cost, and manufacturability.</p>
+                </div>
+            </div>
+
+            <div class="stage-card" id="stage-validation">
+                <div class="stage-header">
+                    <h3>Validation & Simulation</h3>
+                </div>
+                <div class="step-item">
+                    <div class="step-meta">
+                        <span class="step-num">Step 4</span>
+                        <h4 class="step-title">Engineering Simulation & Verification</h4>
+                    </div>
+                    <p class="step-desc">Conduct SI (Signal Integrity), PI (Power Integrity), EMC/EMI, and thermal analysis for critical signal paths. Proactively identify and resolve crosstalk, power noise, electromagnetic radiation, and thermal risks to prevent post-production rework.</p>
+                </div>
+                <div class="step-item">
+                    <div class="step-meta">
+                        <span class="step-num">Step 5</span>
+                        <h4 class="step-title">DFM/DFA Review & Optimization</h4>
+                    </div>
+                    <p class="step-desc">Execute comprehensive DFM (Design for Manufacturing) and DFA (Design for Assembly) reviews. Verify trace width/spacing, vias, pads, and solder mask to optimize Gerber files and BOM, ensuring seamless transition to PCB fabrication and SMT assembly.</p>
+                </div>
+            </div>
+
+            <div class="stage-card" id="stage-gerber">
+                <div class="stage-header">
+                    <h3>Gerber Output</h3>
+                </div>
+                <div class="step-item">
+                    <div class="step-meta">
+                        <span class="step-num">Step 6</span>
+                        <h4 class="step-title">Design File Finalization & Handover</h4>
+                    </div>
+                    <p class="step-desc">Output a complete manufacturing file package, including Gerber/drill files, BOM, pick-and-place files, assembly drawings, and test instructions. Files undergo multiple verifications to ensure full compatibility with production requirements.</p>
+                </div>
+            </div>
+
+            <div class="stage-card" id="stage-mfg">
+                <div class="stage-header">
+                    <h3>Manufacturing</h3>
+                </div>
+                <p>We provide one-stop services from PCB prototyping and SMT assembly to mass production. Once the design is finalized, it seamlessly transitions into manufacturing, significantly shortening your project timeline.</p>
+                <a href="#quote-page" class="mfg-btn">Get a Free Manufacturing Quote</a>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const sections = document.querySelectorAll('.stage-card');
+        const navItems = document.querySelectorAll('.nav-item');
+
+        // 设置观察者参数：当卡片进入视口中部 50% 时触发
+        const observerOptions = {
+            root: null,
+            rootMargin: '-20% 0px -60% 0px',
+            threshold: 0
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // 获取当前滚到的卡片 ID
+                    const currentId = entry.target.getAttribute('id');
+                    
+                    // 移除所有导航项的高亮状态
+                    navItems.forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    
+                    // 为对应的导航项添加高亮
+                    const activeNav = document.querySelector(`.nav-link[data-target="${currentId}"]`).parentElement;
+                    if (activeNav) {
+                        activeNav.classList.add('active');
+                        
+                        // 在移动端时，保持高亮项在视图中间
+                        if(window.innerWidth <= 992) {
+                            activeNav.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                        }
+                    }
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+    });
+</script>
+
+</body>
+</html>

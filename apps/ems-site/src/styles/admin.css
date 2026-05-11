@@ -1,0 +1,106 @@
+/**
+ * Admin design tokens + a11y baseline.
+ *
+ * Scope: only applies inside `.admin-shell` (AdminLayout).
+ * Goal: provide a stable token layer that Tailwind utilities can reference via CSS variables.
+ */
+:where(.admin-shell) {
+  /* Typography */
+  --admin-font-sans: Inter, Poppins, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --admin-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --admin-text-sm: 0.875rem; /* 14px */
+  --admin-text-base: 0.9375rem; /* 15px */
+  --admin-text-lg: 1.125rem; /* 18px */
+  --admin-leading: 1.5;
+
+  /* Colors (aligned with `项目思考/后台/后台UI优化.md` suggested values) */
+  --admin-bg: #f8fafc;
+  --admin-surface: #ffffff;
+  --admin-surface-muted: #f1f5f9;
+  --admin-border: #e5e7eb;
+  --admin-border-subtle: #eef2f6;
+  --admin-fg: #0f172a;
+  --admin-fg-muted: #64748b;
+  --admin-fg-subtle: #94a3b8;
+
+  --admin-primary: #ea543f;
+  --admin-primary-hover: #d94b38;
+  --admin-primary-soft: rgba(234, 84, 63, 0.12);
+
+  --admin-danger: #dc2626;
+  --admin-danger-hover: #b91c1c;
+  --admin-danger-soft: rgba(220, 38, 38, 0.12);
+
+  --admin-success: #22c55e;
+  --admin-success-soft: rgba(34, 197, 94, 0.14);
+  --admin-warning: #f59e0b;
+  --admin-warning-soft: rgba(245, 158, 11, 0.16);
+
+  /* Sidebar */
+  --admin-sidebar-bg: #0e1b2b;
+  --admin-sidebar-border: rgba(148, 163, 184, 0.14);
+  --admin-sidebar-fg: rgba(226, 232, 240, 0.78);
+  --admin-sidebar-fg-muted: rgba(226, 232, 240, 0.56);
+  --admin-sidebar-fg-active: #ffffff;
+  --admin-sidebar-hover: rgba(226, 232, 240, 0.08);
+  --admin-sidebar-active: rgba(226, 232, 240, 0.12);
+  --admin-sidebar-accent: var(--admin-primary);
+  --admin-sidebar-w: 240px;
+  --admin-sidebar-w-collapsed: 72px;
+
+  /* Radius + shadow */
+  --admin-radius-sm: 0.5rem; /* 8px (buttons/inputs) */
+  --admin-radius-md: 0.75rem; /* 12px (card/dropdown/modal) */
+  --admin-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);
+  --admin-shadow-md: 0 12px 32px rgba(15, 23, 42, 0.14);
+
+  /* Density */
+  --admin-page-max: 1320px;
+  --admin-page-px: 1.5rem; /* 24px */
+  --admin-page-py: 1.5rem; /* 24px */
+  --admin-card-p: 1rem; /* 16px */
+  --admin-stack-gap: 1rem; /* 16px */
+  --admin-control-sm: 2.25rem; /* 36px */
+  --admin-control-md: 2.5rem; /* 40px */
+  --admin-control-lg: 2.75rem; /* 44px */
+  --admin-topbar-h: 3.5rem; /* 56px */
+
+  /* A11y */
+  --admin-focus: rgba(234, 84, 63, 0.28);
+}
+
+:where(.admin-shell) {
+  font-family: var(--admin-font-sans);
+  line-height: var(--admin-leading);
+  background: var(--admin-bg);
+  color: var(--admin-fg);
+}
+
+:where(.admin-shell) .admin-sidebar[data-variant='static'] {
+  width: var(--admin-sidebar-w);
+  transition: width 160ms ease;
+}
+
+:where(.admin-shell) .admin-sidebar[data-variant='static'].is-collapsed {
+  width: var(--admin-sidebar-w-collapsed);
+}
+
+:where(.admin-shell) .admin-sidebar[data-variant='static'].is-collapsed .admin-sidebar-label {
+  display: none;
+}
+
+:where(.admin-shell) .admin-sidebar[data-variant='static'].is-collapsed a[data-admin-close-sidebar] {
+  justify-content: center;
+}
+
+/* Baseline focus ring: consistent, visible, keyboard-only. */
+:where(.admin-shell) :focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--admin-focus);
+  border-radius: calc(var(--admin-radius-sm) + 2px);
+}
+
+/* Selection baseline to keep contrast sane. */
+:where(.admin-shell) ::selection {
+  background: var(--admin-primary-soft);
+}

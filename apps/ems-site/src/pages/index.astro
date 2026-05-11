@@ -1,0 +1,44 @@
+---
+export const prerender = false;
+
+import EmsLayout from '../layouts/EmsLayout.astro';
+import HeroBanner from '../components/common/HeroBanner.astro';
+import ServicesSection from '../components/ems/ServicesSection.astro';
+import QualityControlSection from '../components/ems/QualityControlSection.astro';
+import CertificationSection from '../components/ems/CertificationSection.astro';
+import IndustrySection from '../components/common/IndustrySection.astro';
+import EquipmentSection from '../components/ems/EquipmentSection.astro';
+import WhyChooseUsSection from '../components/ems/WhyChooseUsSection.astro';
+// import OrderProcessSection from '../components/ems/OrderProcessSection.astro';
+import FaqSection from '../components/common/FaqSection.astro';
+import QuoteFormSection from '../components/common/QuoteFormSection.astro';
+import { emsHomeDefaults } from '../content/defaults/ems';
+import { normalizeEmsHomeContentJson } from '../content/normalize/ems';
+import { createSupabaseClient } from '../lib/supabase/client';
+import { mergeSectionFallback } from '../lib/supabase/mappers';
+import { getPublishedPageBundleBySlug } from '../lib/supabase/queries';
+
+const slug = Astro.url.pathname;
+
+const supabase = createSupabaseClient();
+const bundle = supabase ? await getPublishedPageBundleBySlug(supabase, slug) : null;
+
+const contentJson = bundle?.content?.content_json ?? null;
+const data = normalizeEmsHomeContentJson(mergeSectionFallback(emsHomeDefaults as any, contentJson) as any) as any;
+
+const title = bundle?.seo?.meta_title ?? 'EMS Home | RapidDirect';
+const description = bundle?.seo?.meta_description ?? 'RapidDirect EMS landing page under /ems/.';
+---
+
+<EmsLayout title={title} description={description}>
+  <HeroBanner data={data.hero} />
+  <ServicesSection data={data.services} />
+  <QualityControlSection data={data.quality} />
+  <CertificationSection data={data.certification} />
+  <IndustrySection data={data.industry} />
+  <EquipmentSection data={data.equipment} />
+  <WhyChooseUsSection data={data.why_choose_us} />
+  {/* <OrderProcessSection data={data.order_process} /> */}
+  <FaqSection data={data.faq} />
+  <QuoteFormSection data={data.quote_form} />
+</EmsLayout>

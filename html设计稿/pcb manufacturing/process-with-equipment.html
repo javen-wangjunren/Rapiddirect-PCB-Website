@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PCB Manufacturing - Interactive Slider</title>
+<style>
+    :root {
+        --primary-color: #ef533f;
+        --primary-hover: #d64734;
+        --bg-color: #faf5f5; /* 浅底色 */
+        --card-bg: #ffffff;
+        --text-dark: #1a1a1a;
+        --text-gray: #555555;
+        --border-color: #eaeaea;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    .slider-section {
+        background-color: var(--bg-color);
+        padding: 80px 20px;
+    }
+
+    .slider-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: var(--card-bg);
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+        overflow: hidden;
+    }
+
+    /* 顶部标题区 */
+    .slider-header {
+        padding: 50px 50px 30px;
+        text-align: center;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .slider-header h2 {
+        font-size: 32px;
+        color: var(--text-dark);
+        margin-bottom: 12px;
+        font-weight: 800;
+    }
+
+    .slider-header p {
+        color: var(--text-gray);
+        font-size: 16px;
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    /* 导航栏 (Tabs) */
+    .slider-nav {
+        display: flex;
+        background-color: #fcfcfc;
+        border-bottom: 1px solid var(--border-color);
+        overflow-x: auto; /* 移动端支持横向滑动 */
+        scrollbar-width: none; /* 隐藏滚动条 Firefox */
+    }
+    
+    .slider-nav::-webkit-scrollbar {
+        display: none; /* 隐藏滚动条 Chrome/Safari */
+    }
+
+    .nav-item {
+        flex: 1;
+        min-width: 160px;
+        padding: 20px 15px;
+        text-align: center;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text-gray);
+        position: relative;
+        transition: all 0.3s ease;
+        border-right: 1px solid var(--border-color);
+    }
+
+    .nav-item:last-child {
+        border-right: none;
+    }
+
+    .nav-item::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background-color: transparent;
+        transition: background-color 0.3s ease;
+    }
+
+    .nav-item:hover {
+        background-color: #ffffff;
+        color: var(--primary-color);
+    }
+
+    .nav-item.active {
+        background-color: #ffffff;
+        color: var(--primary-color);
+    }
+
+    .nav-item.active::after {
+        background-color: var(--primary-color);
+    }
+
+    /* 内容展示区 */
+    .slider-content-wrapper {
+        position: relative;
+        min-height: 480px;
+    }
+
+    .content-panel {
+        display: none;
+        padding: 50px;
+        animation: fadeIn 0.5s ease;
+    }
+
+    .content-panel.active {
+        display: flex;
+        gap: 50px;
+        align-items: center;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 左侧视觉区 (图/视频) */
+    .visual-area {
+        flex: 1.2;
+    }
+
+    .visual-placeholder {
+        width: 100%;
+        height: 380px;
+        background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #64748b;
+        font-weight: 600;
+        font-size: 16px;
+        box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* 右侧详情区 */
+    .details-area {
+        flex: 1;
+    }
+
+    .stage-label {
+        display: inline-block;
+        padding: 6px 12px;
+        background-color: rgba(239, 83, 63, 0.1);
+        color: var(--primary-color);
+        border-radius: 4px;
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 16px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .details-area h3 {
+        font-size: 28px;
+        color: var(--text-dark);
+        margin-bottom: 20px;
+        line-height: 1.2;
+    }
+
+    /* 子步骤列表 */
+    .sub-steps {
+        list-style: none;
+        margin-bottom: 30px;
+    }
+
+    .sub-steps li {
+        position: relative;
+        padding-left: 30px;
+        margin-bottom: 16px;
+        font-size: 15px;
+        color: var(--text-gray);
+        line-height: 1.5;
+    }
+
+    .sub-steps li::before {
+        content: '✓';
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 20px;
+        height: 20px;
+        background-color: var(--primary-color);
+        color: #ffffff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .sub-steps li strong {
+        color: var(--text-dark);
+    }
+
+    /* 机器/质量参数小卡片 */
+    .spec-box {
+        background-color: #f8f9fa;
+        border: 1px solid var(--border-color);
+        padding: 16px 20px;
+        border-radius: 8px;
+        border-left: 4px solid var(--primary-color);
+    }
+
+    .spec-box h5 {
+        font-size: 14px;
+        color: var(--text-dark);
+        margin-bottom: 6px;
+    }
+
+    .spec-box p {
+        font-size: 13px;
+        color: var(--text-gray);
+        margin: 0;
+    }
+
+    /* =========================================
+       移动端响应式
+       ========================================= */
+    @media (max-width: 900px) {
+        .slider-header { padding: 40px 20px 20px; }
+        
+        .content-panel.active {
+            flex-direction: column; /* 手机端上下堆叠 */
+            padding: 30px 20px;
+            gap: 30px;
+        }
+
+        .visual-area, .details-area { width: 100%; }
+        .visual-placeholder { height: 260px; }
+        .details-area h3 { font-size: 24px; }
+    }
+</style>
+</head>
+<body>
+
+<section class="slider-section">
+    <div class="slider-container">
+        
+        <div class="slider-header">
+            <h2>Precision PCB Manufacturing Process</h2>
+            <p>Explore our streamlined 5-stage production flow. We consolidate 14 complex sub-processes into a highly controlled, automated ecosystem.</p>
+        </div>
+
+        <div class="slider-nav">
+            <div class="nav-item active" data-target="panel-1">01. Pre-Production</div>
+            <div class="nav-item" data-target="panel-2">02. Inner Layer</div>
+            <div class="nav-item" data-target="panel-3">03. Outer Layer</div>
+            <div class="nav-item" data-target="panel-4">04. Solder Mask & Finish</div>
+            <div class="nav-item" data-target="panel-5">05. Testing & QC</div>
+        </div>
+
+        <div class="slider-content-wrapper">
+            
+            <div class="content-panel active" id="panel-1">
+                <div class="visual-area">
+                    <div class="visual-placeholder">
+                        [ Image/Video: Engineering & DFM Software ]
+                    </div>
+                </div>
+                <div class="details-area">
+                    <span class="stage-label">Stage 01</span>
+                    <h3>Design Validation & Substrate Prep</h3>
+                    <ul class="sub-steps">
+                        <li><strong>DFM Check:</strong> Engineering review of Gerber files to prevent manufacturability issues.</li>
+                        <li><strong>Material Selection:</strong> Selecting premium Shengyi/Rogers Copper Clad Laminates (CCL).</li>
+                        <li><strong>Substrate Baking:</strong> Baking boards to remove moisture and prevent delamination.</li>
+                    </ul>
+                    <div class="spec-box">
+                        <h5>Quality Control Checkpoint</h5>
+                        <p>100% automated DRC (Design Rule Checking) before any physical material is cut.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-panel" id="panel-2">
+                <div class="visual-area">
+                    <div class="visual-placeholder">
+                        [ Image/Video: LDI Machine or Etching Line ]
+                    </div>
+                </div>
+                <div class="details-area">
+                    <span class="stage-label">Stage 02</span>
+                    <h3>Inner Layer Core Formation</h3>
+                    <ul class="sub-steps">
+                        <li><strong>LDI Printing:</strong> Laser Direct Imaging transfers the circuit pattern onto photoresist.</li>
+                        <li><strong>UV Exposure:</strong> Hardening the desired circuit paths under precision UV light.</li>
+                        <li><strong>Etching & Stripping:</strong> Removing unwanted copper to reveal the bare inner circuitry.</li>
+                    </ul>
+                    <div class="spec-box">
+                        <h5>Key Equipment</h5>
+                        <p>Orbotech LDI Systems (Achieving 2mil/2mil min trace/space).</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-panel" id="panel-3">
+                <div class="visual-area">
+                    <div class="visual-placeholder">
+                        [ Image/Video: CNC Drilling / Lamination Press ]
+                    </div>
+                </div>
+                <div class="details-area">
+                    <span class="stage-label">Stage 03</span>
+                    <h3>Lamination, Drilling & Plating</h3>
+                    <ul class="sub-steps">
+                        <li><strong>Lamination:</strong> Pressing inner layers with prepreg under high temperature and vacuum.</li>
+                        <li><strong>CNC Drilling:</strong> High-speed mechanical and laser drilling for vias.</li>
+                        <li><strong>Copper Plating:</strong> Electroless plating to metalize hole walls for layer interconnection.</li>
+                    </ul>
+                    <div class="spec-box">
+                        <h5>Precision Metrics</h5>
+                        <p>Drill hole position accuracy within ±0.05mm. Aspect ratio up to 12:1.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-panel" id="panel-4">
+                <div class="visual-area">
+                    <div class="visual-placeholder">
+                        [ Image/Video: Surface Finish Process (ENIG) ]
+                    </div>
+                </div>
+                <div class="details-area">
+                    <span class="stage-label">Stage 04</span>
+                    <h3>Solder Mask & Surface Finishing</h3>
+                    <ul class="sub-steps">
+                        <li><strong>Solder Mask:</strong> Applying liquid photoimageable (LPI) mask to protect traces from oxidation.</li>
+                        <li><strong>Silkscreen:</strong> Printing component designators and logos.</li>
+                        <li><strong>Surface Finish:</strong> Applying ENIG, HASL, or OSP to exposed pads for optimal solderability.</li>
+                    </ul>
+                    <div class="spec-box">
+                        <h5>Compliance</h5>
+                        <p>All surface finishes are 100% RoHS compliant and lead-free.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-panel" id="panel-5">
+                <div class="visual-area">
+                    <div class="visual-placeholder">
+                        [ Image/Video: Flying Probe / AOI Machine ]
+                    </div>
+                </div>
+                <div class="details-area">
+                    <span class="stage-label">Stage 05</span>
+                    <h3>Final Inspection & Testing</h3>
+                    <ul class="sub-steps">
+                        <li><strong>AOI & X-Ray:</strong> Automated Optical Inspection for surface defects; X-ray for internal via checks.</li>
+                        <li><strong>Electrical Testing:</strong> Flying probe or bed-of-nails testing for shorts and opens.</li>
+                        <li><strong>Final Routing & QA:</strong> V-scoring, routing to final dimensions, and vacuum packaging.</li>
+                    </ul>
+                    <div class="spec-box">
+                        <h5>Delivery Guarantee</h5>
+                        <p>100% electrically tested. Delivered with comprehensive outgoing quality control (OQC) reports.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const navItems = document.querySelectorAll('.nav-item');
+        const panels = document.querySelectorAll('.content-panel');
+
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                // 1. 移除所有 nav-item 的 active 状态
+                navItems.forEach(nav => nav.classList.remove('active'));
+                // 2. 为当前点击的 nav-item 添加 active 状态
+                this.classList.add('active');
+
+                // 3. 获取目标面板 ID
+                const targetId = this.getAttribute('data-target');
+
+                // 4. 移除所有面板的 active 状态 (隐藏它们)
+                panels.forEach(panel => panel.classList.remove('active'));
+                
+                // 5. 显示目标面板
+                document.getElementById(targetId).classList.add('active');
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

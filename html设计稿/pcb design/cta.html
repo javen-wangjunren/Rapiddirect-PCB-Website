@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Final CTA - PCB Design</title>
+<style>
+    :root {
+        --primary-color: #ef533f;
+        --primary-hover: #d64734;
+        --bg-dark: #0a0b0d; /* 极深色背景 */
+        --text-light: #ffffff;
+        --text-muted: #94a3b8;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    .final-cta-section {
+        background-color: var(--bg-dark);
+        padding: 120px 20px;
+        position: relative;
+        overflow: hidden;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* 科技感背景光晕装饰 */
+    .final-cta-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 800px;
+        height: 800px;
+        background: radial-gradient(circle, rgba(239, 83, 63, 0.1) 0%, rgba(10, 11, 13, 0) 70%);
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    /* 模拟工程图纸的细微网格背景 */
+    .final-cta-section::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: 
+            linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        background-size: 40px 40px;
+        z-index: 0;
+        pointer-events: none;
+    }
+
+    .container {
+        max-width: 900px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 2; /* 确保内容在光晕和网格之上 */
+    }
+
+    /* --- 标题与文案 --- */
+    .cta-title {
+        font-size: 48px;
+        font-weight: 800;
+        color: var(--text-light);
+        margin-bottom: 24px;
+        letter-spacing: -1px;
+        line-height: 1.2;
+    }
+
+    .cta-title span {
+        color: var(--primary-color);
+    }
+
+    .cta-desc {
+        font-size: 18px;
+        color: var(--text-muted);
+        line-height: 1.6;
+        margin-bottom: 48px;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* --- 双轨按钮区 (Dual Buttons) --- */
+    .btn-group {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+
+    /* 主按钮：开始项目 */
+    .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background-color: var(--primary-color);
+        color: #ffffff;
+        text-decoration: none;
+        padding: 18px 40px;
+        border-radius: 50px;
+        font-size: 18px;
+        font-weight: 700;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 25px rgba(239, 83, 63, 0.25);
+    }
+
+    .btn-primary:hover {
+        background-color: var(--primary-hover);
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(239, 83, 63, 0.35);
+    }
+
+    /* 次按钮：联系工程师 */
+    .btn-outline {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background-color: transparent;
+        color: #ffffff;
+        text-decoration: none;
+        padding: 18px 40px;
+        border-radius: 50px;
+        font-size: 18px;
+        font-weight: 700;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline:hover {
+        border-color: #ffffff;
+        background-color: rgba(255, 255, 255, 0.05);
+        transform: translateY(-3px);
+    }
+
+    /* --- 信任打底标签 (Trust Badges) --- */
+    .trust-badges {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 30px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding-top: 30px;
+    }
+
+    .trust-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #cbd5e1;
+    }
+
+    .trust-item svg {
+        color: var(--primary-color);
+        width: 18px;
+        height: 18px;
+    }
+
+    /* --- 移动端自适应 --- */
+    @media (max-width: 768px) {
+        .final-cta-section { padding: 80px 20px; }
+        .cta-title { font-size: 36px; }
+        .btn-group { flex-direction: column; gap: 16px; }
+        .btn-primary, .btn-outline { width: 100%; justify-content: center; padding: 16px 20px; }
+        .trust-badges { gap: 15px; flex-direction: column; align-items: center; }
+    }
+</style>
+</head>
+<body>
+
+<section class="final-cta-section">
+    <div class="container">
+        
+        <h2 class="cta-title">Ready to Turn Your PCB Design into <span>Reality?</span></h2>
+        <p class="cta-desc">Upload your Gerber files for a free DFM check and get a detailed quote within 2 hours. Have a complex project? Our senior engineers are on standby to discuss your specific requirements.</p>
+        
+        <div class="btn-group">
+            <a href="#start-project" class="btn-primary">
+                Start Your Project
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </a>
+            
+            <a href="#contact-engineer" class="btn-outline">
+                Talk to an Engineer
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            </a>
+        </div>
+
+        <div class="trust-badges">
+            <div class="trust-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                Strict NDA Protection
+            </div>
+            <div class="trust-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                100% Free DFM Check
+            </div>
+            <div class="trust-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                Quote Within 2 Hours
+            </div>
+        </div>
+
+    </div>
+</section>
+
+</body>
+</html>

@@ -1,0 +1,50 @@
+---
+import type { EmsHomeWhyChooseUsContent } from '../../types/ems-home';
+import { getAssetPath } from '../../lib/assets';
+
+export interface Props {
+  data: EmsHomeWhyChooseUsContent;
+}
+
+const { data } = Astro.props;
+---
+
+<section class="bg-white py-16 sm:py-20">
+  <div class="mx-auto max-w-[1679px] px-6">
+    <div class="mx-auto max-w-4xl text-center">
+      <h2 class="text-4xl font-semibold leading-[72px] tracking-[0.12px] text-black sm:text-5xl">
+        {data.heading_prefix} <span class="text-[#ea543f]">{data.heading_highlight}</span>
+      </h2>
+      <p class="mt-8 text-2xl font-semibold leading-9 tracking-[0.4px] text-black">
+        {data.sub_heading}
+      </p>
+      <p class="mx-auto mt-5 max-w-5xl text-base leading-7 text-slate-700 sm:text-lg">
+        {data.description}
+      </p>
+    </div>
+
+    <div class="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-3">
+      {data.cards.map((card, idx) => (
+        <article
+          class:list={[
+            'rounded-3xl border-2 bg-white p-8 shadow-[0_10px_15px_-3px_rgba(0,0,0,0.10),0_4px_6px_-4px_rgba(0,0,0,0.10)]',
+            idx === 1 ? 'border-[#ea543f] shadow-[0_0_15px_-4px_rgba(234,84,63,0.70)]' : 'border-slate-200'
+          ]}
+        >
+          <div class:list={['flex h-12 w-12 items-center justify-center rounded-2xl', idx === 1 ? 'bg-[#ea543f]/20' : 'bg-slate-200']}>
+            <img src={getAssetPath(card.icon_url)} alt="" class="h-6 w-6" />
+          </div>
+
+          <h3 class="mt-6 text-2xl font-semibold leading-8 tracking-[0.07px] text-slate-900">
+            {card.title}
+          </h3>
+
+          <div class="mt-5 border-t border-slate-200 pt-5">
+            <p class="text-base leading-8 text-black">{card.description}</p>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+

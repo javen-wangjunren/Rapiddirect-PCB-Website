@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Services & Sourcing Capabilities - Classic Layered</title>
+<style>
+    :root {
+        --primary-color: #ef533f;
+        --primary-hover: #d64734;
+        --primary-light: #fff0ed;
+        --bg-light: #F5F5F5;
+        --card-bg: #ffffff;
+        --text-dark: #1a1a1a;
+        --text-gray: #666666;
+        --border-color: #e5e7eb;
+        --img-placeholder-bg: #e2e8f0;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    .sourcing-section {
+        background-color: var(--bg-light);
+        padding: 100px 20px;
+    }
+
+    .container {
+        max-width: 1280px;
+        margin: 0 auto;
+    }
+
+    /* =========================================
+       1. 模块总标题
+       ========================================= */
+    .section-header {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+
+    .section-header h2 {
+        font-size: 36px;
+        font-weight: 800;
+        color: var(--text-dark);
+        margin-bottom: 16px;
+        letter-spacing: -0.5px;
+    }
+
+    .section-header p {
+        font-size: 18px;
+        color: var(--text-gray);
+        max-width: 750px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    /* 子模块通用标题 */
+    .sub-header {
+        margin-bottom: 30px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .sub-header h3 {
+        font-size: 24px;
+        font-weight: 800;
+        color: var(--text-dark);
+    }
+    
+    .sub-header::after {
+        content: '';
+        flex-grow: 1;
+        height: 1px;
+        background-color: var(--border-color);
+        margin-left: 10px;
+    }
+
+    /* 通用图片占位符样式 */
+    .img-placeholder {
+        width: 100%;
+        height: 100%;
+        background-color: var(--img-placeholder-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #64748b;
+        font-size: 13px;
+        font-weight: 600;
+        text-align: center;
+        padding: 10px;
+        position: relative;
+    }
+
+    .img-placeholder img {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        object-fit: contain; /* Logo用contain，实景图用cover */
+        opacity: 0; /* 替换为真图时把这个删掉 */
+    }
+
+    /* =========================================
+       层级 1：核心服务区 (4列文字卡片)
+       ========================================= */
+    .core-services-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+        margin-bottom: 80px;
+    }
+
+    .service-card {
+        background: var(--card-bg);
+        border-radius: 12px;
+        padding: 32px 24px;
+        border: 1px solid transparent;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        transition: all 0.3s ease;
+    }
+
+    .service-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+        border-color: var(--primary-color);
+    }
+
+    .card-icon {
+        width: 40px;
+        height: 40px;
+        color: var(--primary-color);
+        margin-bottom: 20px;
+    }
+
+    .service-card h4 {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 12px;
+    }
+
+    .service-card p {
+        font-size: 14px;
+        color: var(--text-gray);
+        line-height: 1.6;
+    }
+
+    /* =========================================
+       层级 2：元器件品类 (实景图文卡片)
+       ========================================= */
+    .categories-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr); /* 3列2行排版照片最大气 */
+        gap: 24px;
+        margin-bottom: 80px;
+    }
+
+    .category-card {
+        background: var(--card-bg);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        border: 1px solid var(--border-color);
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .category-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+        border-color: #d1d5db;
+    }
+
+    .category-img {
+        height: 160px; /* 控制图片高度 */
+        background-color: var(--img-placeholder-bg);
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* 当有了真实图片后，鼠标悬停图片微放大效果 */
+    .category-card:hover .category-img img {
+        transform: scale(1.05);
+        transition: transform 0.5s ease;
+    }
+
+    .category-info {
+        padding: 20px;
+        text-align: center;
+        background: var(--card-bg);
+    }
+
+    .category-info h4 {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-dark);
+    }
+
+    /* =========================================
+       层级 3：渠道与品牌墙 (图文分栏)
+       ========================================= */
+    .supply-brand-layout {
+        display: flex;
+        gap: 30px;
+        align-items: stretch;
+    }
+
+    /* 左侧：渠道优势 (文本+列表) */
+    .supply-chain-panel {
+        flex: 0 0 35%;
+        background: var(--card-bg);
+        border-radius: 16px;
+        padding: 40px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+    }
+
+    .supply-chain-panel h4 {
+        font-size: 20px;
+        font-weight: 800;
+        margin-bottom: 24px;
+        color: var(--text-dark);
+    }
+
+    .channel-list {
+        list-style: none;
+    }
+
+    .channel-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .channel-list li:last-child {
+        margin-bottom: 0;
+    }
+
+    .channel-icon {
+        color: #10b981; /* 绿色认证标 */
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+
+    .channel-text strong {
+        display: block;
+        font-size: 16px;
+        color: var(--text-dark);
+        margin-bottom: 4px;
+    }
+
+    .channel-text span {
+        font-size: 14px;
+        color: var(--text-gray);
+        line-height: 1.5;
+    }
+
+    /* 右侧：品牌 Logo 墙 */
+    .brand-wall-panel {
+        flex: 1;
+        background: var(--card-bg);
+        border-radius: 16px;
+        padding: 40px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .brand-wall-panel h4 {
+        font-size: 20px;
+        font-weight: 800;
+        margin-bottom: 24px;
+        color: var(--text-dark);
+    }
+
+    .brands-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr); /* 4列排列品牌Logo */
+        gap: 16px;
+        flex-grow: 1;
+    }
+
+    .logo-item {
+        height: 80px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        background-color: #ffffff;
+        overflow: hidden;
+    }
+
+    .logo-item:hover {
+        border-color: var(--primary-color);
+        box-shadow: 0 4px 15px rgba(239, 83, 63, 0.1);
+        transform: translateY(-2px);
+    }
+
+    /* =========================================
+       移动端适配
+       ========================================= */
+    @media (max-width: 1024px) {
+        .core-services-grid { grid-template-columns: repeat(2, 1fr); }
+        .categories-grid { grid-template-columns: repeat(2, 1fr); }
+        .supply-brand-layout { flex-direction: column; }
+        .supply-chain-panel, .brand-wall-panel { width: 100%; }
+        .brands-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 640px) {
+        .core-services-grid { grid-template-columns: 1fr; }
+        .categories-grid { grid-template-columns: 1fr; }
+        .brands-grid { grid-template-columns: repeat(2, 1fr); }
+        .supply-chain-panel { padding: 30px 20px; }
+        .brand-wall-panel { padding: 30px 20px; }
+    }
+</style>
+</head>
+<body>
+
+<section class="sourcing-section">
+    <div class="container">
+        
+        <div class="section-header">
+            <h2>Our Services & Sourcing Capabilities</h2>
+            <p>One-stop electronic components sourcing supporting full BOM, small batches, and mass production.</p>
+        </div>
+
+        <div class="core-services-grid">
+            <div class="service-card">
+                <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                <h4>Full BOM Sourcing</h4>
+                <p>End-to-end BOM procurement, supporting loose parts, turnkey assembly, samples, and mass production seamlessly.</p>
+            </div>
+
+            <div class="service-card">
+                <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                <h4>Alternative Components</h4>
+                <p>Professional cross-reference matching and drop-in replacement suggestions to avoid delays and save costs.</p>
+            </div>
+
+            <div class="service-card">
+                <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                <h4>Cost-down Solutions</h4>
+                <p>Multi-channel price comparison and structural BOM optimization to drastically reduce your overall material costs.</p>
+            </div>
+
+            <div class="service-card">
+                <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <h4>Shortage & Obsolete</h4>
+                <p>Global sourcing network to quickly locate allocated, obsolete, and hard-to-find electronic components.</p>
+            </div>
+        </div>
+
+        <div class="sub-header">
+            <h3>Components We Source</h3>
+        </div>
+        
+        <div class="categories-grid">
+            
+            <div class="category-card">
+                <div class="category-img">
+                    <div class="img-placeholder">
+                        [ Image: Integrated Circuits / Microchips ]
+                        </div>
+                </div>
+                <div class="category-info">
+                    <h4>Integrated Circuits (IC)</h4>
+                </div>
+            </div>
+
+            <div class="category-card">
+                <div class="category-img">
+                    <div class="img-placeholder">
+                        [ Image: Resistors, Capacitors, Inductors ]
+                        </div>
+                </div>
+                <div class="category-info">
+                    <h4>Resistors, Capacitors, Inductors</h4>
+                </div>
+            </div>
+
+            <div class="category-card">
+                <div class="category-img">
+                    <div class="img-placeholder">
+                        [ Image: Connectors & Terminals ]
+                        </div>
+                </div>
+                <div class="category-info">
+                    <h4>Connectors</h4>
+                </div>
+            </div>
+
+            <div class="category-card">
+                <div class="category-img">
+                    <div class="img-placeholder">
+                        [ Image: Electronic Sensors ]
+                        </div>
+                </div>
+                <div class="category-info">
+                    <h4>Sensors</h4>
+                </div>
+            </div>
+
+            <div class="category-card">
+                <div class="category-img">
+                    <div class="img-placeholder">
+                        [ Image: Diodes & Transistors ]
+                        </div>
+                </div>
+                <div class="category-info">
+                    <h4>Diodes & Transistors</h4>
+                </div>
+            </div>
+
+            <div class="category-card">
+                <div class="category-img">
+                    <div class="img-placeholder">
+                        [ Image: PCB Related Components ]
+                        </div>
+                </div>
+                <div class="category-info">
+                    <h4>PCB Related Components</h4>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="sub-header">
+            <h3>Authorized Supply Chain & Brands</h3>
+        </div>
+
+        <div class="supply-brand-layout">
+            
+            <div class="supply-chain-panel">
+                <h4>Global Trusted Network</h4>
+                <ul class="channel-list">
+                    <li>
+                        <svg class="channel-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                        <div class="channel-text">
+                            <strong>Authorized Manufacturers (OEM)</strong>
+                            <span>Direct sourcing from original factories for absolute authenticity.</span>
+                        </div>
+                    </li>
+                    <li>
+                        <svg class="channel-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                        <div class="channel-text">
+                            <strong>Tier-1 Distributors</strong>
+                            <span>Partnered with global franchised distributors like Digi-Key, Mouser, and Arrow.</span>
+                        </div>
+                    </li>
+                    <li>
+                        <svg class="channel-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                        <div class="channel-text">
+                            <strong>Verified Spot Market</strong>
+                            <span>Rigorous vendor auditing to source shortage parts safely.</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="brand-wall-panel">
+                <h4>Brands We Support</h4>
+                <div class="brands-grid">
+                    
+                    <div class="logo-item">
+                        <div class="img-placeholder">
+                            [ Logo: Texas Instruments ]
+                            </div>
+                    </div>
+                    
+                    <div class="logo-item">
+                        <div class="img-placeholder">
+                            [ Logo: STMicroelectronics ]
+                            </div>
+                    </div>
+
+                    <div class="logo-item">
+                        <div class="img-placeholder">
+                            [ Logo: Infineon ]
+                            </div>
+                    </div>
+
+                    <div class="logo-item">
+                        <div class="img-placeholder">
+                            [ Logo: NXP ]
+                            </div>
+                    </div>
+
+                    <div class="logo-item">
+                        <div class="img-placeholder">
+                            [ Logo: Analog Devices ]
+                            </div>
+                    </div>
+
+                    <div class="logo-item">
+                        <div class="img-placeholder">
+                            [ Logo: Microchip ]
+                        </div>
+                    </div>
+
+                    <div class="logo-item">
+                        <div class="img-placeholder">
+                            [ Logo: ON Semiconductor ]
+                        </div>
+                    </div>
+
+                    <div class="logo-item" style="background-color: var(--img-placeholder-bg); display:flex; align-items:center; justify-content:center; color:#64748b; font-weight:700; font-size:14px; text-align:center;">
+                        + 500<br>More Brands
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+</body>
+</html>

@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PCB Design Workflow - Dynamic Console</title>
+<style>
+    :root {
+        --primary-color: #ef533f;
+        --primary-hover: #d64734;
+        --bg-light: #F5F5F5;
+        --text-dark: #1a1a1a;
+        --text-gray: #555555;
+        --border-color: #e5e7eb;
+        
+        /* 各阶段专属柔和背景色  */
+        --bg-idea: #F5F0FF; /* 柔和浅紫 [cite: 21] */
+        --bg-design: #F0FFF0; /* 柔和浅绿 [cite: 24] */
+        --bg-validation: #F0F8FF; /* 柔和浅蓝 [cite: 27] */
+        --bg-gerber: #FFFFFF; /* 纯白/浅灰 [cite: 30] */
+        --bg-mfg: #111111; /* 深色转化区 */
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    .workflow-section {
+        background-color: var(--bg-light);
+        padding: 80px 20px;
+        color: var(--text-dark);
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    /* =========================================
+       1. 模块标题 [cite: 4, 5]
+       ========================================= */
+    .section-header {
+        text-align: center;
+        margin-bottom: 50px;
+    }
+
+    .section-header h2 {
+        font-size: 36px;
+        font-weight: 800;
+        margin-bottom: 12px;
+        letter-spacing: -1px;
+    }
+
+    .section-header p {
+        font-size: 16px;
+        color: var(--text-gray);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    /* =========================================
+       2. 顶部阶段导航条 [cite: 12, 13]
+       ========================================= */
+    .workflow-nav {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 40px;
+        flex-wrap: wrap;
+    }
+
+    .nav-btn {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        padding: 12px 24px;
+        border-radius: 50px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        color: var(--text-gray);
+        transition: all 0.3s ease;
+        white-space: nowrap;
+    }
+
+    /* 模拟 Altium 的黑底白字高亮态 [cite: 13, 14] */
+    .nav-btn.active {
+        background: #000000;
+        color: #ffffff;
+        border-color: #000000;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .nav-divider {
+        width: 40px;
+        height: 1px;
+        background: var(--border-color);
+    }
+
+    @media (max-width: 768px) {
+        .nav-divider { display: none; }
+    }
+
+    /* =========================================
+       3. 主体详情卡片 (双栏结构) [cite: 11, 16]
+       ========================================= */
+    .console-wrapper {
+        position: relative;
+        min-height: 500px;
+        border-radius: 24px;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.03);
+        transition: background-color 0.5s ease; /* 背景平滑过渡 [cite: 15] */
+    }
+
+    .stage-card {
+        display: none; /* 默认隐藏 */
+        padding: 60px;
+        animation: fadeIn 0.4s ease forwards;
+    }
+
+    .stage-card.active {
+        display: flex;
+        gap: 60px;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 左侧：阶段视觉区 [cite: 16, 18] */
+    .card-left {
+        flex: 0 0 35%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .card-left h3 {
+        font-size: 32px;
+        font-weight: 800;
+        margin-bottom: 24px;
+    }
+
+    .visual-placeholder {
+        width: 100%;
+        aspect-ratio: 1/1;
+        background: rgba(0,0,0,0.03);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        color: #94a3b8;
+    }
+
+    /* 右侧：详细步骤区 [cite: 16, 19] */
+    .card-right {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 40px;
+    }
+
+    .step-block {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .step-tag {
+        display: inline-block;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--primary-color);
+        background: rgba(239, 83, 63, 0.1);
+        padding: 4px 12px;
+        border-radius: 50px;
+        width: fit-content;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .step-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text-dark);
+    }
+
+    .step-desc {
+        font-size: 15px;
+        color: var(--text-gray);
+        line-height: 1.6;
+    }
+
+    /* =========================================
+       4. 特殊阶段：Manufacturing (CTA) [cite: 32, 34]
+       ========================================= */
+    #stage-mfg {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 100px 40px;
+    }
+
+    #stage-mfg h3 { color: #ffffff; margin-bottom: 16px; }
+    #stage-mfg p { color: #aaaaaa; max-width: 650px; margin-bottom: 32px; font-size: 17px; }
+
+    .cta-btn {
+        background-color: var(--primary-color);
+        color: #ffffff;
+        text-decoration: none;
+        padding: 18px 48px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 20px rgba(239, 83, 63, 0.2);
+    }
+
+    .cta-btn:hover {
+        background-color: var(--primary-hover);
+        transform: translateY(-2px);
+    }
+
+    /* =========================================
+       移动端适配
+       ========================================= */
+    @media (max-width: 992px) {
+        .stage-card.active { flex-direction: column; padding: 40px 30px; }
+        .card-left { flex: none; margin-bottom: 40px; text-align: center; }
+        .visual-placeholder { height: 200px; }
+    }
+</style>
+</head>
+<body>
+
+<section class="workflow-section">
+    <div class="container">
+        
+        <div class="section-header">
+            <h2>PCB Design Workflow</h2>
+            <p>From Idea to Production, Every Step Standardized & Transparent.</p>
+        </div>
+
+        <nav class="workflow-nav">
+            <button class="nav-btn active" data-target="stage-idea">Idea</button>
+            <div class="nav-divider"></div>
+            <button class="nav-btn" data-target="stage-design">PCB Design</button>
+            <div class="nav-divider"></div>
+            <button class="nav-btn" data-target="stage-validation">Validation & Sim</button>
+            <div class="nav-divider"></div>
+            <button class="nav-btn" data-target="stage-gerber">Gerber Output</button>
+            <div class="nav-divider"></div>
+            <button class="nav-btn" data-target="stage-mfg">Manufacturing</button>
+        </nav>
+
+        <div class="console-wrapper" id="console-box" style="background-color: var(--bg-idea);">
+            
+            <div class="stage-card active" id="stage-idea" data-bg="var(--bg-idea)">
+                <div class="card-left">
+                    <h3>Idea & Definition</h3>
+                    <div class="visual-placeholder">[ Image: Requirement Alignment ]</div>
+                </div>
+                <div class="card-right">
+                    <div class="step-block">
+                        <span class="step-tag">Step 1</span>
+                        <h4 class="step-title">Project Requirement & Alignment</h4>
+                        <p class="step-desc">与客户深度对齐项目目标、应用场景、性能指标、成本与交期要求，输出《项目需求规格书》，明确关键约束，确保设计方向100%匹配客户需求 [cite: 22]。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stage-card" id="stage-design" data-bg="var(--bg-design)">
+                <div class="card-left">
+                    <h3>PCB Design</h3>
+                    <div class="visual-placeholder">[ Image: Schematic & Layout ]</div>
+                </div>
+                <div class="card-right">
+                    <div class="step-block">
+                        <span class="step-tag">Step 2</span>
+                        <h4 class="step-title">Schematic Design & Review</h4>
+                        <p class="step-desc">根据需求完成电路原理图设计，同步进行设计规则自查与评审，提前排查功能缺陷与器件冲突 [cite: 25]。</p>
+                    </div>
+                    <div class="step-block">
+                        <span class="step-tag">Step 3</span>
+                        <h4 class="step-title">PCB Layout & Component Placement</h4>
+                        <p class="step-desc">基于原理图完成PCB布局布线，重点处理高速信号、阻抗控制与EMC相关走线，兼顾可制造性与散热需求 [cite: 25]。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stage-card" id="stage-validation" data-bg="var(--bg-validation)">
+                <div class="card-left">
+                    <h3>Validation & Simulation</h3>
+                    <div class="visual-placeholder">[ Image: SI/PI Simulation ]</div>
+                </div>
+                <div class="card-right">
+                    <div class="step-block">
+                        <span class="step-tag">Step 4</span>
+                        <h4 class="step-title">Engineering Simulation & Verification</h4>
+                        <p class="step-desc">针对关键链路进行SI/PI、EMC/EMI仿真与热分析，提前识别并解决信号串扰与散热隐患，降低项目风险 [cite: 28]。</p>
+                    </div>
+                    <div class="step-block">
+                        <span class="step-tag">Step 5</span>
+                        <h4 class="step-title">DFM/DFA Review & Optimization</h4>
+                        <p class="step-desc">开展可制造性（DFM）与可组装性（DFA）全流程评审，优化Gerber文件与BOM清单，降低量产不良率 [cite: 28]。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stage-card" id="stage-gerber" data-bg="var(--bg-gerber)">
+                <div class="card-left">
+                    <h3>Gerber Output</h3>
+                    <div class="visual-placeholder">[ Image: Full Design Package ]</div>
+                </div>
+                <div class="card-right">
+                    <div class="step-block">
+                        <span class="step-tag">Step 6</span>
+                        <h4 class="step-title">Design File Finalization & Handover</h4>
+                        <p class="step-desc">输出完整生产文件包，包含Gerber、BOM清单、坐标文件等，确保与生产要求完全兼容，直接对接生产流程 [cite: 31]。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stage-card" id="stage-mfg" data-bg="var(--bg-mfg)">
+                <h3>Seamless Manufacturing Integration</h3>
+                <p>我们提供从PCB打样、SMT组装到批量生产的一站式配套服务，设计完成后可无缝衔接生产环节，大幅缩短你的项目周期 [cite: 35]。</p>
+                <a href="#quote-page" class="cta-btn">Get a Free Manufacturing Quote</a>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const navBtns = document.querySelectorAll('.nav-btn');
+        const cards = document.querySelectorAll('.stage-card');
+        const consoleBox = document.getElementById('console-box');
+
+        navBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // 1. 更新导航按钮状态
+                navBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                // 2. 更新卡片可见性
+                const targetId = btn.getAttribute('data-target');
+                cards.forEach(card => {
+                    card.classList.remove('active');
+                    if (card.getAttribute('id') === targetId) {
+                        card.classList.add('active');
+                        // 3. 同步更新容器背景色 [cite: 15]
+                        consoleBox.style.backgroundColor = card.getAttribute('data-bg');
+                    }
+                });
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

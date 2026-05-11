@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Engineering & Simulation - Interactive Showcase</title>
+<style>
+    :root {
+        --primary-color: #ef533f;
+        --primary-hover: #d64734;
+        --primary-light: #fff0ed;
+        --accent-blue: #2563eb;
+        --bg-light: #F5F5F5;
+        --card-bg: #ffffff;
+        --text-dark: #1a1a1a;
+        --text-gray: #555555;
+        --border-color: #e5e7eb;
+        --screen-bg: #111111; /* 仿真屏幕的深色背景 */
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    .simulation-section {
+        background-color: var(--bg-light);
+        padding: 100px 20px;
+        color: var(--text-dark);
+        overflow: hidden;
+    }
+
+    .container {
+        max-width: 1280px;
+        margin: 0 auto;
+    }
+
+    /* =========================================
+       1. 模块标题区
+       ========================================= */
+    .section-header {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+
+    .section-header h2 {
+        font-size: 36px;
+        font-weight: 800;
+        margin-bottom: 16px;
+        letter-spacing: -1px;
+    }
+
+    .section-header p {
+        font-size: 18px;
+        color: var(--text-gray);
+        max-width: 800px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    /* =========================================
+       2. 动态展厅布局 (Left-Right Split)
+       ========================================= */
+    .showcase-layout {
+        display: flex;
+        gap: 30px;
+        margin-bottom: 60px;
+        align-items: stretch;
+    }
+
+    /* 左侧：菜单导航栏 */
+    .tabs-column {
+        flex: 0 0 35%;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .sim-tab {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 20px 24px;
+        background-color: transparent;
+        border: 1px solid transparent;
+        border-radius: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .sim-tab:hover {
+        background-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .sim-tab.active {
+        background-color: var(--card-bg);
+        border-color: var(--border-color);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+        transform: translateX(10px); /* 激活时轻微右移，产生指向感 */
+    }
+
+    .tab-icon {
+        width: 40px;
+        height: 40px;
+        background-color: #ffffff;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-gray);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+    }
+
+    .sim-tab.active .tab-icon {
+        background-color: var(--primary-light);
+        color: var(--primary-color);
+        box-shadow: none;
+    }
+
+    .tab-text {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-gray);
+        transition: color 0.3s ease;
+    }
+
+    .sim-tab.active .tab-text {
+        color: var(--text-dark);
+        font-weight: 700;
+    }
+
+    /* 右侧：动态显示器面板 */
+    .display-column {
+        flex: 1;
+        background: var(--card-bg);
+        border-radius: 24px;
+        padding: 30px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.05);
+        position: relative;
+        min-height: 550px;
+    }
+
+    .sim-panel {
+        display: none; /* 默认隐藏 */
+        animation: fadeInRight 0.4s ease forwards;
+        height: 100%;
+        flex-direction: column;
+    }
+
+    .sim-panel.active {
+        display: flex;
+    }
+
+    @keyframes fadeInRight {
+        from { opacity: 0; transform: translateX(15px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    /* 2.1 模拟仿真屏幕图 */
+    .sim-screen {
+        width: 100%;
+        height: 300px;
+        background-color: var(--screen-bg);
+        border-radius: 16px;
+        margin-bottom: 30px;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        /* 模拟工程软件的网格背景 */
+        background-image: linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+        background-size: 20px 20px;
+    }
+
+    .placeholder-text {
+        color: rgba(255,255,255,0.5);
+        font-family: monospace;
+        font-size: 14px;
+        letter-spacing: 1px;
+    }
+
+    /* 真实图片可放在这里，覆盖网格背景 */
+    .sim-img {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.85; /* 轻微透明感 */
+    }
+
+    /* 2.2 底部详细描述区 */
+    .sim-details h3 {
+        font-size: 24px;
+        font-weight: 800;
+        margin-bottom: 12px;
+        color: var(--text-dark);
+    }
+
+    .sim-details p {
+        font-size: 15px;
+        color: var(--text-gray);
+        line-height: 1.6;
+        margin-bottom: 24px;
+    }
+
+    .highlight {
+        color: var(--accent-blue);
+        font-weight: 600;
+    }
+
+    .benefits-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .benefit-tag {
+        font-size: 13px;
+        font-weight: 600;
+        background: #f1f5f9;
+        color: #475569;
+        padding: 8px 16px;
+        border-radius: 50px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .benefit-tag span {
+        color: #10b981;
+        font-size: 16px;
+    }
+
+    /* =========================================
+       3. 底部收尾与 CTA
+       ========================================= */
+    .section-footer {
+        text-align: center;
+        max-width: 900px;
+        margin: 0 auto;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .summary-text {
+        font-size: 16px;
+        color: var(--text-gray);
+        line-height: 1.6;
+        margin-bottom: 30px;
+    }
+
+    .cta-btn {
+        display: inline-block;
+        background-color: var(--card-bg);
+        color: var(--text-dark);
+        border: 2px solid var(--border-color);
+        text-decoration: none;
+        padding: 16px 40px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 16px;
+        transition: all 0.3s ease;
+    }
+
+    .cta-btn:hover {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+        box-shadow: 0 10px 20px rgba(239, 83, 63, 0.1);
+        transform: translateY(-2px);
+    }
+
+    /* =========================================
+       移动端自适应
+       ========================================= */
+    @media (max-width: 992px) {
+        .showcase-layout {
+            flex-direction: column;
+        }
+
+        .tabs-column {
+            flex-direction: row;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none;
+        }
+
+        .tabs-column::-webkit-scrollbar { display: none; }
+
+        .sim-tab {
+            flex: 0 0 auto;
+            scroll-snap-align: start;
+            padding: 12px 20px;
+        }
+
+        .sim-tab.active {
+            transform: translateX(0);
+            transform: translateY(-5px); /* 移动端改为上浮 */
+        }
+    }
+
+    @media (max-width: 768px) {
+        .section-header h2 { font-size: 28px; }
+        .display-column { padding: 20px; }
+        .sim-screen { height: 200px; }
+        .sim-details h3 { font-size: 20px; }
+    }
+</style>
+</head>
+<body>
+
+<section class="simulation-section">
+    <div class="container">
+        
+        <div class="section-header">
+            <h2>Engineering & Simulation Services</h2>
+            <p>Design Validation & Engineering Simulation to Reduce Risks, Ensure Performance, and Accelerate Time-to-Market</p>
+        </div>
+
+        <div class="showcase-layout">
+            
+            <div class="tabs-column">
+                <div class="sim-tab active" data-target="panel-1">
+                    <div class="tab-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg></div>
+                    <span class="tab-text">SI/PI Analysis</span>
+                </div>
+                <div class="sim-tab" data-target="panel-2">
+                    <div class="tab-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M3 12h1m8-9v1m8 8h1m-9 8v1M5.6 5.6l.7.7m11.4 0l-.7.7m0 11.4l.7.7m-12.1-.7l-.7.7"></path></svg></div>
+                    <span class="tab-text">EMI/EMC Simulation</span>
+                </div>
+                <div class="sim-tab" data-target="panel-3">
+                    <div class="tab-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></div>
+                    <span class="tab-text">Thermal Analysis</span>
+                </div>
+                <div class="sim-tab" data-target="panel-4">
+                    <div class="tab-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg></div>
+                    <span class="tab-text">Stack-up & Impedance</span>
+                </div>
+                <div class="sim-tab" data-target="panel-5">
+                    <div class="tab-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.77 3.77z"></path></svg></div>
+                    <span class="tab-text">DFM/DFA Review</span>
+                </div>
+                <div class="sim-tab" data-target="panel-6">
+                    <div class="tab-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg></div>
+                    <span class="tab-text">DRC & LVS Checks</span>
+                </div>
+            </div>
+
+            <div class="display-column">
+                
+                <div class="sim-panel active" id="panel-1">
+                    <div class="sim-screen">
+                        <span class="placeholder-text">[ Visual: SI/PI Eye Diagram Simulation ]</span>
+                        </div>
+                    <div class="sim-details">
+                        <h3>SI/PI Analysis & Optimization</h3>
+                        <p>Validate high-speed signal paths and power delivery networks (PDN) to eliminate issues like signal reflection, crosstalk, voltage droop, and noise. We ensure stable performance for <span class="highlight">DDR, PCIe, USB</span>, and other high-speed interfaces.</p>
+                        <div class="benefits-group">
+                            <div class="benefit-tag"><span>✓</span> Eliminate high-speed design risks before prototyping</div>
+                            <div class="benefit-tag"><span>✓</span> Improve power stability and reduce noise interference</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sim-panel" id="panel-2">
+                    <div class="sim-screen">
+                        <span class="placeholder-text">[ Visual: Electromagnetic Radiation Heatmap ]</span>
+                    </div>
+                    <div class="sim-details">
+                        <h3>EMI/EMC Simulation & Pre-Compliance</h3>
+                        <p>Simulate electromagnetic radiation and susceptibility to identify potential EMC compliance issues early. We optimize routing, shielding, and grounding to meet <span class="highlight">CE, FCC</span>, and other industry standards, reducing costly post-design rework.</p>
+                        <div class="benefits-group">
+                            <div class="benefit-tag"><span>✓</span> Minimize electromagnetic interference</div>
+                            <div class="benefit-tag"><span>✓</span> Speed up regulatory compliance certification</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sim-panel" id="panel-3">
+                    <div class="sim-screen">
+                        <span class="placeholder-text">[ Visual: PCB Thermal Distribution 3D Model ]</span>
+                    </div>
+                    <div class="sim-details">
+                        <h3>Thermal Analysis & Thermal Design</h3>
+                        <p>Perform thermal simulation to predict heat distribution and hotspots on <span class="highlight">high-power PCBs</span>. We optimize copper pours, vias, and component placement to improve heat dissipation, preventing overheating and extending product lifespan.</p>
+                        <div class="benefits-group">
+                            <div class="benefit-tag"><span>✓</span> Avoid thermal-related failures</div>
+                            <div class="benefit-tag"><span>✓</span> Optimize design for high-power applications</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sim-panel" id="panel-4">
+                    <div class="sim-screen">
+                        <span class="placeholder-text">[ Visual: Multilayer Stack-up Profile ]</span>
+                    </div>
+                    <div class="sim-details">
+                        <h3>Stack-up Design & Impedance Control</h3>
+                        <p>Customize PCB layer stack-ups based on your performance and manufacturing requirements. We calculate and control <span class="highlight">50Ω, 90Ω, 100Ω</span> differential/single-ended impedance for high-speed signals, ensuring consistent electrical performance.</p>
+                        <div class="benefits-group">
+                            <div class="benefit-tag"><span>✓</span> Accurate impedance matching for high-speed designs</div>
+                            <div class="benefit-tag"><span>✓</span> Optimize stack-up for cost and manufacturability</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sim-panel" id="panel-5">
+                    <div class="sim-screen">
+                        <span class="placeholder-text">[ Visual: DFM/DFA Manufacturing Software Check ]</span>
+                    </div>
+                    <div class="sim-details">
+                        <h3>DFM/DFA Design for Manufacturing</h3>
+                        <p>Conduct full <span class="highlight">DFM/DFA</span> checks to verify line width/spacing, via sizes, pad geometries, and component placement against PCB fabrication and SMT assembly rules. We eliminate design issues that would cause production defects.</p>
+                        <div class="benefits-group">
+                            <div class="benefit-tag"><span>✓</span> Reduce production yield loss</div>
+                            <div class="benefit-tag"><span>✓</span> Ensure seamless handover to mass production</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sim-panel" id="panel-6">
+                    <div class="sim-screen">
+                        <span class="placeholder-text">[ Visual: Schematic vs Layout Validation ]</span>
+                    </div>
+                    <div class="sim-details">
+                        <h3>DRC & LVS Design Rule Checks</h3>
+                        <p>Run comprehensive Design Rule Checks (<span class="highlight">DRC</span>) and Layout Versus Schematic (<span class="highlight">LVS</span>) verification to ensure your PCB layout exactly matches the schematic and adheres to all design rules. This catches errors early to avoid costly re-spins.</p>
+                        <div class="benefits-group">
+                            <div class="benefit-tag"><span>✓</span> Eliminate layout vs schematic mismatches</div>
+                            <div class="benefit-tag"><span>✓</span> Ensure design rule compliance before prototyping</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="section-footer">
+            <p class="summary-text">
+                All simulations and engineering validations are fully documented with actionable optimization recommendations. Every design we deliver is pre-validated for performance, compliance, and manufacturability, ready to move directly to prototyping and mass production.
+            </p>
+            <a href="#engineer" class="cta-btn">Talk to Our Simulation Engineer</a>
+        </div>
+
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const tabs = document.querySelectorAll('.sim-tab');
+        const panels = document.querySelectorAll('.sim-panel');
+
+        tabs.forEach(tab => {
+            // 桌面端使用 mouseenter (悬停切换)，体验更丝滑；移动端原生支持 click
+            tab.addEventListener('mouseenter', function() {
+                // 1. 移除所有 active 状态
+                tabs.forEach(t => t.classList.remove('active'));
+                panels.forEach(p => p.classList.remove('active'));
+
+                // 2. 为当前悬停项添加 active
+                this.classList.add('active');
+
+                // 3. 显示对应的面板
+                const targetId = this.getAttribute('data-target');
+                document.getElementById(targetId).classList.add('active');
+            });
+            
+            // 为移动端增加点击事件支持
+            tab.addEventListener('click', function() {
+                 tabs.forEach(t => t.classList.remove('active'));
+                 panels.forEach(p => p.classList.remove('active'));
+                 this.classList.add('active');
+                 const targetId = this.getAttribute('data-target');
+                 document.getElementById(targetId).classList.add('active');
+                 
+                 // 移动端点击后确保图标居中显示
+                 if(window.innerWidth <= 992) {
+                     this.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                 }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

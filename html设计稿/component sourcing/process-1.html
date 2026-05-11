@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Sourcing Process - Visual Pipeline</title>
+<style>
+    :root {
+        --primary-color: #ef533f;
+        --bg-light: #F5F5F5;
+        --card-bg: #ffffff;
+        --text-dark: #1a1a1a;
+        --text-gray: #666666;
+        --border-color: #e5e7eb;
+        --img-placeholder-bg: #e2e8f0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+
+    .process-section { background-color: var(--bg-light); padding: 100px 20px; overflow: hidden; }
+    .container { max-width: 1100px; margin: 0 auto; position: relative; }
+
+    .section-header { text-align: center; margin-bottom: 80px; }
+    .section-header h2 { font-size: 36px; font-weight: 800; color: var(--text-dark); margin-bottom: 16px; }
+    .section-header p { font-size: 18px; color: var(--text-gray); }
+
+    /* --- 流水线主体 --- */
+    .pipeline-wrapper { position: relative; padding: 20px 0; }
+    
+    /* 中轴线 */
+    .pipeline-wrapper::before {
+        content: ''; position: absolute; left: 50%; top: 0; bottom: 0;
+        width: 2px; background-color: var(--border-color); transform: translateX(-50%);
+    }
+
+    .process-item {
+        display: flex; justify-content: space-between; align-items: center;
+        width: 100%; margin-bottom: 60px; position: relative;
+    }
+
+    .process-item:last-child { margin-bottom: 0; }
+
+    /* 左右交错逻辑 */
+    .process-item:nth-child(even) { flex-direction: row-reverse; }
+
+    /* 中轴圆点 */
+    .item-dot {
+        position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+        width: 14px; height: 14px; background-color: var(--primary-color);
+        border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 4px rgba(239, 83, 63, 0.1); z-index: 2;
+    }
+
+    /* 文字卡片与图片模块宽度 */
+    .item-text, .item-visual { width: 45%; }
+
+    /* 图片模块样式 */
+    .item-visual {
+        aspect-ratio: 16 / 10; background-color: var(--img-placeholder-bg);
+        border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color);
+        display: flex; align-items: center; justify-content: center; position: relative;
+    }
+    .item-visual img { width: 100%; height: 100%; object-fit: cover; }
+    .img-alt { font-size: 13px; color: #64748b; font-weight: 600; text-align: center; padding: 20px; }
+
+    /* 文字内容样式 */
+    .item-text h4 { font-size: 20px; font-weight: 800; color: var(--text-dark); margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+    .step-num { color: var(--primary-color); font-size: 14px; font-weight: 900; letter-spacing: 1px; }
+    .item-text p { font-size: 15px; color: var(--text-gray); line-height: 1.6; }
+
+    /* 移动端适配 */
+    @media (max-width: 768px) {
+        .pipeline-wrapper::before { left: 20px; }
+        .item-dot { left: 20px; }
+        .process-item, .process-item:nth-child(even) { flex-direction: column; align-items: flex-start; }
+        .item-text, .item-visual { width: calc(100% - 50px); margin-left: 50px; }
+        .item-visual { margin-top: 20px; order: 2; }
+    }
+</style>
+</head>
+<body>
+
+<section class="process-section">
+    <div class="container">
+        
+        <div class="section-header">
+            <h2>Our Sourcing Process</h2>
+            <p>A transparent and controlled workflow ensuring original parts and on-time delivery.</p>
+        </div>
+
+        <div class="pipeline-wrapper">
+            
+            <div class="process-item">
+                <div class="item-dot"></div>
+                <div class="item-text">
+                    <h4><span class="step-num">01.</span> Submit BOM</h4>
+                    <p>Upload your Bill of Materials (BOM) in Excel or CSV format. Our system and engineers instantly analyze your part numbers for availability.</p>
+                </div>
+                <div class="item-visual">
+                    <span class="img-alt">[ Real Photo: A clear engineering BOM file displayed on a high-res tablet screen ]</span>
+                </div>
+            </div>
+
+            <div class="process-item">
+                <div class="item-dot"></div>
+                <div class="item-text">
+                    <h4><span class="step-num">02.</span> BOM Review & RFQ</h4>
+                    <p>Our senior procurement engineers review every line item, verifying MPNs and suggested quantities to provide a precise Request for Quote.</p>
+                </div>
+                <div class="item-visual">
+                    <span class="img-alt">[ Real Photo: A senior procurement engineer reviewing technical specs on dual monitors ]</span>
+                </div>
+            </div>
+
+            <div class="process-item">
+                <div class="item-dot"></div>
+                <div class="item-text">
+                    <h4><span class="step-num">03.</span> Supplier Matching</h4>
+                    <p>We leverage our global network to match your needs with authorized manufacturers and Tier-1 distributors, ensuring 100% original sourcing.</p>
+                </div>
+                <div class="item-visual">
+                    <span class="img-alt">[ Real Photo: Global supply chain map icons paired with authorized distributor logos ]</span>
+                </div>
+            </div>
+
+            <div class="process-item">
+                <div class="item-dot"></div>
+                <div class="item-text">
+                    <h4><span class="step-num">04.</span> Price & Lead Time</h4>
+                    <p>Get a comprehensive report on real-time pricing and confirmed lead times. We offer cost-down alternatives for long-lead items for your approval.</p>
+                </div>
+                <div class="item-visual">
+                    <span class="img-alt">[ Real Photo: A formal quotation report showing transparent price breakdowns and dates ]</span>
+                </div>
+            </div>
+
+            <div class="process-item">
+                <div class="item-dot"></div>
+                <div class="item-text">
+                    <h4><span class="step-num">05.</span> Order & Procurement</h4>
+                    <p>Upon your confirmation, we execute the purchase immediately. Our ERP system tracks every reel and tray until it reaches our facility.</p>
+                </div>
+                <div class="item-visual">
+                    <span class="img-alt">[ Real Photo: Professional purchasing staff executing orders in an ERP management system ]</span>
+                </div>
+            </div>
+
+            <div class="process-item">
+                <div class="item-dot"></div>
+                <div class="item-text">
+                    <h4><span class="step-num">06.</span> IQC Incoming Inspection</h4>
+                    <p>Crucial stage: 100% inspection including X-ray anti-counterfeit testing, visual verification, and quantity counts in our ESD-safe labs.</p>
+                </div>
+                <div class="item-visual">
+                    <span class="img-alt">[ Real Photo: IQC inspector using a digital microscope to check component markings ]</span>
+                </div>
+            </div>
+
+            <div class="process-item">
+                <div class="item-dot"></div>
+                <div class="item-text">
+                    <h4><span class="step-num">07.</span> Delivery / PCBA</h4>
+                    <p>Parts are either vacuum-packed for worldwide shipment or seamlessly transferred to our internal SMT lines for assembly.</p>
+                </div>
+                <div class="item-visual">
+                    <span class="img-alt">[ Real Photo: Vacuum-sealed component reels with professional traceability labels ]</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+</body>
+</html>

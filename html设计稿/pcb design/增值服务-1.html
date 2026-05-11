@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Engineering & Simulation Services - Classic Grid</title>
+<style>
+    :root {
+        --primary-color: #ef533f; /* 品牌橙色 */
+        --primary-hover: #d64734;
+        --accent-blue: #2563eb; /* 术语高亮蓝色 */
+        --bg-light: #F5F5F5; /* 模块背景色 */
+        --card-bg: #ffffff; /* 卡片背景色 */
+        --text-dark: #1a1a1a;
+        --text-gray: #555555;
+        --border-color: #e5e7eb;
+        --benefit-bg: #f1f5f9;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    .simulation-section {
+        background-color: var(--bg-light);
+        padding: 100px 20px;
+        color: var(--text-dark);
+    }
+
+    .container {
+        max-width: 1280px;
+        margin: 0 auto;
+    }
+
+    /* =========================================
+       1. 模块标题区
+       ========================================= */
+    .section-header {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+
+    .section-header h2 {
+        font-size: 36px;
+        font-weight: 800;
+        margin-bottom: 16px;
+        letter-spacing: -1px;
+    }
+
+    .section-header p {
+        font-size: 18px;
+        color: var(--text-gray);
+        max-width: 800px;
+        margin: 0 auto;
+        line-height: 1.5;
+    }
+
+    /* =========================================
+       2. 3x2 卡片网格布局
+       ========================================= */
+    .services-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr); /* PC端3列 */
+        gap: 30px;
+        margin-bottom: 60px;
+    }
+
+    .service-card {
+        background: var(--card-bg);
+        border-radius: 16px;
+        padding: 32px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .service-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+        border-color: #ffe0db;
+    }
+
+    /* 服务图标 */
+    .icon-box {
+        width: 48px;
+        height: 48px;
+        color: var(--primary-color);
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .service-card h3 {
+        font-size: 19px;
+        font-weight: 700;
+        margin-bottom: 16px;
+        line-height: 1.3;
+    }
+
+    .service-card p {
+        font-size: 14px;
+        color: var(--text-gray);
+        line-height: 1.6;
+        margin-bottom: 24px;
+        flex-grow: 1;
+    }
+
+    /* 术语高亮 */
+    .highlight {
+        color: var(--accent-blue);
+        font-weight: 600;
+    }
+
+    /* Key Benefits 标签 */
+    .benefits-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .benefit-tag {
+        font-size: 12px;
+        font-weight: 600;
+        background: var(--benefit-bg);
+        color: #475569;
+        padding: 6px 12px;
+        border-radius: 50px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .benefit-tag span {
+        color: #10b981; /* 勾选框绿色 */
+    }
+
+    /* =========================================
+       3. 底部总结与 CTA
+       ========================================= */
+    .section-footer {
+        text-align: center;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .summary-text {
+        font-size: 16px;
+        color: var(--text-gray);
+        line-height: 1.6;
+        margin-bottom: 32px;
+    }
+
+    .cta-btn {
+        display: inline-block;
+        background-color: var(--primary-color);
+        color: #ffffff;
+        text-decoration: none;
+        padding: 16px 40px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 20px rgba(239, 83, 63, 0.2);
+    }
+
+    .cta-btn:hover {
+        background-color: var(--primary-hover);
+        transform: translateY(-2px);
+    }
+
+    /* =========================================
+       移动端自适应
+       ========================================= */
+    @media (max-width: 1024px) {
+        .services-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+        .services-grid { grid-template-columns: 1fr; }
+        .section-header h2 { font-size: 28px; }
+        .service-card { padding: 24px; }
+    }
+</style>
+</head>
+<body>
+
+<section class="simulation-section">
+    <div class="container">
+        
+        <div class="section-header">
+            <h2>Engineering & Simulation Services</h2>
+            <p>Design Validation & Engineering Simulation to Reduce Risks, Ensure Performance, and Accelerate Time-to-Market</p>
+        </div>
+
+        <div class="services-grid">
+            
+            <div class="service-card">
+                <div class="icon-box">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                </div>
+                <h3>SI/PI Analysis & Optimization</h3>
+                <p>Validate high-speed signal paths and power delivery networks (PDN) to eliminate issues like signal reflection, crosstalk, and noise. We ensure stable performance for <span class="highlight">DDR, PCIe, USB</span>, and other interfaces.</p>
+                <div class="benefits-group">
+                    <div class="benefit-tag"><span>✓</span> Eliminate high-speed risks</div>
+                    <div class="benefit-tag"><span>✓</span> Reduce noise interference</div>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="icon-box">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M3 12h1m8-9v1m8 8h1m-9 8v1M5.6 5.6l.7.7m11.4 0l-.7.7m0 11.4l.7.7m-12.1-.7l-.7.7"></path></svg>
+                </div>
+                <h3>EMI/EMC Simulation & Compliance</h3>
+                <p>Simulate electromagnetic radiation to identify potential compliance issues early. We optimize routing and shielding to meet <span class="highlight">CE, FCC</span> standards, reducing costly post-design rework.</p>
+                <div class="benefits-group">
+                    <div class="benefit-tag"><span>✓</span> Minimize interference</div>
+                    <div class="benefit-tag"><span>✓</span> Faster regulatory certification</div>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="icon-box">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                </div>
+                <h3>Thermal Analysis & Thermal Design</h3>
+                <p>Perform thermal simulation to predict heat distribution on <span class="highlight">high-power PCBs</span>. We optimize copper pours and vias to improve heat dissipation, extending product lifespan.</p>
+                <div class="benefits-group">
+                    <div class="benefit-tag"><span>✓</span> Avoid thermal failures</div>
+                    <div class="benefit-tag"><span>✓</span> Optimize heat dissipation</div>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="icon-box">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                </div>
+                <h3>Stack-up Design & Impedance Control</h3>
+                <p>Customize PCB layer stack-ups based on performance needs. We calculate and control <span class="highlight">50Ω, 90Ω, 100Ω</span> impedance for high-speed signals, ensuring consistent electrical performance.</p>
+                <div class="benefits-group">
+                    <div class="benefit-tag"><span>✓</span> Accurate impedance matching</div>
+                    <div class="benefit-tag"><span>✓</span> Optimized cost & performance</div>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="icon-box">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.77 3.77z"></path></svg>
+                </div>
+                <h3>DFM/DFA Review & Optimization</h3>
+                <p>Conduct full <span class="highlight">DFM/DFA</span> checks against fabrication and assembly rules. We eliminate design issues that would cause production defects or assembly failures before they happen.</p>
+                <div class="benefits-group">
+                    <div class="benefit-tag"><span>✓</span> Reduce yield loss</div>
+                    <div class="benefit-tag"><span>✓</span> Seamless mass production</div>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="icon-box">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                </div>
+                <h3>DRC & LVS Design Rule Checks</h3>
+                <p>Run comprehensive <span class="highlight">DRC and LVS</span> verification to ensure your PCB layout matches the schematic. This catches critical errors early to avoid costly re-spins and fabrication delays.</p>
+                <div class="benefits-group">
+                    <div class="benefit-tag"><span>✓</span> No schematic mismatches</div>
+                    <div class="benefit-tag"><span>✓</span> Design rule compliance</div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="section-footer">
+            <p class="summary-text">
+                All simulations and engineering validations are fully documented with actionable optimization recommendations. Every design we deliver is pre-validated for performance, compliance, and manufacturability, ready to move directly to prototyping and mass production.
+            </p>
+            <a href="#quote" class="cta-btn">Talk to Our Simulation Engineer</a>
+        </div>
+
+    </div>
+</section>
+
+</body>
+</html>

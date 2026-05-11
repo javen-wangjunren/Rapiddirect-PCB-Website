@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Service - Modern Enterprise Card Grid</title>
+<style>
+    :root {
+        --primary-color: #ef533f; /* 品牌橙色 */
+        --primary-hover: #d64734;
+        --bg-color: #f4f6f9; /* 页面底色 */
+        --card-bg: #ffffff; /* 卡片底色 */
+        --text-dark: #1a1a1a;
+        --text-gray: #555555;
+        --border-color: #eaeaea;
+        --img-bg: #f0f2f5; /* 图片统一背景色 */
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    .container {
+        max-width: 1300px;
+        margin: 0 auto;
+        padding: 80px 20px;
+        background-color: var(--bg-color);
+    }
+
+    /* 模块标题区 */
+    .header {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+
+    .header h2 {
+        font-size: 36px;
+        font-weight: 800;
+        color: var(--text-dark);
+        margin-bottom: 16px;
+        letter-spacing: -0.5px;
+    }
+
+    .header p {
+        font-size: 16px;
+        color: var(--text-gray);
+        max-width: 650px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    /* 网格容器 */
+    .grid-container {
+        display: grid;
+        gap: 24px;
+        /* 默认手机端单列 */
+        grid-template-columns: 1fr; 
+    }
+
+    /* --- 平板端自适应 (2列) --- */
+    @media (min-width: 600px) {
+        .grid-container {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    /* --- 桌面端自适应 (4列) --- */
+    @media (min-width: 1024px) {
+        .grid-container {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+
+    /* 单个卡片样式 */
+    .card {
+        background-color: var(--card-bg);
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* 悬停效果 */
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+        border-color: #ffe0db;
+    }
+
+    /* 图片容器 */
+    .image-wrapper {
+        position: relative;
+        width: 100%;
+        /* 16:9 比例 */
+        aspect-ratio: 16 / 9; 
+        background-color: var(--img-bg);
+        overflow: hidden;
+    }
+
+    .card-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.4s ease;
+    }
+
+    /* 图片悬停效果 (轻微放大) */
+    .card:hover .card-image {
+        transform: scale(1.05);
+    }
+
+    /* 卡片内容区 */
+    .content {
+        padding: 24px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .content-top {
+        margin-bottom: 20px;
+    }
+
+    .title {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 8px;
+        line-height: 1.3;
+    }
+
+    .description {
+        font-size: 14px;
+        color: var(--text-gray);
+        line-height: 1.5;
+        /* 限制描述文本不超过三行，确保布局对齐 */
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* 文字链接链接 */
+    .link {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--primary-color);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: color 0.3s ease;
+    }
+
+    .link:hover {
+        color: var(--primary-hover);
+    }
+
+</style>
+</head>
+<body>
+
+<div class="container">
+    
+    <div class="header">
+        <h2>我们的服务</h2>
+        <p>提供覆盖从标准板到复杂特殊板的全品类PCB制造服务，满足您不同应用场景的电路解决方案需求。</p>
+    </div>
+
+    <div class="grid-container">
+        
+        <div class="card">
+            <div class="image-wrapper">
+                <img src="https://via.placeholder.com/1600x900?text=Standard+PCB" alt="Standard PCB" class="card-image">
+            </div>
+            <div class="content">
+                <div class="content-top">
+                    <h3 class="title">标准PCB</h3>
+                    <p class="description">提供可靠的基础电路解决方案，满足各种通用电子产品的需求。</p>
+                </div>
+                <a href="#" class="link">了解更多 →</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="image-wrapper">
+                <img src="https://via.placeholder.com/1600x900?text=Flexible+PCB" alt="Flexible PCB" class="card-image">
+            </div>
+            <div class="content">
+                <div class="content-top">
+                    <h3 class="title">柔性PCB</h3>
+                    <p class="description">采用柔性基材，可弯曲折叠，适用于动态应用和紧凑空间设计。</p>
+                </div>
+                <a href="#" class="link">了解更多 →</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="image-wrapper">
+                <img src="https://via.placeholder.com/1600x900?text=Rigid-Flex+PCB" alt="Rigid-Flex PCB" class="card-image">
+            </div>
+            <div class="content">
+                <div class="content-top">
+                    <h3 class="title">刚挠结合PCB</h3>
+                    <p class="description">融合刚性和柔性板优势，无需连接器，提升电路可靠性和设计灵活性。</p>
+                </div>
+                <a href="#" class="link">了解更多 →</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="image-wrapper">
+                <img src="https://via.placeholder.com/1600x900?text=Advanced+PCB" alt="Advanced PCB" class="card-image">
+            </div>
+            <div class="content">
+                <div class="content-top">
+                    <h3 class="title">先进PCB</h3>
+                    <p class="description">支持复杂设计和高性能要求，如高层数板、背板等，满足特定工业应用。</p>
+                </div>
+                <a href="#" class="link">了解更多 →</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="image-wrapper">
+                <img src="https://via.placeholder.com/1600x900?text=HDI+PCB" alt="HDI PCB" class="card-image">
+            </div>
+            <div class="content">
+                <div class="content-top">
+                    <h3 class="title">HDI PCB</h3>
+                    <p class="description">高密度互连技术，实现更小孔径、更细线宽，适用于小型化、高功能电子产品。</p>
+                </div>
+                <a href="#" class="link">了解更多 →</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="image-wrapper">
+                <img src="https://via.placeholder.com/1600x900?text=RF+PCB" alt="RF PCB" class="card-image">
+            </div>
+            <div class="content">
+                <div class="content-top">
+                    <h3 class="title">射频PCB</h3>
+                    <p class="description">专门处理高频信号，低损耗，适用于通信、雷达和无线应用。</p>
+                </div>
+                <a href="#" class="link">了解更多 →</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="image-wrapper">
+                <img src="https://via.placeholder.com/1600x900?text=Metal+Core+PCB" alt="Metal Core PCB" class="card-image">
+            </div>
+            <div class="content">
+                <div class="content-top">
+                    <h3 class="title">金属基PCB</h3>
+                    <p class="description">采用金属芯散热，适用于大功率应用，如LED照明、电源等。</p>
+                </div>
+                <a href="#" class="link">了解更多 →</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="image-wrapper">
+                <img src="https://via.placeholder.com/1600x900?text=Ceramic+PCB" alt="Ceramic PCB" class="card-image">
+            </div>
+            <div class="content">
+                <div class="content-top">
+                    <h3 class="title">陶瓷PCB</h3>
+                    <p class="description">具有卓越的热传导和电气绝缘性能，适用于极端环境和高功率应用。</p>
+                </div>
+                <a href="#" class="link">了解更多 →</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,131 @@
+---
+import EmsLayout from '../layouts/EmsLayout.astro';
+import PcbProcessSection from '../components/common/PcbProcessSection.astro';
+import WhyChooseUsSection from '../components/common/WhyChooseUsSection.astro';
+import type { PcbProcessContent } from '../types/pcb-process';
+import type { WhyChooseUsContent } from '../types/why-choose-us';
+
+const process: PcbProcessContent = {
+  title: 'Precision PCB Manufacturing Process',
+  desc: 'Explore our streamlined 5-stage production flow. We consolidate 14 complex sub-processes into a highly controlled, automated ecosystem.',
+  stages: [
+    {
+      stage_name: '01. Pre-Production',
+      image_url: '',
+      process_name: 'Design Validation & Substrate Prep',
+      process_desc: [
+        'DFM Check: Engineering review of Gerber files to prevent manufacturability issues.',
+        'Material Selection: Selecting premium Shengyi/Rogers Copper Clad Laminates (CCL).',
+        'Substrate Baking: Baking boards to remove moisture and prevent delamination.'
+      ],
+      expert_advice: {
+        title: 'Quality Control Checkpoint',
+        desc: '100% automated DRC (Design Rule Checking) before any physical material is cut.'
+      }
+    },
+    {
+      stage_name: '02. Inner Layer',
+      image_url: '',
+      process_name: 'Inner Layer Core Formation',
+      process_desc: [
+        'LDI Printing: Laser Direct Imaging transfers the circuit pattern onto photoresist.',
+        'UV Exposure: Hardening the desired circuit paths under precision UV light.',
+        'Etching & Stripping: Removing unwanted copper to reveal the bare inner circuitry.'
+      ],
+      expert_advice: {
+        title: 'Key Equipment',
+        desc: 'Orbotech LDI Systems (Achieving 2mil/2mil min trace/space).'
+      }
+    },
+    {
+      stage_name: '03. Outer Layer',
+      image_url: '',
+      process_name: 'Lamination, Drilling & Plating',
+      process_desc: [
+        'Lamination: Pressing inner layers with prepreg under high temperature and vacuum.',
+        'CNC Drilling: High-speed mechanical and laser drilling for vias.',
+        'Copper Plating: Electroless plating to metalize hole walls for layer interconnection.'
+      ],
+      expert_advice: {
+        title: 'Precision Metrics',
+        desc: 'Drill hole position accuracy within ±0.05mm. Aspect ratio up to 12:1.'
+      }
+    },
+    {
+      stage_name: '04. Solder Mask & Finish',
+      image_url: '',
+      process_name: 'Solder Mask & Surface Finishing',
+      process_desc: [
+        'Solder Mask: Applying liquid photoimageable (LPI) mask to protect traces from oxidation.',
+        'Silkscreen: Printing component designators and logos.',
+        'Surface Finish: Applying ENIG, HASL, or OSP to exposed pads for optimal solderability.'
+      ],
+      expert_advice: {
+        title: 'Compliance',
+        desc: 'All surface finishes are 100% RoHS compliant and lead-free.'
+      }
+    },
+    {
+      stage_name: '05. Testing & QC',
+      image_url: '',
+      process_name: 'Final Inspection & Testing',
+      process_desc: [
+        'AOI & X-Ray: Automated Optical Inspection for surface defects; X-ray for internal via checks.',
+        'Electrical Testing: Flying probe or bed-of-nails testing for shorts and opens.',
+        'Final Routing & QA: V-scoring, routing to final dimensions, and vacuum packaging.'
+      ],
+      expert_advice: {
+        title: 'Delivery Guarantee',
+        desc: '100% electrically tested. Delivered with comprehensive outgoing quality control (OQC) reports.'
+      }
+    }
+  ]
+};
+
+const whyChooseUs: WhyChooseUsContent = {
+  title: 'Why Partner With Us?',
+  desc: 'We deliver more than just circuit boards — we deliver reliability, speed, and peace of mind through our streamlined manufacturing ecosystem.',
+  advantages: [
+    {
+      icon_url: '',
+      title: 'Strict Quality Control',
+      highlight: '9-Stage Closed-Loop QC',
+      desc: 'Fully equipped with SPI, AOI, X-Ray, and ICT testing. 100% electrical validation ensuring compliance with strict IPC and ISO standards.'
+    },
+    {
+      icon_url: '',
+      title: 'Fast Turnaround Time',
+      highlight: '24H Prototype Lead Time',
+      desc: 'Highly automated agile production lines. Get your prototypes shipped in as fast as 24 hours and reduce mass production cycles by 30%.'
+    },
+    {
+      icon_url: '',
+      title: 'True One-Stop Service',
+      highlight: 'PCB + Components + Assembly',
+      desc: 'Stop managing multiple vendors. We handle PCB fabrication, global parts sourcing, assembly, and final testing under one roof.'
+    }
+  ],
+  stats_bar: {
+    stats: [
+      { number: '10+', label: 'Years Exp.' },
+      { number: '5000+', label: 'Projects' },
+      { number: '99.8%', label: 'Satisfaction' }
+    ],
+    button: { text: 'Get a Quote', href: '#quote' }
+  }
+};
+---
+
+<EmsLayout
+  title="PCB Manufacturing | RapidDirect"
+  description="Scaffold page for /ems/pcb-manufacturing/."
+>
+  <PcbProcessSection data={process} />
+  <WhyChooseUsSection data={whyChooseUs} />
+  <section class="mx-auto max-w-7xl px-6 py-20">
+    <h1 class="text-4xl font-semibold tracking-tight text-slate-900">PCB Manufacturing</h1>
+    <p class="mt-4 max-w-2xl text-base leading-7 text-slate-600">
+      Route scaffold initialized for the PCB Manufacturing service page.
+    </p>
+  </section>
+</EmsLayout>

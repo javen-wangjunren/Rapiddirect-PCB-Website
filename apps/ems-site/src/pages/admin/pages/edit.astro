@@ -1,0 +1,13 @@
+---
+export const prerender = false;
+
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import AdminPageEditor from '../../../components/admin/AdminPageEditor';
+
+const slug = Astro.url.searchParams.get('slug') ?? '/ems/';
+---
+
+<AdminLayout title="Page Editor">
+  <AdminPageEditor initialSlug={slug} client:load />
+</AdminLayout>
+

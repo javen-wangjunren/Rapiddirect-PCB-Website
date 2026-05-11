@@ -1,0 +1,10 @@
+---
+export const prerender = true;
+
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import AdminPagesIndex from '../../../components/admin/AdminPagesIndex';
+---
+
+<AdminLayout title="Pages">
+  <AdminPagesIndex client:load />
+</AdminLayout>

@@ -1,0 +1,51 @@
+---
+import '../styles/global.css';
+import { getHref } from '../lib/assets';
+
+export interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'RapidDirect EMS',
+  description = 'EMS subsite under /ems built with Astro, React, Tailwind, and Supabase.'
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+  </head>
+  <body class="bg-slate-50 text-slate-950 antialiased">
+    <div class="min-h-screen">
+      <header class="border-b border-slate-200 bg-white/90 backdrop-blur">
+        <div class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+          <a href={getHref('/')} class="text-lg font-semibold tracking-tight text-slate-900">
+            RapidDirect EMS
+          </a>
+          <nav class="hidden gap-6 text-sm text-slate-600 md:flex">
+            <a href={getHref('/pcb-manufacturing/')} class="hover:text-slate-900">Manufacturing</a>
+            <a href={getHref('/pcb-assembly/')} class="hover:text-slate-900">Assembly</a>
+            <a href={getHref('/pcb-design/')} class="hover:text-slate-900">Design</a>
+            <a href={getHref('/components-sourcing/')} class="hover:text-slate-900">Sourcing</a>
+          </nav>
+        </div>
+      </header>
+
+      <main>
+        <slot />
+      </main>
+
+      <footer class="border-t border-slate-200 bg-white">
+        <div class="mx-auto max-w-7xl px-6 py-10 text-sm text-slate-500">
+          EMS project scaffold initialized for `/ems/` subpath deployment.
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

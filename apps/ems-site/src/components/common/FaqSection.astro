@@ -1,0 +1,12 @@
+---
+import type { EmsHomeFaqContent } from '../../types/ems-home';
+import { FaqSection as FaqSectionReact } from './FaqSection';
+
+export interface Props {
+  data: EmsHomeFaqContent;
+}
+
+const { data } = Astro.props;
+---
+
+<FaqSectionReact data={data} client:load />

@@ -1,0 +1,12 @@
+---
+import type { PcbProcessContent } from '../../types/pcb-process';
+import { PcbProcessSection as PcbProcessSectionReact } from './PcbProcessSection';
+
+export interface Props {
+  data: PcbProcessContent;
+}
+
+const { data } = Astro.props;
+---
+
+<PcbProcessSectionReact data={data} client:load />

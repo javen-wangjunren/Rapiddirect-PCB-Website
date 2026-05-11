@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>One-Stop Production Hybrid Pipeline - PCBasic</title>
+<style>
+    :root {
+        --primary-color: #ef533f;
+        --primary-hover: #d64734;
+        --accent-blue: #0066FF;
+        --bg-light: #F5F5F5;
+        --card-bg: #ffffff;
+        --text-dark: #1a1a1a;
+        --text-gray: #666666;
+        --border-color: #e5e7eb;
+        --tag-bg: #F0F0F0;
+        --line-color: #d1d5db;
+        --img-bg: #f0f2f5; 
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+        background-color: #ffffff;
+    }
+
+    .pipeline-section {
+        background-color: var(--bg-light);
+        padding: 100px 20px;
+        overflow: hidden;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        position: relative;
+    }
+
+    /* --- Section Header --- */
+    .section-header {
+        text-align: center;
+        margin-bottom: 80px;
+    }
+
+    .section-header h2 {
+        font-size: 38px;
+        font-weight: 800;
+        color: var(--text-dark);
+        margin-bottom: 16px;
+        letter-spacing: -1px;
+    }
+
+    .section-header p {
+        font-size: 18px;
+        color: var(--text-gray);
+        max-width: 800px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    /* =========================================
+       沉浸式垂直流水线 (Photo-Text Hybrid)
+       ========================================= */
+    .timeline-wrapper {
+        position: relative;
+        max-width: 1100px; /* Wider container for photo/text */
+        margin: 0 auto 100px auto;
+    }
+
+    /* Central Line */
+    .timeline-wrapper::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        width: 4px;
+        background-color: var(--line-color);
+        transform: translateX(-50%);
+        border-radius: 4px;
+        z-index: 1;
+    }
+
+    /* Progress Line */
+    .timeline-progress {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        width: 4px;
+        background-color: var(--primary-color);
+        transform: translateX(-50%);
+        border-radius: 4px;
+        height: 0;
+        transition: height 0.1s linear;
+        z-index: 2;
+    }
+
+    .timeline-item {
+        position: relative;
+        width: 100%;
+        margin-bottom: 80px; /* More space between stages */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        opacity: 0;
+        transform: translateY(40px);
+        transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        z-index: 3; /* Floating above lines */
+    }
+
+    .timeline-item.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .timeline-item:last-child {
+        margin-bottom: 0;
+    }
+
+    /* Central Dots */
+    .timeline-dot {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 18px;
+        height: 18px;
+        background-color: #ffffff;
+        border: 4px solid var(--line-color);
+        border-radius: 50%;
+        z-index: 5;
+        transition: all 0.4s ease;
+    }
+
+    .timeline-item.visible .timeline-dot {
+        border-color: var(--primary-color);
+        background-color: var(--primary-color);
+        box-shadow: 0 0 0 5px rgba(239, 83, 63, 0.15);
+    }
+
+    /* =========================================
+       Card Layout (Split Photo / Text)
+       ========================================= */
+    .timeline-content {
+        width: 44%; /* Space for Card */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        transition: transform 0.3s ease;
+    }
+
+    /* Staggered Layout (Odd: Text-Photo, Even: Photo-Text) */
+    .timeline-item:nth-child(odd) {
+        flex-direction: row-reverse;
+    }
+
+    /* Text Card Styling */
+    .text-card {
+        background: var(--card-bg);
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+        border: 1px solid var(--border-color);
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Photo Module Styling */
+    .photo-module {
+        aspect-ratio: 4/3; /* Consistent ratio for photos */
+        background-color: var(--img-bg);
+        border-radius: 12px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--border-color);
+        position: relative;
+    }
+
+    .photo-module img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .photo-module:hover img {
+        transform: scale(1.05);
+    }
+
+    .placeholder-txt {
+        color: #94a3b8;
+        font-size: 14px;
+        font-weight: 500;
+        position: absolute;
+    }
+
+    /* --- Internal Card Styling --- */
+    .card-icon {
+        width: 24px;
+        height: 24px;
+        color: var(--primary-color);
+        margin-bottom: 20px;
+    }
+
+    .text-card h3 {
+        font-size: 19px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 10px;
+    }
+
+    .text-card p {
+        font-size: 14px;
+        color: var(--text-gray);
+        line-height: 1.6;
+        margin-bottom: 18px;
+        flex-grow: 1;
+    }
+
+    .highlight {
+        color: var(--accent-blue);
+        font-weight: 600;
+    }
+
+    .tags-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .value-tag {
+        font-size: 12px;
+        font-weight: 600;
+        background-color: var(--tag-bg);
+        color: #475569;
+        padding: 5px 12px;
+        border-radius: 50px;
+    }
+
+    /* =========================================
+       Trust Base (Retained Design)
+       ========================================= */
+    .trust-base {
+        background: var(--card-bg);
+        border-radius: 20px;
+        padding: 60px 50px;
+        text-align: center;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.04);
+        border: 1px solid var(--border-color);
+        max-width: 1000px;
+        margin: 0 auto;
+        opacity: 0;
+        transform: translateY(40px);
+        transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .trust-base.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .trust-base h3 {
+        font-size: 28px;
+        font-weight: 800;
+        margin-bottom: 35px;
+        color: var(--text-dark);
+    }
+
+    .benefits-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr); /* Back to horizontal */
+        gap: 24px;
+        margin-bottom: 45px;
+        text-align: left;
+    }
+
+    .benefit-item {
+        background: var(--bg-light);
+        padding: 20px;
+        border-radius: 10px;
+    }
+
+    .benefit-item h4 {
+        font-size: 15px;
+        color: var(--text-dark);
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .benefit-item h4 svg {
+        color: var(--primary-color);
+        width: 18px;
+        height: 18px;
+    }
+
+    .benefit-item p {
+        font-size: 13px;
+        color: var(--text-gray);
+        line-height: 1.5;
+    }
+
+    .quote-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background-color: var(--primary-color);
+        color: #ffffff;
+        text-decoration: none;
+        padding: 16px 40px;
+        border-radius: 50px;
+        font-size: 17px;
+        font-weight: 700;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 20px rgba(239, 83, 63, 0.2);
+    }
+
+    .quote-btn:hover {
+        background-color: var(--primary-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(239, 83, 63, 0.3);
+    }
+
+    /* =========================================
+       移动端自适应 (Responsive Hybrid Pipeline)
+       ========================================= */
+    @media (max-width: 992px) {
+        .timeline-wrapper { max-width: 90%; }
+        
+        /* Central line moves left */
+        .timeline-wrapper::before,
+        .timeline-progress {
+            left: 20px;
+        }
+
+        .timeline-dot {
+            left: 20px;
+        }
+
+        .timeline-item, .timeline-item:nth-child(odd) {
+            flex-direction: column;
+            align-items: flex-start;
+            margin-bottom: 60px;
+        }
+
+        .timeline-content {
+            width: calc(100% - 60px);
+            margin-left: 60px;
+            margin-bottom: 20px;
+        }
+
+        /* Mobile Stacking: Text Card above Photo */
+        .timeline-content:last-child {
+            order: 2; /* Photo is second */
+            width: calc(100% - 60px);
+            margin-left: 60px;
+        }
+        
+        .photo-module {
+            aspect-ratio: 16/9; /* Wider ratio for mobile */
+        }
+
+        .benefits-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 600px) {
+        .trust-base {
+            padding: 40px 20px;
+        }
+        .benefits-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+</head>
+<body>
+
+<section class="pipeline-section">
+    <div class="container">
+        
+        <div class="section-header">
+            <h2>One-Stop: From Design to Mass Production</h2>
+            <p>Your Single Partner for PCB Prototyping, Manufacturing, Assembly & Full-Scale Production</p>
+        </div>
+
+        <div class="timeline-wrapper" id="timeline">
+            <div class="timeline-progress" id="timeline-progress"></div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content text-card">
+                    <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                    <h3>Rapid PCB Prototyping</h3>
+                    <p>Fast-turn PCB prototyping with <span class="highlight">24–72 hour</span> lead times, supporting multi-layer boards and HDI. Perfect for quick iteration before production.</p>
+                    <div class="tags-wrapper">
+                        <span class="value-tag">Fast Turnaround</span>
+                        <span class="value-tag">Low MOQ Support</span>
+                    </div>
+                </div>
+                <div class="timeline-content photo-module">
+                    <span class="placeholder-txt">[ Image: Engineer inspecting prototype ]</span>
+                    </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content text-card">
+                    <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                    <h3>Precision PCB Fabrication</h3>
+                    <p>High-quality manufacturing for advanced technologies including <span class="highlight">Rigid-Flex</span> and specialized substrates. Strict IPC-A-600 standard compliance.</p>
+                    <div class="tags-wrapper">
+                        <span class="value-tag">IPC Standards</span>
+                        <span class="value-tag">Precision Etching</span>
+                    </div>
+                </div>
+                <div class="timeline-content photo-module">
+                    <span class="placeholder-txt">[ Image: Automated PCB Fabrication Line ]</span>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content text-card">
+                    <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                    <h3>Full SMT & THT Assembly</h3>
+                    <p>Turnkey assembly for complex <span class="highlight">fine-pitch</span> and mixed technology. Automated Optical Inspection (AOI) ensuring consistent quality.</p>
+                    <div class="tags-wrapper">
+                        <span class="value-tag">AOI Inspection</span>
+                        <span class="value-tag">Mixed Technology</span>
+                    </div>
+                </div>
+                <div class="timeline-content photo-module">
+                    <span class="placeholder-txt">[ Image: Full SMT Pick and Place Line ]</span>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content text-card">
+                    <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                    <h3>Component Sourcing</h3>
+                    <p>End-to-end procurement with traced sourcing and <span class="highlight">BOM validation</span>. Supply chain risk mitigation with genuine components.</p>
+                    <div class="tags-wrapper">
+                        <span class="value-tag">Bom Validation</span>
+                        <span class="value-tag">Genuine Traceability</span>
+                    </div>
+                </div>
+                <div class="timeline-content photo-module">
+                    <span class="placeholder-txt">[ Image: Warehouse Component Reels ]</span>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content text-card">
+                    <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    <h3>Flexible Production Runs</h3>
+                    <p>Scalable capacity from prototypes up to <span class="highlight">100,000+ units</span>. Flexible MOQs with consistent quality across all volumes.</p>
+                    <div class="tags-wrapper">
+                        <span class="value-tag">Scalable Volume</span>
+                        <span class="value-tag">Flexible Capacity</span>
+                    </div>
+                </div>
+                <div class="timeline-content photo-module">
+                    <span class="placeholder-txt">[ Image: Final PCBA Batch Quality Control ]</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="trust-base" id="trust-base">
+            <h3>Why Choose Our One-Stop Production Service?</h3>
+            <div class="benefits-grid">
+                <div class="benefit-item">
+                    <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Seamless Workflow</h4>
+                    <p>Design handled by the same team until delivery, eliminating miscommunication.</p>
+                </div>
+                <div class="benefit-item">
+                    <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Controlled Lead Times</h4>
+                    <p>No supplier handovers. We optimize steps to stay on schedule.</p>
+                </div>
+                <div class="benefit-item">
+                    <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Cost Efficiency</h4>
+                    <p>Unified production reduces overhead and eliminates hidden third-party fees.</p>
+                </div>
+                <div class="benefit-item">
+                    <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Quality Consistency</h4>
+                    <p>Unified standards across all stages with full material traceability.</p>
+                </div>
+            </div>
+            
+            <a href="#quote" class="quote-btn">
+                Get a Custom Production Quote
+            </a>
+        </div>
+
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const timelineItems = document.querySelectorAll('.timeline-item');
+        const trustBase = document.getElementById('trust-base');
+        const progressBar = document.getElementById('timeline-progress');
+        const timeline = document.getElementById('timeline');
+
+        // Observer for card fade-in animation
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px 0px -15% 0px',
+            threshold: 0.1
+        };
+
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        timelineItems.forEach(item => revealObserver.observe(item));
+        revealObserver.observe(trustBase);
+
+        // Scroll listener for the central progress line
+        window.addEventListener('scroll', () => {
+            const timelineRect = timeline.getBoundingClientRect();
+            const viewportHeight = window.innerHeight;
+            
+            // Calculate progress based on central line intersection
+            if (timelineRect.top < viewportHeight / 2) {
+                let progressHeight = (viewportHeight / 2) - timelineRect.top;
+                
+                // Max height limited by total timeline length
+                if (progressHeight > timelineRect.height) {
+                    progressHeight = timelineRect.height;
+                }
+                
+                progressBar.style.height = `${progressHeight}px`;
+            } else {
+                progressBar.style.height = '0px';
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

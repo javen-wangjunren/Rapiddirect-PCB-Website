@@ -1,0 +1,13 @@
+---
+import type { PcbaCapabilityContent } from '../../types/pcb-assembly';
+import { PcbaCapabilitySection as PcbaCapabilitySectionReact } from './PcbaCapabilitySection';
+
+export interface Props {
+  data: PcbaCapabilityContent;
+}
+
+const { data } = Astro.props;
+---
+
+<PcbaCapabilitySectionReact data={data} client:load />
+

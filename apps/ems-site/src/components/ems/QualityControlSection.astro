@@ -1,0 +1,12 @@
+---
+import type { EmsHomeQualityContent } from '../../types/ems-home';
+import { QualityControlSection as QualityControlSectionReact } from './QualityControlSection';
+
+export interface Props {
+  data: EmsHomeQualityContent;
+}
+
+const { data } = Astro.props;
+---
+
+<QualityControlSectionReact data={data} client:load />

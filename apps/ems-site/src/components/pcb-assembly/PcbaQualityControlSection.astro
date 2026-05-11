@@ -1,0 +1,13 @@
+---
+import type { PcbaQualityControlContent } from '../../types/pcb-assembly';
+import { PcbaQualityControlSection as PcbaQualityControlSectionReact } from './PcbaQualityControlSection';
+
+export interface Props {
+  data: PcbaQualityControlContent;
+}
+
+const { data } = Astro.props;
+---
+
+<PcbaQualityControlSectionReact data={data} client:load />
+

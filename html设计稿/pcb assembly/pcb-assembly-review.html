@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customers' Feedback - Carousel & CTA</title>
+<style>
+    :root {
+        --primary-color: #ef533f;
+        --primary-hover: #d64734;
+        --bg-color: #f8f9fa;
+        --card-bg: #ffffff;
+        --text-dark: #1a1a1a;
+        --text-gray: #666666;
+        --border-color: #eaeaea;
+        --star-color: #FFB800; 
+        --verified-color: #10b981; 
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    .feedback-section {
+        background-color: var(--bg-color);
+        padding: 80px 20px;
+        overflow: hidden; /* 防止滑动时的横向溢出 */
+    }
+
+    .container {
+        max-width: 1280px;
+        margin: 0 auto;
+        position: relative;
+    }
+
+    /* --- 头部 --- */
+    .section-header {
+        text-align: center;
+        margin-bottom: 50px;
+    }
+
+    .section-header h2 {
+        font-size: 36px;
+        color: var(--text-dark);
+        margin-bottom: 16px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+    }
+
+    .section-header p {
+        color: var(--text-gray);
+        font-size: 16px;
+        max-width: 650px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    /* --- 评价轮播区 (Carousel) --- */
+    .carousel-wrapper {
+        position: relative;
+        margin-bottom: 50px;
+    }
+
+    /* 左右切换按钮 */
+    .nav-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 50px;
+        height: 50px;
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        z-index: 10;
+        color: var(--text-dark);
+        transition: all 0.3s ease;
+    }
+
+    .nav-btn:hover {
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+        box-shadow: 0 6px 20px rgba(239, 83, 63, 0.2);
+    }
+
+    .prev-btn { left: -25px; }
+    .next-btn { right: -25px; }
+
+    /* 滑动轨道 */
+    .reviews-track {
+        display: flex;
+        gap: 30px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none; 
+        padding: 10px 0 30px 0; /* 留出阴影空间 */
+    }
+
+    .reviews-track::-webkit-scrollbar { display: none; }
+
+    /* --- 单个评价卡片 --- */
+    .review-card {
+        flex: 0 0 calc(33.333% - 20px); /* 桌面端一行展示3个 */
+        scroll-snap-align: start;
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .review-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+        border-color: #ffe0db;
+    }
+
+    /* 1. 顶部真实成品实拍图 */
+    .card-image-wrapper {
+        width: 100%;
+        height: 220px;
+        background-color: #f0f2f5;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1px solid var(--border-color);
+        overflow: hidden;
+    }
+
+    .card-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .review-card:hover .card-image {
+        transform: scale(1.05);
+    }
+
+    .placeholder-txt {
+        color: #94a3b8;
+        font-size: 14px;
+        font-weight: 500;
+        position: absolute;
+    }
+
+    /* 验证标识 */
+    .verified-badge {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        background-color: rgba(255, 255, 255, 0.95);
+        color: var(--verified-color);
+        padding: 6px 12px;
+        border-radius: 50px;
+        font-size: 12px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        backdrop-filter: blur(4px);
+    }
+
+    /* 2. 客户信息与评价内容 */
+    .card-body {
+        padding: 30px 24px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .user-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .user-avatar {
+        width: 44px;
+        height: 44px;
+        background-color: #e2e8f0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+
+    .user-details h4 {
+        font-size: 16px;
+        color: var(--text-dark);
+        margin-bottom: 4px;
+    }
+
+    .user-industry {
+        font-size: 13px;
+        color: var(--text-gray);
+    }
+
+    .star-rating {
+        color: var(--star-color);
+        font-size: 16px;
+        letter-spacing: 1px;
+    }
+
+    /* 评价正文提炼 */
+    .review-content {
+        flex-grow: 1;
+    }
+
+    .review-highlight {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 12px;
+        line-height: 1.3;
+    }
+
+    .review-text {
+        font-size: 14px;
+        color: var(--text-gray);
+        line-height: 1.6;
+    }
+
+    .read-more {
+        color: var(--primary-color);
+        font-weight: 600;
+        text-decoration: none;
+        font-size: 14px;
+        transition: color 0.3s;
+    }
+
+    .read-more:hover {
+        color: var(--primary-hover);
+        text-decoration: underline;
+    }
+
+    /* --- 底部 CTA 区域 --- */
+    .cta-wrapper {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .cta-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background-color: var(--primary-color);
+        color: #ffffff;
+        padding: 18px 48px;
+        border-radius: 50px;
+        font-size: 18px;
+        font-weight: 700;
+        text-decoration: none;
+        box-shadow: 0 10px 25px rgba(239, 83, 63, 0.25);
+        transition: all 0.3s ease;
+    }
+
+    .cta-btn:hover {
+        background-color: var(--primary-hover);
+        box-shadow: 0 15px 35px rgba(239, 83, 63, 0.35);
+        transform: translateY(-3px);
+    }
+
+    /* --- 移动端自适应 --- */
+    @media (max-width: 1024px) {
+        .review-card {
+            flex: 0 0 calc(50% - 15px); /* 平板显示两个 */
+        }
+        .nav-btn {
+            display: none; /* 平板及以下隐藏按钮，使用原生滑动 */
+        }
+    }
+
+    @media (max-width: 768px) {
+        .review-card {
+            flex: 0 0 85%; /* 手机端显示一个，露出一点下一个的边缘提示可滑 */
+        }
+        .card-image-wrapper {
+            height: 200px;
+        }
+        .cta-btn {
+            width: 100%;
+            justify-content: center;
+            padding: 16px 20px;
+            font-size: 16px;
+        }
+    }
+</style>
+</head>
+<body>
+
+<section class="feedback-section">
+    <div class="container">
+        
+        <div class="section-header">
+            <h2>Customers' Feedback</h2>
+            <p>Trusted by engineers and procurement teams worldwide. See what our clients have to say about our PCBA manufacturing quality and service.</p>
+        </div>
+
+        <div class="carousel-wrapper">
+            
+            <button class="nav-btn prev-btn" id="review-prev" aria-label="Previous Review">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+
+            <div class="reviews-track" id="review-track">
+                
+                <div class="review-card">
+                    <div class="card-image-wrapper">
+                        <span class="placeholder-txt">[ Image: Industrial PCBA ]</span>
+                        <div class="verified-badge">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            Verified Purchase
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="user-meta">
+                            <div class="user-info">
+                                <div class="user-avatar">👨🏼‍🦰</div>
+                                <div class="user-details">
+                                    <h4>Steve Fuller 🇬🇧</h4>
+                                    <span class="user-industry">Industrial Control System</span>
+                                </div>
+                            </div>
+                            <div class="star-rating">★★★★★</div>
+                        </div>
+                        <div class="review-content">
+                            <h3 class="review-highlight">"Fast Turnaround & Excellent Service"</h3>
+                            <p class="review-text">
+                                Really easy service to use. I uploaded the Gerber's and had the PCBs in two weeks even with Christmas in the middle of the shipping time. Excellent...
+                                <a href="#" class="read-more">Read More</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="review-card">
+                    <div class="card-image-wrapper">
+                        <span class="placeholder-txt">[ Image: Medical Rigid-Flex ]</span>
+                        <div class="verified-badge">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            Verified Purchase
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="user-meta">
+                            <div class="user-info">
+                                <div class="user-avatar">👩🏻</div>
+                                <div class="user-details">
+                                    <h4>Sophie Dupont 🇫🇷</h4>
+                                    <span class="user-industry">Medical Devices</span>
+                                </div>
+                            </div>
+                            <div class="star-rating">★★★★★</div>
+                        </div>
+                        <div class="review-content">
+                            <h3 class="review-highlight">"Flawless ISO 13485 Compliance"</h3>
+                            <p class="review-text">
+                                We deal with very complex PCB assemblies for patient monitors. Their rigid-flex boards passed all compliance tests on the first try. The high-resolution...
+                                <a href="#" class="read-more">Read More</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="review-card">
+                    <div class="card-image-wrapper">
+                        <span class="placeholder-txt">[ Image: Smart Home IoT ]</span>
+                        <div class="verified-badge">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            Verified Purchase
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="user-meta">
+                            <div class="user-info">
+                                <div class="user-avatar">🧔🏽‍♂️</div>
+                                <div class="user-details">
+                                    <h4>Jason Reynolds 🇺🇸</h4>
+                                    <span class="user-industry">IoT & Smart Home</span>
+                                </div>
+                            </div>
+                            <div class="star-rating">★★★★★</div>
+                        </div>
+                        <div class="review-content">
+                            <h3 class="review-highlight">"Perfect BGA Assembly"</h3>
+                            <p class="review-text">
+                                The conformal coating process and X-Ray inspection reports really make a difference. Our boards stay stable and corrosion-free, which means...
+                                <a href="#" class="read-more">Read More</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="review-card">
+                    <div class="card-image-wrapper">
+                        <span class="placeholder-txt">[ Image: Auto Headlight PCBA ]</span>
+                        <div class="verified-badge">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            Verified Purchase
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="user-meta">
+                            <div class="user-info">
+                                <div class="user-avatar">👨🏽‍🔧</div>
+                                <div class="user-details">
+                                    <h4>Markus Weber 🇩🇪</h4>
+                                    <span class="user-industry">Automotive Electronics</span>
+                                </div>
+                            </div>
+                            <div class="star-rating">★★★★★</div>
+                        </div>
+                        <div class="review-content">
+                            <h3 class="review-highlight">"Reliable Heavy Copper Boards"</h3>
+                            <p class="review-text">
+                                Thermal management was critical for our new LED modules. Their Metal Core PCBs perform exceptionally well under extreme heat conditions...
+                                <a href="#" class="read-more">Read More</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <button class="nav-btn next-btn" id="review-next" aria-label="Next Review">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+        </div>
+
+        <div class="cta-wrapper">
+            <a href="#quote-page" class="cta-btn">
+                Get Instant Quote
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </a>
+        </div>
+
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const track = document.getElementById('review-track');
+        const btnPrev = document.getElementById('review-prev');
+        const btnNext = document.getElementById('review-next');
+
+        btnNext.addEventListener('click', () => {
+            const cardWidth = track.querySelector('.review-card').offsetWidth;
+            const gap = 30; 
+            track.scrollBy({ left: cardWidth + gap, behavior: 'smooth' });
+        });
+
+        btnPrev.addEventListener('click', () => {
+            const cardWidth = track.querySelector('.review-card').offsetWidth;
+            const gap = 30;
+            track.scrollBy({ left: -(cardWidth + gap), behavior: 'smooth' });
+        });
+    });
+</script>
+
+</body>
+</html>

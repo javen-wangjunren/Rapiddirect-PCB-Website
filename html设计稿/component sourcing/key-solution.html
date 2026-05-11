@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Key Solutions - Component Sourcing</title>
+<style>
+    :root {
+        --primary-color: #ef533f; /* 品牌橙色 */
+        --primary-hover: #d64734;
+        --primary-light: #fff0ed; /* 浅橙色高亮底色 */
+        --bg-light: #F5F5F5; /* 模块浅灰背景 */
+        --card-bg: #ffffff;
+        --text-dark: #1a1a1a;
+        --text-gray: #555555;
+        --border-color: #e5e7eb;
+        --success-green: #10b981; /* 清单打勾的绿色 */
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    .key-solutions-section {
+        background-color: var(--bg-light);
+        padding: 100px 20px;
+    }
+
+    .container {
+        max-width: 1100px; /* 控制最大宽度，让两列卡片更紧凑易读 */
+        margin: 0 auto;
+    }
+
+    /* =========================================
+       1. 模块标题区
+       ========================================= */
+    .section-header {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+
+    .section-header h2 {
+        font-size: 36px;
+        font-weight: 800;
+        color: var(--text-dark);
+        margin-bottom: 16px;
+        letter-spacing: -0.5px;
+    }
+
+    .section-header p {
+        font-size: 18px;
+        color: var(--text-gray);
+        max-width: 700px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    /* =========================================
+       2. 双卡片并排布局
+       ========================================= */
+    .solutions-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 32px;
+    }
+
+    .solution-card {
+        background: var(--card-bg);
+        border-radius: 8px; /* 按照要求 8px 圆角 */
+        padding: 40px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.03); /* 轻微阴影 */
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .solution-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+        border-color: var(--primary-color);
+    }
+
+    /* --- 顶部：图标与大标题 --- */
+    .card-header {
+        margin-bottom: 30px;
+    }
+
+    .card-icon {
+        width: 48px;
+        height: 48px;
+        color: var(--primary-color);
+        margin-bottom: 20px;
+        background-color: var(--primary-light);
+        padding: 10px;
+        border-radius: 8px;
+    }
+
+    .card-title {
+        font-size: 24px;
+        font-weight: 800;
+        color: var(--text-dark);
+        line-height: 1.3;
+    }
+
+    /* --- 中部：要点短句列表 --- */
+    .card-points {
+        list-style: none;
+        flex-grow: 1; /* 让列表撑开空间，保证底部价值区对齐 */
+        margin-bottom: 30px;
+    }
+
+    .card-points li {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .card-points li:last-child {
+        margin-bottom: 0;
+    }
+
+    .point-icon {
+        color: var(--success-green);
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+
+    .point-text {
+        font-size: 16px;
+        color: var(--text-gray);
+        line-height: 1.5;
+        font-weight: 500;
+    }
+
+    /* --- 底部：价值一句话 --- */
+    .card-value {
+        background-color: #f8fafc; /* 极浅的蓝灰色，形成底座感 */
+        padding: 20px;
+        border-radius: 6px;
+        border-left: 4px solid var(--primary-color); /* 品牌色左边框高亮 */
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .value-icon {
+        color: var(--primary-color);
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+
+    .value-text {
+        font-size: 15px;
+        color: var(--text-dark);
+        font-weight: 700;
+        line-height: 1.5;
+    }
+
+    /* =========================================
+       移动端自适应
+       ========================================= */
+    @media (max-width: 768px) {
+        .solutions-grid {
+            grid-template-columns: 1fr; /* 移动端自动单列 */
+            gap: 24px;
+        }
+        .solution-card {
+            padding: 30px 24px;
+        }
+        .card-title {
+            font-size: 22px;
+        }
+    }
+</style>
+</head>
+<body>
+
+<section class="key-solutions-section">
+    <div class="container">
+        
+        <div class="section-header">
+            <h2>Key Solutions</h2>
+            <p>We solve your toughest component sourcing challenges</p>
+        </div>
+
+        <div class="solutions-grid">
+            
+            <div class="solution-card">
+                <div class="card-header">
+                    <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                    <h3 class="card-title">Shortage & Obsolete Components Support</h3>
+                </div>
+                
+                <ul class="card-points">
+                    <li>
+                        <svg class="point-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span class="point-text">Global hard-to-find parts sourcing</span>
+                    </li>
+                    <li>
+                        <svg class="point-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span class="point-text">Obsolete component cross-reference & alternatives</span>
+                    </li>
+                    <li>
+                        <svg class="point-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span class="point-text">Long-lead parts reservation & stock support</span>
+                    </li>
+                    <li>
+                        <svg class="point-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span class="point-text">End-of-life (EOL) lifecycle management</span>
+                    </li>
+                </ul>
+
+                <div class="card-value">
+                    <svg class="value-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    <span class="value-text">Secure critical components to keep your production on track.</span>
+                </div>
+            </div>
+
+            <div class="solution-card">
+                <div class="card-header">
+                    <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                    <h3 class="card-title">Cost Optimization & BOM Solutions</h3>
+                </div>
+                
+                <ul class="card-points">
+                    <li>
+                        <svg class="point-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span class="point-text">Multi-supplier price comparison</span>
+                    </li>
+                    <li>
+                        <svg class="point-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span class="point-text">High-cost component replacement proposals</span>
+                    </li>
+                    <li>
+                        <svg class="point-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span class="point-text">BOM rationalization & integration</span>
+                    </li>
+                    <li>
+                        <svg class="point-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span class="point-text">Bulk purchasing cost-down benefits</span>
+                    </li>
+                </ul>
+
+                <div class="card-value">
+                    <svg class="value-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                    <span class="value-text">Lower your total material cost without compromising quality.</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+</body>
+</html>

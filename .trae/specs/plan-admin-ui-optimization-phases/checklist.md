@@ -1,0 +1,10 @@
+- [x] UI 优化范围与裁剪完成：不新增现网不存在模块（Search/Need Help 等），导航入口以现网为准
+- [x] Design Tokens 已建立并被后台组件引用（颜色/排版/间距/圆角/阴影）
+- [x] UI Primitives 已提供且具备一致状态（hover/focus/disabled/loading/danger）
+- [x] Admin Shell（Layout/Sidebar/Topbar）样式与交互统一，且不破坏现有路由与 session guard
+- [x] Pages 列表页符合 List 模板：Header/Filters/List/Pagination/空态/加载态/错误态
+- [x] Page 编辑页符合 Editor 模板：EditorHeader/Tabs/保存发布反馈/危险操作确认/未保存离开提示
+- [x] Media Library（如在范围内）已按 List 模板收口，复用同一套组件
+- [x] 关键闭环回归通过：后台编辑保存 → Supabase 写入 → 前台 `/ems/` 刷新可见
+- [x] 响应式回归通过：≥1200 双栏、<1200 堆叠、移动端核心操作可用
+- [x] 可访问性基础回归通过：键盘可达、focus 可见、交互控件语义合理

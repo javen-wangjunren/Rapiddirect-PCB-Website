@@ -1,0 +1,9 @@
+name = "pcb-ems-contact"
+main = "src/index.ts"
+compatibility_date = "2026-04-24"
+
+[vars]
+ALLOWED_ORIGIN = "https://rapiddirect.com"
+FROM_EMAIL = "RapidDirect EMS <no-reply@rapiddirect.com>"
+TO_EMAIL = "you@example.com"
+

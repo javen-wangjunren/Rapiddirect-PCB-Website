@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Services - Interactive Hover Showcase</title>
+<style>
+    :root {
+        --primary-color: #ef533f;
+        --text-dark: #111111;
+        --text-gray: #777777;
+        --text-light: #c0c0c0;
+        --bg-color: #fcfcfc;
+        --border-color: #eeeeee;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    .service-section {
+        background-color: var(--bg-color);
+        padding: 100px 20px;
+        overflow: hidden;
+    }
+
+    .container {
+        max-width: 1300px;
+        margin: 0 auto;
+    }
+
+    /* --- 头部区域 --- */
+    .section-header {
+        margin-bottom: 60px;
+    }
+
+    .section-header h2 {
+        font-size: 40px;
+        color: var(--text-dark);
+        font-weight: 800;
+        letter-spacing: -1px;
+        margin-bottom: 16px;
+    }
+
+    .section-header p {
+        font-size: 18px;
+        color: var(--text-gray);
+        max-width: 600px;
+        line-height: 1.6;
+    }
+
+    /* --- 核心交互区域 (Desktop: 左右分栏) --- */
+    .interactive-showcase {
+        position: relative;
+        display: flex;
+        min-height: 600px; 
+    }
+
+    /* 修复间距：将左侧栏宽度从 45% 缩减到 32% */
+    .list-column {
+        width: 32%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        z-index: 2;
+    }
+
+    .category-item {
+        /* 保持为空即可 */
+    }
+
+    /* 侧边栏文字标题 */
+    .category-title {
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--text-light);
+        padding: 16px 0;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        display: inline-block;
+        position: relative;
+    }
+
+    .category-title:hover {
+        color: var(--text-gray);
+    }
+
+    .category-item.active .category-title {
+        color: var(--text-dark);
+        transform: translateX(20px);
+    }
+
+    .category-item.active .category-title::before {
+        content: '';
+        position: absolute;
+        left: -20px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 12px;
+        height: 3px;
+        background-color: var(--primary-color);
+        border-radius: 2px;
+    }
+
+    /* --- 右侧内容区 --- */
+    /* 修复间距：将右侧内容区从 50% 拓宽到 62%，使其向左靠拢 */
+    .category-content {
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 62%; 
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: all 0.5s ease-in-out;
+    }
+
+    .category-item.active .category-content {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }
+
+    /* 视觉大图 */
+    .image-wrapper {
+        width: 100%;
+        aspect-ratio: 16 / 10;
+        border-radius: 16px;
+        overflow: hidden;
+        background-color: #f0f2f5;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.06);
+        position: relative;
+    }
+
+    .card-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transform: scale(1.05);
+        transition: transform 1s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    .category-item.active .card-image {
+        transform: scale(1);
+    }
+
+    .placeholder-text {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #94a3b8;
+        font-size: 16px;
+        font-weight: 500;
+        z-index: 1;
+    }
+
+    /* 文字描述区 */
+    .text-wrapper {
+        margin-top: 30px;
+        padding-right: 40px;
+    }
+
+    .text-wrapper h3 {
+        font-size: 24px;
+        color: var(--text-dark);
+        margin-bottom: 12px;
+    }
+
+    .text-wrapper p {
+        font-size: 16px;
+        color: var(--text-gray);
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+
+    .learn-more {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--primary-color);
+        font-weight: 600;
+        text-decoration: none;
+        font-size: 15px;
+        transition: color 0.3s ease;
+    }
+
+    .learn-more:hover {
+        color: #d64734;
+    }
+
+    /* =========================================
+       移动端自适应
+       ========================================= */
+    @media (max-width: 992px) {
+        .section-header { margin-bottom: 40px; }
+        .section-header h2 { font-size: 32px; }
+        
+        .interactive-showcase {
+            display: block;
+            min-height: auto;
+        }
+
+        .list-column { width: 100%; }
+
+        .category-item {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .category-item:last-child { border-bottom: none; }
+
+        .category-title {
+            font-size: 22px;
+            width: 100%;
+            padding: 24px 0;
+            color: var(--text-dark);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .category-title:hover { color: var(--primary-color); }
+
+        .category-item.active .category-title {
+            color: var(--primary-color);
+            transform: none;
+        }
+
+        .category-item.active .category-title::before { display: none; }
+
+        .category-title::after {
+            content: '+';
+            font-size: 28px;
+            font-weight: 400;
+            color: var(--text-light);
+            transition: transform 0.3s ease;
+        }
+
+        .category-item.active .category-title::after {
+            content: '−';
+            color: var(--primary-color);
+        }
+
+        .category-content {
+            position: static; 
+            width: 100%;
+            transform: none;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            pointer-events: auto;
+            visibility: visible;
+            transition: max-height 0.4s ease, opacity 0.4s ease;
+        }
+
+        .category-item.active .category-content {
+            max-height: 800px;
+            opacity: 1;
+            padding-bottom: 30px;
+        }
+
+        .text-wrapper {
+            margin-top: 20px;
+            padding-right: 0;
+        }
+
+        .text-wrapper h3 { display: none; }
+    }
+</style>
+</head>
+<body>
+
+<section class="service-section">
+    <div class="container">
+        
+        <div class="section-header">
+            <h2>Our Capabilities</h2>
+            <p>From standard designs to complex high-density architectures, we offer a complete spectrum of PCB manufacturing technologies.</p>
+        </div>
+
+        <div class="interactive-showcase">
+            <div class="list-column">
+                
+                <div class="category-item active">
+                    <div class="category-title">Standard PCB</div>
+                    <div class="category-content">
+                        <div class="image-wrapper">
+                            <div class="placeholder-text">[ Image: Standard PCB ]</div>
+                            <img src="" alt="" class="card-image">
+                        </div>
+                        <div class="text-wrapper">
+                            <h3>Standard PCB</h3>
+                            <p>Conventional PCB solutions including single-layer, double-layer, and multi-layer boards (up to 32 layers) tailored for general electronic applications and consumer devices.</p>
+                            <a href="#" class="learn-more">Explore capabilities →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category-item">
+                    <div class="category-title">Flexible PCB</div>
+                    <div class="category-content">
+                        <div class="image-wrapper">
+                            <div class="placeholder-text">[ Image: Flexible PCB ]</div>
+                            <img src="" alt="" class="card-image">
+                        </div>
+                        <div class="text-wrapper">
+                            <h3>Flexible PCB</h3>
+                            <p>Bendable and space-saving Polyimide (PI) solutions. Ideal for compact devices, wearables, and dynamic applications requiring continuous flexing.</p>
+                            <a href="#" class="learn-more">Explore capabilities →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category-item">
+                    <div class="category-title">Rigid-Flex PCB</div>
+                    <div class="category-content">
+                        <div class="image-wrapper">
+                            <div class="placeholder-text">[ Image: Rigid-Flex PCB ]</div>
+                            <img src="" alt="" class="card-image">
+                        </div>
+                        <div class="text-wrapper">
+                            <h3>Rigid-Flex PCB</h3>
+                            <p>A hybrid combination of rigid and flex board technologies. It eliminates the need for connectors, significantly improving reliability for complex 3D electronic packaging.</p>
+                            <a href="#" class="learn-more">Explore capabilities →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category-item">
+                    <div class="category-title">Advanced PCB</div>
+                    <div class="category-content">
+                        <div class="image-wrapper">
+                            <div class="placeholder-text">[ Image: Advanced PCB ]</div>
+                            <img src="" alt="" class="card-image">
+                        </div>
+                        <div class="text-wrapper">
+                            <h3>Advanced PCB</h3>
+                            <p>High-end PCB solutions leveraging cutting-edge technologies, including thick copper, ultra-large backplanes, and embedded components for specialized industrial use.</p>
+                            <a href="#" class="learn-more">Explore capabilities →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category-item">
+                    <div class="category-title">HDI PCB</div>
+                    <div class="category-content">
+                        <div class="image-wrapper">
+                            <div class="placeholder-text">[ Image: HDI PCB ]</div>
+                            <img src="" alt="" class="card-image">
+                        </div>
+                        <div class="text-wrapper">
+                            <h3>HDI PCB</h3>
+                            <p>High-Density Interconnect boards featuring microvias, blind, and buried vias. Perfect for miniaturized, high-performance electronics like smartphones and IoT devices.</p>
+                            <a href="#" class="learn-more">Explore capabilities →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category-item">
+                    <div class="category-title">RF PCB</div>
+                    <div class="category-content">
+                        <div class="image-wrapper">
+                            <div class="placeholder-text">[ Image: RF PCB ]</div>
+                            <img src="" alt="" class="card-image">
+                        </div>
+                        <div class="text-wrapper">
+                            <h3>Radio Frequency (RF) PCB</h3>
+                            <p>Engineered with specialized low-loss materials (e.g., Rogers, Taconic) and strict impedance control to minimize signal loss in high-frequency communications and radar systems.</p>
+                            <a href="#" class="learn-more">Explore capabilities →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category-item">
+                    <div class="category-title">Metal Core PCB</div>
+                    <div class="category-content">
+                        <div class="image-wrapper">
+                            <div class="placeholder-text">[ Image: Metal Core PCB ]</div>
+                            <img src="" alt="" class="card-image">
+                        </div>
+                        <div class="text-wrapper">
+                            <h3>Metal Core PCB (MCPCB)</h3>
+                            <p>Featuring an aluminum or copper base for superior thermal management. Widely used in high-power LED lighting, automotive headlights, and power converters.</p>
+                            <a href="#" class="learn-more">Explore capabilities →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="category-item">
+                    <div class="category-title">Ceramic PCB</div>
+                    <div class="category-content">
+                        <div class="image-wrapper">
+                            <div class="placeholder-text">[ Image: Ceramic PCB ]</div>
+                            <img src="" alt="" class="card-image">
+                        </div>
+                        <div class="text-wrapper">
+                            <h3>Ceramic PCB</h3>
+                            <p>Offers exceptional thermal conductivity and electrical insulation. Built to withstand extreme temperatures and environments, ideal for aerospace and high-power modules.</p>
+                            <a href="#" class="learn-more">Explore capabilities →</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const items = document.querySelectorAll('.category-item');
+
+        items.forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                if (window.innerWidth > 992) {
+                    items.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                }
+            });
+
+            const title = item.querySelector('.category-title');
+            title.addEventListener('click', () => {
+                if (window.innerWidth <= 992) {
+                    const isActive = item.classList.contains('active');
+                    items.forEach(i => i.classList.remove('active'));
+                    if (!isActive) {
+                        item.classList.add('active');
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

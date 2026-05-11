@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PCB Assembly - Interactive Dashboard</title>
+<style>
+    :root {
+        --primary-color: #ef533f;
+        --primary-light: #fff0ed;
+        --bg-color: #f4f6f9;
+        --panel-bg: #ffffff;
+        --text-dark: #1a1a1a;
+        --text-gray: #555555;
+        --border-color: #eaeaea;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    .dashboard-section {
+        background-color: var(--bg-color);
+        padding: 80px 20px;
+    }
+
+    .container {
+        max-width: 1280px;
+        margin: 0 auto;
+    }
+
+    /* --- 头部 --- */
+    .section-header {
+        text-align: center;
+        margin-bottom: 50px;
+    }
+
+    .section-header h2 {
+        font-size: 36px;
+        color: var(--text-dark);
+        margin-bottom: 16px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+    }
+
+    .section-header p {
+        color: var(--text-gray);
+        font-size: 16px;
+        max-width: 700px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    /* =========================================
+       核心：交互式仪表盘 (Dashboard Layout)
+       ========================================= */
+    .dashboard-wrapper {
+        display: flex;
+        background: var(--panel-bg);
+        border-radius: 20px;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.06);
+        border: 1px solid var(--border-color);
+        overflow: hidden;
+        min-height: 600px;
+    }
+
+    /* --- 左侧：动态视觉展示区 --- */
+    .visual-panel {
+        flex: 0 0 40%;
+        background-color: #111;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dynamic-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: opacity 0.4s ease-in-out, transform 4s ease-out;
+        opacity: 0.8;
+    }
+
+    /* 图片切换时的淡入动画 */
+    .fade-in {
+        animation: quickFade 0.5s forwards;
+    }
+    @keyframes quickFade {
+        0% { opacity: 0; transform: scale(1.05); }
+        100% { opacity: 0.8; transform: scale(1); }
+    }
+
+    .visual-overlay-text {
+        position: absolute;
+        bottom: 30px;
+        left: 30px;
+        right: 30px;
+        color: #fff;
+        z-index: 2;
+    }
+
+    .visual-overlay-text h3 {
+        font-size: 24px;
+        margin-bottom: 8px;
+        font-weight: 700;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .visual-overlay-text p {
+        font-size: 14px;
+        color: rgba(255,255,255,0.8);
+        text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    }
+
+    /* --- 右侧：交互控制区 --- */
+    .control-panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* 顶部 Tabs */
+    .dashboard-tabs {
+        display: flex;
+        border-bottom: 1px solid var(--border-color);
+        background-color: #fafbfc;
+    }
+
+    .tab-btn {
+        flex: 1;
+        background: transparent;
+        border: none;
+        padding: 24px 15px;
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text-gray);
+        cursor: pointer;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .tab-btn:hover { color: var(--text-dark); background-color: #fff; }
+    
+    .tab-btn.active {
+        color: var(--primary-color);
+        background-color: #fff;
+    }
+
+    .tab-btn.active::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background-color: var(--primary-color);
+    }
+
+    /* 内容区容器 */
+    .tab-content-container {
+        padding: 40px;
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .tab-pane {
+        display: none;
+        animation: slideUpFade 0.4s ease forwards;
+    }
+
+    .tab-pane.active { display: block; }
+
+    @keyframes slideUpFade {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* =========================================
+       各个 Tab 的专属布局样式
+       ========================================= */
+       
+    /* 1. Assembly Types (悬浮列表) */
+    .hover-list { list-style: none; }
+    
+    .hover-item {
+        padding: 20px;
+        border-radius: 12px;
+        border: 1px solid transparent;
+        margin-bottom: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .hover-item:hover {
+        background-color: var(--primary-light);
+        border-color: #ffe0db;
+        transform: translateX(5px);
+    }
+
+    .item-icon {
+        color: var(--primary-color);
+        margin-top: 2px;
+    }
+
+    .hover-item h4 { font-size: 18px; color: var(--text-dark); margin-bottom: 6px; }
+    .hover-item p { font-size: 14px; color: var(--text-gray); line-height: 1.5; }
+
+    /* 2. Tech Specs (数据网格) */
+    .spec-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    .spec-card {
+        padding: 20px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        background: #fafbfc;
+    }
+    .spec-card h4 { font-size: 15px; color: var(--text-dark); margin-bottom: 8px; }
+    .spec-card p { font-size: 14px; color: var(--text-gray); }
+    .spec-card strong { color: var(--primary-color); }
+
+    /* 3. Production Volume (阶梯卡片) */
+    .volume-layout { display: flex; flex-direction: column; gap: 16px; }
+    .volume-card {
+        display: flex;
+        align-items: center;
+        padding: 24px;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        background: #fff;
+        border-left: 4px solid var(--border-color);
+    }
+    .volume-card:nth-child(1) { border-left-color: #3b82f6; } /* 样板蓝 */
+    .volume-card:nth-child(2) { border-left-color: #10b981; } /* 小批绿 */
+    .volume-card:nth-child(3) { border-left-color: var(--primary-color); } /* 量产橙 */
+    
+    .vol-qty { font-size: 24px; font-weight: 800; color: var(--text-dark); width: 150px; }
+    .vol-desc h4 { font-size: 16px; margin-bottom: 4px; }
+    .vol-desc p { font-size: 14px; color: var(--text-gray); }
+
+    /* 4. Turn Times (垂直时间轴) */
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+        margin-top: 10px;
+    }
+    .timeline::before {
+        content: ''; position: absolute; left: 7px; top: 0; bottom: 0;
+        width: 2px; background-color: var(--border-color);
+    }
+    .time-node { position: relative; margin-bottom: 35px; }
+    .time-node::before {
+        content: ''; position: absolute; left: -30px; top: 4px;
+        width: 16px; height: 16px; border-radius: 50%;
+        background-color: #fff; border: 3px solid var(--primary-color);
+        box-shadow: 0 0 0 4px var(--primary-light);
+    }
+    .time-node h4 { font-size: 18px; color: var(--primary-color); margin-bottom: 6px; }
+    .time-node p { font-size: 14px; color: var(--text-gray); }
+    .time-node strong { color: var(--text-dark); }
+
+    /* =========================================
+       移动端自适应
+       ========================================= */
+    @media (max-width: 992px) {
+        .dashboard-wrapper { flex-direction: column; min-height: auto; }
+        .visual-panel { flex: none; height: 260px; width: 100%; }
+        
+        .dashboard-tabs { overflow-x: auto; scrollbar-width: none; }
+        .dashboard-tabs::-webkit-scrollbar { display: none; }
+        .tab-btn { flex: 0 0 auto; white-space: nowrap; padding: 20px; }
+        
+        .tab-content-container { padding: 24px 20px; }
+        .spec-grid { grid-template-columns: 1fr; }
+        
+        .volume-card { flex-direction: column; align-items: flex-start; gap: 12px; }
+    }
+</style>
+</head>
+<body>
+
+<section class="dashboard-section">
+    <div class="container">
+        
+        <div class="section-header">
+            <h2>Complete PCBA Manufacturing</h2>
+            <p>From advanced SMT placement for micro-components to full box build assembly, explore our comprehensive manufacturing capabilities tailored for your product lifecycle.</p>
+        </div>
+
+        <div class="dashboard-wrapper">
+            
+            <div class="visual-panel">
+                <img id="dashboard-img" class="dynamic-image" src="https://via.placeholder.com/800x1200/1a1a1a/ffffff?text=General+PCBA+Assembly" alt="PCBA Process">
+                
+                <div class="visual-overlay-text">
+                    <h3 id="overlay-title">High-Precision Assembly</h3>
+                    <p id="overlay-desc">Delivering reliable electronics manufacturing solutions.</p>
+                </div>
+            </div>
+
+            <div class="control-panel">
+                
+                <div class="dashboard-tabs">
+                    <button class="tab-btn active" data-tab="types" data-default-img="General+PCBA+Assembly" data-default-title="High-Precision Assembly">Assembly Types</button>
+                    <button class="tab-btn" data-tab="specs" data-default-img="BGA+01005+Components" data-default-title="Technical Capabilities">Component Specs</button>
+                    <button class="tab-btn" data-tab="volume" data-default-img="Mass+Production+Line" data-default-title="Flexible Production">Production Volume</button>
+                    <button class="tab-btn" data-tab="time" data-default-img="Global+Logistics+Shipping" data-default-title="Rapid Delivery">Turn Times</button>
+                </div>
+
+                <div class="tab-content-container">
+                    
+                    <div class="tab-pane active" id="types">
+                        <ul class="hover-list">
+                            <li class="hover-item" data-img="SMT+Placement+Machine" data-title="Surface Mount (SMT)">
+                                <div class="item-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect></svg>
+                                </div>
+                                <div>
+                                    <h4>Surface Mount (SMT)</h4>
+                                    <p>High-speed automated placement for fine-pitch components on single or double-sided boards.</p>
+                                </div>
+                            </li>
+                            <li class="hover-item" data-img="Wave+Soldering+Process" data-title="Through-Hole (THT)">
+                                <div class="item-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                                </div>
+                                <div>
+                                    <h4>Through-Hole (THT)</h4>
+                                    <p>Automated wave soldering and precise manual insertion for robust mechanical connections.</p>
+                                </div>
+                            </li>
+                            <li class="hover-item" data-img="Mixed+Technology+PCBA" data-title="Mixed Technology">
+                                <div class="item-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path></svg>
+                                </div>
+                                <div>
+                                    <h4>Mixed (SMT & THT)</h4>
+                                    <p>Seamless integration of SMT and Through-hole components on complex multi-layer architectures.</p>
+                                </div>
+                            </li>
+                            <li class="hover-item" data-img="Conformal+Coating" data-title="Specialized Assembly">
+                                <div class="item-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                                </div>
+                                <div>
+                                    <h4>Additional Services</h4>
+                                    <p>Flex PCB assembly, Conformal coating, and Shield cover assembly for EMI emission control.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="tab-pane" id="specs">
+                        <div class="spec-grid">
+                            <div class="spec-card">
+                                <h4>Min Component Size</h4>
+                                <p>Passive components down to <strong>01005</strong> size supported.</p>
+                            </div>
+                            <div class="spec-card">
+                                <h4>BGA & QFN Support</h4>
+                                <p>Down to <strong>0.35mm pitch</strong>. Includes POP (Package on Package) and WLCSP.</p>
+                            </div>
+                            <div class="spec-card">
+                                <h4>PCB Complexity</h4>
+                                <p>Support for <strong>Multi-layer PCB</strong>, Flex boards, and single/double-sided placement.</p>
+                            </div>
+                            <div class="spec-card">
+                                <h4>Connectors & Wiring</h4>
+                                <p>Hard metric connectors, Cable & wire harness integration.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane" id="volume">
+                        <div class="volume-layout">
+                            <div class="volume-card">
+                                <div class="vol-qty">1 – 100 pcs</div>
+                                <div class="vol-desc">
+                                    <h4>Prototype Assembly</h4>
+                                    <p>No MOQ. Ideal for engineering validation, NPI, and functional testing.</p>
+                                </div>
+                            </div>
+                            <div class="volume-card">
+                                <div class="vol-qty">100 – 1K pcs</div>
+                                <div class="vol-desc">
+                                    <h4>Low Volume Production</h4>
+                                    <p>Dedicated agile production lines for rapid market entry and pilot runs.</p>
+                                </div>
+                            </div>
+                            <div class="volume-card">
+                                <div class="vol-qty">1,000+ pcs</div>
+                                <div class="vol-desc">
+                                    <h4>Mass Production</h4>
+                                    <p>Highly automated assembly with ICT/AOI testing for cost-optimized scale.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane" id="time">
+                        <div class="timeline">
+                            <div class="time-node">
+                                <h4>Quick Turn (Same Day)</h4>
+                                <p>Available for <strong>consigned parts</strong>. Get your boards assembled in hours, not days.</p>
+                            </div>
+                            <div class="time-node">
+                                <h4>Fast Turnaround (2-5 Days)</h4>
+                                <p>Standard rapid assembly for turnkey or partial turnkey prototype projects.</p>
+                            </div>
+                            <div class="time-node">
+                                <h4>Standard Volume (10 Days)</h4>
+                                <p>Reliable and cost-effective schedule for high-volume manufacturing.</p>
+                            </div>
+                            <div class="time-node">
+                                <h4>Scheduled Delivery</h4>
+                                <p>Flexible call-off orders and inventory management for long-term production.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabPanes = document.querySelectorAll('.tab-pane');
+        const mainImage = document.getElementById('dashboard-img');
+        const overlayTitle = document.getElementById('overlay-title');
+        
+        // 更换图片的通用函数
+        function updateVisual(imgName, titleText) {
+            // 重新触发淡入动画
+            mainImage.classList.remove('fade-in');
+            void mainImage.offsetWidth; // 触发重绘 (Trigger reflow)
+            mainImage.classList.add('fade-in');
+            
+            // 模拟更换图片URL (实际使用时替换为真实图片路径)
+            mainImage.src = `https://via.placeholder.com/800x1200/1a1a1a/ffffff?text=${imgName}`;
+            overlayTitle.innerText = titleText;
+        }
+
+        // 1. Tab 切换逻辑
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // 重置 Tabs 和 Panes
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabPanes.forEach(p => p.classList.remove('active'));
+
+                // 激活当前 Tab
+                btn.classList.add('active');
+                const targetId = btn.getAttribute('data-tab');
+                document.getElementById(targetId).classList.add('active');
+
+                // 切换对应 Tab 的默认大图
+                const defaultImg = btn.getAttribute('data-default-img');
+                const defaultTitle = btn.getAttribute('data-default-title');
+                updateVisual(defaultImg, defaultTitle);
+            });
+        });
+
+        // 2. Assembly Types 列表悬浮逻辑
+        const hoverItems = document.querySelectorAll('.hover-item');
+        hoverItems.forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                const hoverImg = item.getAttribute('data-img');
+                const hoverTitle = item.getAttribute('data-title');
+                updateVisual(hoverImg, hoverTitle);
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

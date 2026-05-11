@@ -1,0 +1,53 @@
+---
+import type { EmsHomeEquipmentContent } from '../../types/ems-home';
+import { getAssetPath } from '../../lib/assets';
+
+export interface Props {
+  data: EmsHomeEquipmentContent;
+}
+
+const { data } = Astro.props;
+---
+
+<section class="bg-white py-16 sm:py-20">
+  <div class="mx-auto max-w-[1394px] px-6">
+    <div class="text-center">
+      <h2 class="text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
+        {data.title}
+      </h2>
+      <p class="mx-auto mt-4 max-w-3xl text-sm leading-6 text-slate-600 sm:text-base">
+        {data.description}
+      </p>
+    </div>
+
+    <div class="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-3">
+      {data.items.map((item, idx) => (
+        <article
+          class:list={[
+            'flex flex-col overflow-hidden rounded-[17px] bg-white shadow-[0_1px_4px_rgba(0,0,0,0.10),0_1px_2px_-1px_rgba(0,0,0,0.10)]',
+            idx === 0 ? 'lg:row-span-2' : ''
+          ]}
+        >
+          <div class:list={[idx === 0 ? 'h-[520px] lg:h-[620px]' : 'h-[220px]']}>
+            <img
+              src={getAssetPath(item.image_url)}
+              alt=""
+              class="h-full w-full object-cover"
+            />
+          </div>
+          <div class="p-6">
+            <h3 class="text-2xl font-medium leading-[34px] tracking-[-0.54px] text-slate-900">
+              {item.title}
+            </h3>
+            <p class="mt-1 text-[15px] leading-[19px] text-slate-500">{item.description}</p>
+            <div class="mt-5 flex items-center justify-between border-t border-slate-100 pt-4">
+              <span class="text-[15px] leading-[19px] text-slate-400">{item.parameter_label}</span>
+              <span class="text-[17px] leading-6 text-[#ea543f]">{item.parameter_value}</span>
+            </div>
+          </div>
+          <div class="mt-auto h-[5px] w-full shrink-0 bg-[#ea543f]" />
+        </article>
+      ))}
+    </div>
+  </div>
+</section>

@@ -1,0 +1,134 @@
+---
+import { getAssetPath } from '../../lib/assets';
+import type { WhyChooseUsContent } from '../../types/why-choose-us';
+
+export interface Props {
+  data: WhyChooseUsContent;
+}
+
+const { data } = Astro.props;
+
+const isImageUrl = (value?: string) => {
+  if (!value) return false;
+  const v = value.toLowerCase();
+  return (
+    v.startsWith('data:image/') ||
+    v.endsWith('.png') ||
+    v.endsWith('.jpg') ||
+    v.endsWith('.jpeg') ||
+    v.endsWith('.webp') ||
+    v.endsWith('.gif') ||
+    v.endsWith('.svg') ||
+    v.includes('/storage/v1/object/')
+  );
+};
+
+const isSvgUrl = (value?: string) => {
+  if (!value) return false;
+  const v = value.toLowerCase();
+  if (v.startsWith('data:image/svg+xml')) return true;
+  if (v.endsWith('.svg')) return true;
+  if (v.includes('/storage/v1/object/') && v.includes('.svg')) return true;
+  return false;
+};
+---
+
+<section class="bg-[#f8f9fa] py-20">
+  <div class="mx-auto max-w-7xl px-6">
+    <div class="mx-auto max-w-3xl text-center">
+      <h2 class="text-4xl font-extrabold tracking-[-0.5px] text-[#1a1a1a]">{data.title}</h2>
+      <p class="mt-4 text-base leading-7 text-[#666666]">{data.desc}</p>
+    </div>
+
+    <div class="mt-14 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+      {data.advantages.slice(0, 3).map((card, idx) => {
+        const iconSrc = card.icon_url ? getAssetPath(card.icon_url) : '';
+        return (
+          <article class="group rounded-2xl border border-[#eaeaea] bg-white p-10 shadow-[0_4px_20px_rgba(0,0,0,0.02)] transition hover:-translate-y-2 hover:border-[#ffe0db] hover:shadow-[0_15px_35px_rgba(239,83,63,0.08)]">
+            <div class="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-xl bg-[#fff0ed] text-[#ef533f] transition group-hover:scale-110">
+              {iconSrc && isSvgUrl(iconSrc) ? (
+                <span
+                  aria-hidden="true"
+                  class="h-7 w-7 bg-current"
+                  style={`-webkit-mask-image:url(${iconSrc});mask-image:url(${iconSrc});-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;-webkit-mask-size:contain;mask-size:contain;`}
+                />
+              ) : iconSrc && isImageUrl(iconSrc) ? (
+                <img src={iconSrc} alt="" class="h-7 w-7" />
+              ) : (
+                idx === 0 ? (
+                  <svg viewBox="0 0 24 24" class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    <path d="M9 12l2 2 4-4" />
+                  </svg>
+                ) : idx === 1 ? (
+                  <svg viewBox="0 0 24 24" class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                  </svg>
+                ) : (
+                  <svg viewBox="0 0 24 24" class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7" />
+                    <rect x="14" y="3" width="7" height="7" />
+                    <rect x="14" y="14" width="7" height="7" />
+                    <rect x="3" y="14" width="7" height="7" />
+                    <path d="M10 6.5h4" />
+                    <path d="M10 17.5h4" />
+                    <path d="M6.5 10v4" />
+                    <path d="M17.5 10v4" />
+                  </svg>
+                )
+              )}
+            </div>
+            <h3 class="text-xl font-bold text-[#1a1a1a]">{card.title}</h3>
+            <span class="mt-2 block text-sm font-bold uppercase tracking-[0.5px] text-[#ef533f]">{card.highlight}</span>
+            <p class="mt-4 text-[15px] leading-7 text-[#666666]">{card.desc}</p>
+          </article>
+        );
+      })}
+    </div>
+
+    <div class="mt-14 flex flex-col items-center justify-between gap-8 rounded-2xl bg-[#111111] px-10 py-10 shadow-[0_20px_40px_rgba(0,0,0,0.10)] lg:flex-row">
+      <div class="flex w-full flex-col gap-7 md:flex-row md:justify-center lg:w-auto lg:justify-start">
+        {data.stats_bar.stats.slice(0, 3).map((s) => (
+          <div class="flex flex-col">
+            <div class="text-4xl font-extrabold leading-[1.1] text-[#ef533f]">{s.number}</div>
+            <div class="mt-2 text-xs font-bold uppercase tracking-[0.5px] text-[#aaaaaa]">{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      <div class="hidden h-16 w-px bg-[#333333] lg:block" />
+      <div class="h-px w-28 bg-[#333333] lg:hidden" />
+
+      <div class="flex w-full flex-col items-center justify-center gap-6 md:flex-row lg:w-auto lg:justify-end">
+        <div class="flex flex-wrap items-center justify-center gap-4">
+          <span class="inline-flex items-center gap-2 rounded-md border border-[#444444] bg-[#1a1a1a] px-4 py-2 text-xs font-bold text-white">
+            <span class="text-[#ef533f]">
+              <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
+              </svg>
+            </span>
+            ISO 9001
+          </span>
+          <span class="inline-flex items-center gap-2 rounded-md border border-[#444444] bg-[#1a1a1a] px-4 py-2 text-xs font-bold text-white">
+            <span class="text-[#ef533f]">
+              <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
+              </svg>
+            </span>
+            IATF 16949
+          </span>
+        </div>
+
+        <a
+          href={data.stats_bar.button.href}
+          class="inline-flex items-center justify-center whitespace-nowrap rounded-full bg-[#ef533f] px-8 py-4 text-sm font-bold text-white shadow-[0_10px_20px_rgba(239,83,63,0.20)] transition hover:translate-y-[-2px] hover:bg-[#d64734] hover:shadow-[0_15px_30px_rgba(239,83,63,0.30)]"
+        >
+          {data.stats_bar.button.text}
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

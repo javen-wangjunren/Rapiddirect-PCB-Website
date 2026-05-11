@@ -1,0 +1,1170 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PCB 项目代码地图</title>
+    <style>
+      :root {
+        --bg: #f4efe6;
+        --panel: rgba(255, 252, 247, 0.88);
+        --panel-strong: #fffdf9;
+        --ink: #1f2937;
+        --muted: #6b7280;
+        --line: #d8cfc1;
+        --accent: #c66a3d;
+        --accent-2: #165d52;
+        --accent-3: #3863a8;
+        --accent-soft: rgba(198, 106, 61, 0.14);
+        --shadow: 0 18px 50px rgba(93, 73, 53, 0.12);
+        --radius: 22px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Avenir Next", "PingFang SC", "Noto Sans SC", sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top left, rgba(250, 219, 186, 0.6), transparent 30%),
+          radial-gradient(circle at top right, rgba(183, 224, 214, 0.45), transparent 28%),
+          linear-gradient(180deg, #f8f4ec 0%, #f1ece3 100%);
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .shell {
+        max-width: 1480px;
+        margin: 0 auto;
+        padding: 28px;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: 1.3fr 0.7fr;
+        gap: 22px;
+        margin-bottom: 22px;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid rgba(216, 207, 193, 0.85);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(12px);
+      }
+
+      .hero-main {
+        padding: 28px 30px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero-main::after {
+        content: "";
+        position: absolute;
+        right: -48px;
+        top: -48px;
+        width: 220px;
+        height: 220px;
+        background: radial-gradient(circle, rgba(198, 106, 61, 0.18), transparent 68%);
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        padding: 8px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent-2);
+        background: rgba(22, 93, 82, 0.1);
+      }
+
+      h1 {
+        margin: 16px 0 12px;
+        font-size: clamp(32px, 4vw, 54px);
+        line-height: 1.02;
+        letter-spacing: -0.04em;
+      }
+
+      .hero-copy {
+        margin: 0;
+        max-width: 760px;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.75;
+      }
+
+      .hero-points {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 24px;
+      }
+
+      .point {
+        background: rgba(255, 255, 255, 0.76);
+        border: 1px solid rgba(216, 207, 193, 0.8);
+        border-radius: 18px;
+        padding: 16px;
+      }
+
+      .point strong {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 14px;
+      }
+
+      .point span {
+        display: block;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.65;
+      }
+
+      .hero-side {
+        padding: 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .hero-side h2 {
+        margin: 0 0 6px;
+        font-size: 18px;
+      }
+
+      .stat-card {
+        background: rgba(255, 255, 255, 0.7);
+        border: 1px solid rgba(216, 207, 193, 0.85);
+        border-radius: 18px;
+        padding: 16px 18px;
+      }
+
+      .stat-card .value {
+        display: block;
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+      }
+
+      .stat-card .label {
+        display: block;
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .workspace-link {
+        margin-top: auto;
+        padding: 16px 18px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, rgba(22, 93, 82, 0.12), rgba(56, 99, 168, 0.12));
+        border: 1px solid rgba(22, 93, 82, 0.16);
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      .main {
+        display: grid;
+        grid-template-columns: 260px minmax(0, 1fr) 400px;
+        gap: 22px;
+      }
+
+      .sidebar,
+      .detail {
+        padding: 18px;
+      }
+
+      .sidebar h2,
+      .detail h2 {
+        margin: 6px 0 14px;
+        font-size: 16px;
+      }
+
+      .section-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .section-btn {
+        width: 100%;
+        text-align: left;
+        border: 1px solid rgba(216, 207, 193, 0.88);
+        background: rgba(255, 255, 255, 0.72);
+        color: var(--ink);
+        border-radius: 16px;
+        padding: 14px 15px;
+        cursor: pointer;
+        transition: 180ms ease;
+      }
+
+      .section-btn:hover,
+      .section-btn.active {
+        transform: translateY(-1px);
+        border-color: rgba(198, 106, 61, 0.45);
+        background: linear-gradient(135deg, rgba(198, 106, 61, 0.14), rgba(255, 255, 255, 0.95));
+      }
+
+      .section-btn strong {
+        display: block;
+        font-size: 14px;
+        margin-bottom: 6px;
+      }
+
+      .section-btn span {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.55;
+      }
+
+      .legend {
+        margin-top: 18px;
+        padding-top: 16px;
+        border-top: 1px solid rgba(216, 207, 193, 0.85);
+      }
+
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 9px;
+      }
+
+      .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+      }
+
+      .canvas {
+        padding: 20px;
+      }
+
+      .canvas-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: flex-start;
+        margin-bottom: 12px;
+      }
+
+      .canvas-head h2 {
+        margin: 0;
+        font-size: 18px;
+      }
+
+      .canvas-head p {
+        margin: 6px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      .hint {
+        flex-shrink: 0;
+        font-size: 12px;
+        color: var(--muted);
+        background: rgba(255, 255, 255, 0.72);
+        border: 1px solid rgba(216, 207, 193, 0.8);
+        padding: 10px 12px;
+        border-radius: 14px;
+      }
+
+      .diagram-wrap {
+        overflow: auto;
+        border-radius: 20px;
+        border: 1px solid rgba(216, 207, 193, 0.82);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(250, 246, 240, 0.95));
+      }
+
+      svg {
+        display: block;
+        width: 100%;
+        min-width: 900px;
+        height: auto;
+      }
+
+      .edge {
+        stroke: #c8b9a6;
+        stroke-width: 2.4;
+        fill: none;
+        opacity: 0.95;
+      }
+
+      .edge.muted {
+        stroke-dasharray: 8 6;
+      }
+
+      .edge.active {
+        stroke: var(--accent);
+        stroke-width: 3.4;
+      }
+
+      .node rect {
+        fill: rgba(255, 255, 255, 0.9);
+        stroke: rgba(198, 106, 61, 0.18);
+        stroke-width: 1.5;
+        rx: 22;
+        transition: 160ms ease;
+      }
+
+      .node .node-pill {
+        fill: rgba(198, 106, 61, 0.11);
+        stroke: transparent;
+      }
+
+      .node text {
+        font-family: "Avenir Next", "PingFang SC", "Noto Sans SC", sans-serif;
+        pointer-events: none;
+      }
+
+      .node-title {
+        font-size: 17px;
+        font-weight: 700;
+        fill: #1f2937;
+      }
+
+      .node-sub {
+        font-size: 12px;
+        fill: #6b7280;
+      }
+
+      .node:hover rect,
+      .node.active rect {
+        fill: rgba(255, 248, 243, 1);
+        stroke: rgba(198, 106, 61, 0.75);
+        stroke-width: 2.4;
+        filter: drop-shadow(0 12px 22px rgba(198, 106, 61, 0.12));
+      }
+
+      .detail-card {
+        background: rgba(255, 255, 255, 0.76);
+        border: 1px solid rgba(216, 207, 193, 0.82);
+        border-radius: 18px;
+        padding: 16px;
+        margin-bottom: 12px;
+      }
+
+      .detail-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: var(--accent-2);
+        background: rgba(22, 93, 82, 0.08);
+        border-radius: 999px;
+        padding: 7px 10px;
+        margin-bottom: 10px;
+      }
+
+      .detail p {
+        margin: 0 0 12px;
+        font-size: 13px;
+        line-height: 1.75;
+        color: var(--muted);
+      }
+
+      .detail h3 {
+        margin: 0 0 8px;
+        font-size: 24px;
+        letter-spacing: -0.03em;
+      }
+
+      .detail h4 {
+        margin: 0 0 8px;
+        font-size: 13px;
+      }
+
+      .chip-list,
+      .file-list,
+      .route-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .chip,
+      .route {
+        padding: 7px 10px;
+        border-radius: 999px;
+        background: rgba(56, 99, 168, 0.08);
+        color: var(--accent-3);
+        font-size: 12px;
+        text-decoration: none;
+      }
+
+      .file-list a {
+        display: block;
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.85);
+        border: 1px solid rgba(216, 207, 193, 0.88);
+        text-decoration: none;
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      .file-list a:hover {
+        border-color: rgba(198, 106, 61, 0.45);
+        background: rgba(255, 248, 243, 1);
+      }
+
+      .detail-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .mini-flow {
+        margin-top: 8px;
+        padding-left: 18px;
+      }
+
+      .mini-flow li {
+        margin-bottom: 8px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      .footer-note {
+        margin-top: 18px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.7;
+      }
+
+      @media (max-width: 1180px) {
+        .main,
+        .hero {
+          grid-template-columns: 1fr;
+        }
+
+        svg {
+          min-width: 820px;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .shell {
+          padding: 14px;
+        }
+
+        .hero-main,
+        .hero-side,
+        .sidebar,
+        .canvas,
+        .detail {
+          padding: 16px;
+        }
+
+        .hero-points {
+          grid-template-columns: 1fr;
+        }
+
+        svg {
+          min-width: 760px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <section class="hero">
+        <div class="panel hero-main">
+          <span class="eyebrow">Interactive Project Atlas</span>
+          <h1>PCB 项目代码地图</h1>
+          <p class="hero-copy">
+            这是一份面向当前仓库的交互式代码地图，重点解释
+            <strong>`apps/ems-site`</strong> 如何把 Astro 前台、React 后台 CMS、Supabase
+            内容表、媒体库和联系表单 worker 串成一个完整系统。点击中间图上的节点，右侧会展示该部分的职责、关键文件、上下游关系和阅读建议。
+          </p>
+          <div class="hero-points">
+            <div class="point">
+              <strong>前台读链路</strong>
+              <span>页面运行时从 Supabase 拉取已发布内容，再与本地默认结构 merge + normalize 后渲染。</span>
+            </div>
+            <div class="point">
+              <strong>后台写链路</strong>
+              <span>编辑器读写 `pages`、`page_content`、`seo_meta`，管理发布状态和 SEO 信息。</span>
+            </div>
+            <div class="point">
+              <strong>外围能力</strong>
+              <span>媒体库走 Supabase Storage，询盘表单走独立 Cloudflare Worker + Resend。</span>
+            </div>
+          </div>
+        </div>
+
+        <aside class="panel hero-side">
+          <h2>快速概览</h2>
+          <div class="stat-card">
+            <span class="value">6</span>
+            <span class="label">核心模块视图：总览 / 前台 / 后台 / 内容模型 / 数据层 / 外围能力</span>
+          </div>
+          <div class="stat-card">
+            <span class="value">20+</span>
+            <span class="label">可直接跳转的关键文件入口，覆盖页面、组件、Supabase、worker</span>
+          </div>
+          <div class="stat-card">
+            <span class="value">1</span>
+            <span class="label">单文件 HTML，无需依赖外部 CDN，本地直接打开即可交互查看</span>
+          </div>
+          <div class="workspace-link">
+            <strong>建议用法：</strong><br />
+            先看“项目总览”，建立整体结构；再切到“前台渲染”或“后台 CMS”查看实际链路；最后从右侧关键文件直接跳到源码。
+          </div>
+        </aside>
+      </section>
+
+      <section class="main">
+        <aside class="panel sidebar">
+          <h2>视图切换</h2>
+          <div class="section-nav" id="section-nav"></div>
+          <div class="legend">
+            <div class="legend-item"><span class="dot" style="background:#c66a3d"></span>核心内容流 / 主业务节点</div>
+            <div class="legend-item"><span class="dot" style="background:#165d52"></span>后台管理 / 运营链路</div>
+            <div class="legend-item"><span class="dot" style="background:#3863a8"></span>外部服务 / 基础设施</div>
+          </div>
+        </aside>
+
+        <div class="panel canvas">
+          <div class="canvas-head">
+            <div>
+              <h2 id="view-title">项目总览</h2>
+              <p id="view-desc"></p>
+            </div>
+            <div class="hint">点击节点看职责与关键文件</div>
+          </div>
+          <div class="diagram-wrap">
+            <svg id="map-svg" viewBox="0 0 1180 760" aria-label="项目代码地图"></svg>
+          </div>
+        </div>
+
+        <aside class="panel detail">
+          <h2>节点详情</h2>
+          <div id="detail-content"></div>
+        </aside>
+      </section>
+    </div>
+
+    <script>
+      const sections = [
+        {
+          id: "overview",
+          label: "项目总览",
+          blurb: "把前台、后台、数据库、媒体库和 worker 放到一张图里看整体关系。"
+        },
+        {
+          id: "frontend",
+          label: "前台渲染",
+          blurb: "从 Astro 路由到内容 merge、normalize，再到页面区块渲染。"
+        },
+        {
+          id: "admin",
+          label: "后台 CMS",
+          blurb: "从登录、加载内容到保存草稿/发布，覆盖完整编辑器链路。"
+        },
+        {
+          id: "content",
+          label: "内容模型",
+          blurb: "defaults、schemas、normalize 如何共同定义结构化内容。"
+        },
+        {
+          id: "data",
+          label: "数据层",
+          blurb: "Supabase 的页面表、SEO 表、媒体表和权限边界。"
+        },
+        {
+          id: "peripheral",
+          label: "外围能力",
+          blurb: "媒体库与询盘表单 worker 的职责与数据边界。"
+        }
+      ];
+
+      const nodeDetails = {
+        routes: {
+          title: "Astro 路由层",
+          tag: "前台入口",
+          summary:
+            "位于 `src/pages`，负责把 URL 映射成页面入口文件。这里的页面更多是在做“组装”，不是承担复杂业务逻辑。",
+          responsibilities: [
+            "接收 `/ems/`、`/pcb-assembly/`、`/login/`、`/admin/*` 等路径请求",
+            "决定当前页面使用哪个 Layout 和哪些区块组件",
+            "在需要时触发 Supabase 查询并把结果交给组件"
+          ],
+          files: [
+            ["/Users/javen/Desktop/Javen Project/PCB/apps/ems-site/src/pages/index.astro", "首页 `/ems/` 入口"],
+            ["/Users/javen/Desktop/Javen Project/PCB/apps/ems-site/src/pages/pcb-assembly.astro", "PCB Assembly 页面"],
+            ["/Users/javen/Desktop/Javen Project/PCB/apps/ems-site/src/pages/login.astro", "后台登录页"],
+            ["/Users/javen/Desktop/Javen Project/PCB/apps/ems-site/src/pages/admin/pages/index.astro", "后台页面索引"]
+          ],
+          related: ["queries", "components", "admin-ui"],
+          routes: ["/ems/", "/pcb-assembly/", "/login/", "/admin/pages/"],
+          flow: [
+            "URL 命中某个 `.astro` 文件",
+            "页面创建 Supabase client 或直接挂载 React 组件",
+            "把数据和 SEO 传入 Layout / Section 组件",
+            "输出 HTML 或后台管理界面"
+          ]
+        },
+        components: {
+          title: "页面组件层",
+          tag: "渲染层",
+          summary:
+            "`src/components/common`、`src/components/ems`、`src/components/pcb-assembly` 负责真正把内容渲染成页面区块。",
+          responsibilities: [
+            "把结构化 JSON 转成 Hero、Services、FAQ、QuoteForm 等区块",
+            "保持显示层尽量纯粹，少碰数据清洗逻辑",
+            "前台组件和后台编辑器共享同一套内容模型"
+          ],
+          files: [
+            ["/Users/javen/Desktop/Javen Project/PCB/apps/ems-site/src/components/common/HeroBanner.astro", "首页 Hero 区块"],
+            ["/Users/javen/Desktop/Javen Project/PCB/apps/ems-site/src/components/ems/ServicesSection.astro", "EMS 服务区块"],
+            ["/Users/javen/Desktop/Javen Project/PCB/apps/ems-site/src/components/common/FaqSection.astro", "FAQ 区块"],
+            ["/Users/javen/Desktop/Javen Project/PCB/apps/ems-site/src/components/common/QuoteFormSection.tsx", "询盘表单区块"]
+          ],
+          related: ["routes", "content-defaults", "worker"],
+          routes: ["UI Sections", "Layouts", "Shared Types"],
+          flow: [
+            "页面入口准备好 `data`",
+            "组件只消费约定好的字段结构",
+            "出错兜底尽量由 normalize 或默认值处理"
+          ]
+        },
+        queries: {
+          title: "前台 Supabase 查询",
+          tag: "读取已发布页面",
+          summary:
+            "`src/lib/supabase/queries.ts` 负责读取已发布的 `pages`、`page_content`、`seo_meta`，供前台公开页面使用。",
+          responsibilities: [
+            "只查询 `status = published` 的页面",
+            "按 slug 读取页面基础信息、内容 JSON 和 SEO 信息",
+            "把数据库结果封装成前台易用的 PageBundle"
+          ],
+          files: [
+            ["/Users/javen/Desktop/Javen Project/PCB/apps/ems-site/src/lib/supabase/queries.ts", "前台页面查询"],
+            ["/Users/javen/Desktop/Javen Project/PCB/apps/ems-site/src/lib/supabase/client.ts", "前台 Supabase client"],
+            ["/Users/javen/Desktop/Javen Project/PCB/apps/ems-site/src/lib/supabase/mappers.ts", "fallback merge 逻辑"]
+          ],
+          related: ["database", "content-defaults", "normalize"],
+          routes: ["PageBundle", "SEO", "content_json"],
+          flow: [
+            "用 slug 去 `pages` 表查已发布记录",
+            "并行读取 `page_content` 和 `seo_meta`",
+            "返回 `{ page, content, seo }` 供页面使用"
+          ]
+        },
+        "content-defaults": {
+          title: "默认内容层",
+          tag: "兜底结构",
+          summary:
+            "`src/content/defaults` 定义每个页面/模块的默认内容结构，保证数据库缺字段时前台和后台仍能工作。",
+          responsibilities: [
+            "为 Hero、Services、FAQ 等模块提供完整字段骨架",
+            "帮助后台创建空页面时获得稳定初始数据",
+            "减少前台组件出现 `undefined.map` 或 `undefined.startsWith` 的概率"
+          ],
+          files: [
+            ["/Users/javen/Desktop/Javen Project/PCB/apps/ems-site/src/content/defaults/ems.ts", "EMS 首页默认内容"],
+            ["/Users/javen/Desktop/Javen Project/PCB/apps/ems-site/src/content/defaults/pcb-assembly.ts", "PCB Assembly 默认内容"]
+          ],
+          related: ["normalize", "schema", "components"],
+          routes: ["defaults", "fallback", "editor init"],
+          flow: [
+            "初始化编辑器内容",
+            "前台查询后与数据库内容做 merge",
+            "作为结构化内容的最底层兜底"
+          ]
+        },
+        normalize: {
+          title: "内容 Normalize 层",
+          tag: "兼容旧数据",
+          summary:
+            "`src/content/normalize` 用来修正历史 `content_json` 的形状差异，让前台和后台都看到统一结构。",
+          responsibilities: [
+            "把字符串/数组/对象等旧格式整理成统一结构",
+            "避免把脏数据判断散落到很多 UI 组件里",
+            "承接历史数据兼容和未来结构演进"
+          ],
+          files: [
+            ["/Users/javen/Desktop/Javen Project/PCB/apps/ems-site/src/content/normalize/ems.ts", "EMS normalize 逻辑"],
+            ["/Users/javen/Desktop/Javen Project/PCB/apps/ems-site/src/content/normalize/pcb-assembly.ts", "PCB Assembly normalize 逻辑"]
+          ],
+          related: ["content-defaults", "components", "admin-ui"],
+          routes: ["normalizeEmsHomeContentJson()", "legacy content_json"],
+          flow: [
+            "拿到 merge 后的内容对象",
+            "对关键模块做结构标准化",
+            "把最终结果交给前台组件或后台编辑器"
+          ]
+        },
+        "admin-ui": {
+          title: "后台编辑器 UI",
+          tag: "CMS 入口",
+          summary:
+            "`src/components/admin` 是后台管理界面的主体，包括登录、页面列表、页面编辑器、SEO 编辑和发布侧栏。",
+          responsibilities: [
+            "校验当前登录态并进入对应页面",
+            "把 schema 渲染成模块化表单",
+            "协调内容编辑、SEO 编辑、发布状态切换"
+          ],
+          files: [
+            ["/Users/javen/Desktop/Javen Project/PCB/apps/ems-site/src/components/admin/AdminLogin.tsx", "后台登录"],
+            ["/Users/javen/Desktop/Javen Project/PCB/apps/ems-site/src/components/admin/AdminPageEditor.tsx", "通用页面编辑入口"],
+            ["/Users/javen/Desktop/Javen Project/PCB/apps/ems-site/src/components/admin/EmsPageEditor.tsx", "EMS 编辑器"],
+            ["/Users/javen/Desktop/Javen Project/PCB/apps/ems-site/src/components/admin/EmsEditorContentModules.tsx", "内容模块编辑"]
+          ],
+          related: ["admin-queries", "schema", "database", "media"],
+          routes: ["/login/", "/admin/pages/", "/admin/media/"],
+          flow: [
+            "登录后读取页面 bundle",
+            "把 `content_json` merge + normalize 后进入编辑器",
+            "用户修改后触发保存或发布"
+          ]
+        },
+        "admin-queries": {
+          title: "后台读写接口",
+          tag: "CMS 数据核心",
+          summary:
+            "`src/lib/supabase/adminQueries.ts` 封装后台管理所需的数据操作，包括页面列表、按 slug 读取、创建页面和保存 bundle。",
+          responsibilities: [
+            "查询所有页面或分页筛选页面",
+            "按 slug 读取草稿/已发布页面的完整 bundle",
+            "更新 `pages`、`page_content`、`seo_meta`"
+          ],
+          files: [
+            ["/Users/javen/Desktop/Javen Project/PCB/apps/ems-site/src/lib/supabase/adminQueries.ts", "后台页面查询与保存"],
+            ["/Users/javen/Desktop/Javen Project/PCB/apps/ems-site/src/lib/supabase/adminClient.ts", "后台 Supabase client"]
+          ],
+          related: ["admin-ui", "database", "content-defaults"],
+          routes: ["listPagesForAdmin()", "getPageBundleBySlugForAdmin()", "saveAdminBundle()"],
+          flow: [
+            "后台请求进入 adminQueries",
+            "按需求读 `pages / page_content / seo_meta`",
+            "保存时分别 update / upsert 三张表"
+          ]
+        },
+        schema: {
+          title: "Schema 结构定义",
+          tag: "编辑器蓝图",
+          summary:
+            "`src/content/schemas` 描述后台编辑器要暴露哪些字段、字段是什么类型，本质上是在定义内容 JSON 的编辑规则。",
+          responsibilities: [
+            "为每个页面模板提供结构定义",
+            "驱动 SchemaForm 或模块编辑器生成可编辑界面",
+            "保证内容模型和后台 UI 保持一致"
+          ],
+          files: [
+            ["/Users/javen/Desktop/Javen Project/PCB/apps/ems-site/src/content/schemas/ems.ts", "EMS schema"],
+            ["/Users/javen/Desktop/Javen Project/PCB/apps/ems-site/src/content/schemas/pcb-assembly.ts", "PCB Assembly schema"],
+            ["/Users/javen/Desktop/Javen Project/PCB/apps/ems-site/src/components/admin/SchemaForm.tsx", "结构化表单渲染"]
+          ],
+          related: ["content-defaults", "normalize", "admin-ui"],
+          routes: ["hero", "services", "faq", "quote_form"],
+          flow: [
+            "schema 定义字段层级和类型",
+            "后台编辑器按 schema 渲染模块",
+            "最终生成 `content_json`"
+          ]
+        },
+        database: {
+          title: "Supabase 数据层",
+          tag: "核心持久化",
+          summary:
+            "项目内容持久化主要依赖 `pages`、`page_content`、`seo_meta`，媒体库则额外依赖 `media_assets` 和 `media_folders`。",
+          responsibilities: [
+            "保存页面基础信息、SEO 和结构化 JSON 内容",
+            "用 RLS 限制前台只能读取已发布页面",
+            "承接后台 CMS 和媒体库的数据存储"
+          ],
+          files: [
+            ["/Users/javen/Desktop/Javen Project/PCB/supabase/migrations/phase4_schema.sql", "页面主表与 RLS"],
+            ["/Users/javen/Desktop/Javen Project/PCB/supabase/migrations/phase7_media_library.sql", "媒体资产表"],
+            ["/Users/javen/Desktop/Javen Project/PCB/supabase/migrations/phase7_media_folders.sql", "媒体文件夹表"],
+            ["/Users/javen/Desktop/Javen Project/PCB/supabase/migrations/phase9_media_assets_folder_id.sql", "folder_id 演进"]
+          ],
+          related: ["queries", "admin-queries", "media"],
+          routes: ["pages", "page_content", "seo_meta", "media_assets"],
+          flow: [
+            "`pages` 负责 slug、title、template_type、status",
+            "`page_content` 负责 JSON 内容",
+            "`seo_meta` 负责 SEO 字段",
+            "媒体库元数据走 `media_assets` / `media_folders`"
+          ]
+        },
+        media: {
+          title: "媒体库",
+          tag: "资源管理",
+          summary:
+            "后台媒体库既要操作 Supabase Storage，又要维护数据库中的 `media_assets`、`media_folders` 元数据，因此是一个双写边界。",
+          responsibilities: [
+            "列出和筛选媒体资源",
+            "创建文件夹、移动文件、删除文件",
+            "维护 `public_url`、`alt`、`folder_id` 等元数据"
+          ],
+          files: [
+            ["/Users/javen/Desktop/Javen Project/PCB/apps/ems-site/src/components/admin/AdminMediaLibrary.tsx", "媒体库 UI"],
+            ["/Users/javen/Desktop/Javen Project/PCB/apps/ems-site/src/lib/supabase/adminMedia.ts", "媒体库数据逻辑"],
+            ["/Users/javen/Desktop/Javen Project/PCB/apps/ems-site/src/pages/admin/media/index.astro", "媒体库页面入口"]
+          ],
+          related: ["admin-ui", "database", "components"],
+          routes: ["media bucket", "media_assets", "media_folders"],
+          flow: [
+            "UI 发起媒体操作",
+            "Storage 执行上传/移动/删除",
+            "数据库同步路径、目录、公开 URL 和 metadata"
+          ]
+        },
+        worker: {
+          title: "联系表单 Worker",
+          tag: "询盘后端",
+          summary:
+            "Quote Form 的提交逻辑没有写在 Astro 站点里，而是由 `workers/contact-worker` 单独处理，负责安全校验和发信。",
+          responsibilities: [
+            "接收 multipart/form-data 表单",
+            "校验 Turnstile token、必填字段、附件大小",
+            "通过 Resend 将线索邮件发送到业务邮箱"
+          ],
+          files: [
+            ["/Users/javen/Desktop/Javen Project/PCB/workers/contact-worker/src/index.ts", "Worker 入口"],
+            ["/Users/javen/Desktop/Javen Project/PCB/workers/contact-worker/wrangler.toml", "Worker 配置"],
+            ["/Users/javen/Desktop/Javen Project/PCB/apps/ems-site/src/lib/env/index.ts", "前台 contact endpoint 环境变量"]
+          ],
+          related: ["components", "database"],
+          routes: ["PUBLIC_CONTACT_ENDPOINT", "Turnstile", "Resend"],
+          flow: [
+            "前台 Quote Form 提交 multipart/form-data",
+            "Worker 做字段和验证码校验",
+            "成功后调用 Resend API 发出询盘邮件"
+          ]
+        }
+      };
+
+      const views = {
+        overview: {
+          title: "项目总览",
+          desc: "把页面入口、内容流、后台写入、媒体库和询盘表单放到一张全景图里，适合第一次认识这个项目时使用。",
+          nodes: [
+            { id: "routes", x: 90, y: 92, w: 220, h: 112, color: "#c66a3d" },
+            { id: "components", x: 360, y: 92, w: 220, h: 112, color: "#c66a3d" },
+            { id: "queries", x: 630, y: 92, w: 220, h: 112, color: "#c66a3d" },
+            { id: "database", x: 900, y: 92, w: 220, h: 112, color: "#3863a8" },
+            { id: "content-defaults", x: 360, y: 264, w: 220, h: 112, color: "#165d52" },
+            { id: "normalize", x: 630, y: 264, w: 220, h: 112, color: "#165d52" },
+            { id: "admin-ui", x: 90, y: 472, w: 220, h: 112, color: "#165d52" },
+            { id: "admin-queries", x: 360, y: 472, w: 220, h: 112, color: "#165d52" },
+            { id: "media", x: 630, y: 472, w: 220, h: 112, color: "#3863a8" },
+            { id: "worker", x: 900, y: 472, w: 220, h: 112, color: "#3863a8" }
+          ],
+          edges: [
+            { from: "routes", to: "components" },
+            { from: "components", to: "queries" },
+            { from: "queries", to: "database" },
+            { from: "content-defaults", to: "normalize" },
+            { from: "normalize", to: "components" },
+            { from: "admin-ui", to: "admin-queries" },
+            { from: "admin-queries", to: "database" },
+            { from: "admin-ui", to: "media" },
+            { from: "components", to: "worker", muted: true }
+          ]
+        },
+        frontend: {
+          title: "前台渲染链路",
+          desc: "对应 `src/pages/index.astro` 的典型逻辑：读取已发布页面，merge 默认值，normalize 内容，再交给区块组件。",
+          nodes: [
+            { id: "routes", x: 70, y: 270, w: 220, h: 112, color: "#c66a3d" },
+            { id: "queries", x: 340, y: 270, w: 220, h: 112, color: "#c66a3d" },
+            { id: "database", x: 610, y: 92, w: 220, h: 112, color: "#3863a8" },
+            { id: "content-defaults", x: 610, y: 270, w: 220, h: 112, color: "#165d52" },
+            { id: "normalize", x: 610, y: 448, w: 220, h: 112, color: "#165d52" },
+            { id: "components", x: 890, y: 270, w: 220, h: 112, color: "#c66a3d" }
+          ],
+          edges: [
+            { from: "routes", to: "queries" },
+            { from: "queries", to: "database" },
+            { from: "queries", to: "content-defaults", muted: true },
+            { from: "content-defaults", to: "normalize" },
+            { from: "database", to: "normalize", muted: true },
+            { from: "normalize", to: "components" }
+          ]
+        },
+        admin: {
+          title: "后台 CMS 链路",
+          desc: "从 `/login/` 和 `/admin/*` 进入后台，读取页面 bundle，编辑后保存到 `pages / page_content / seo_meta`。",
+          nodes: [
+            { id: "routes", x: 70, y: 90, w: 220, h: 112, color: "#165d52" },
+            { id: "admin-ui", x: 350, y: 90, w: 220, h: 112, color: "#165d52" },
+            { id: "schema", x: 350, y: 270, w: 220, h: 112, color: "#165d52" },
+            { id: "content-defaults", x: 350, y: 450, w: 220, h: 112, color: "#165d52" },
+            { id: "admin-queries", x: 670, y: 270, w: 220, h: 112, color: "#165d52" },
+            { id: "database", x: 930, y: 270, w: 220, h: 112, color: "#3863a8" },
+            { id: "media", x: 930, y: 450, w: 220, h: 112, color: "#3863a8" }
+          ],
+          edges: [
+            { from: "routes", to: "admin-ui" },
+            { from: "schema", to: "admin-ui", muted: true },
+            { from: "content-defaults", to: "admin-ui", muted: true },
+            { from: "admin-ui", to: "admin-queries" },
+            { from: "admin-queries", to: "database" },
+            { from: "admin-ui", to: "media", muted: true }
+          ]
+        },
+        content: {
+          title: "内容模型视图",
+          desc: "这一层是这个项目的关键抽象：内容结构先被定义，再被前台和后台共同消费。",
+          nodes: [
+            { id: "content-defaults", x: 120, y: 250, w: 220, h: 112, color: "#165d52" },
+            { id: "schema", x: 420, y: 90, w: 220, h: 112, color: "#165d52" },
+            { id: "normalize", x: 420, y: 410, w: 220, h: 112, color: "#165d52" },
+            { id: "components", x: 790, y: 110, w: 220, h: 112, color: "#c66a3d" },
+            { id: "admin-ui", x: 790, y: 410, w: 220, h: 112, color: "#165d52" }
+          ],
+          edges: [
+            { from: "content-defaults", to: "normalize" },
+            { from: "schema", to: "admin-ui" },
+            { from: "normalize", to: "components" },
+            { from: "normalize", to: "admin-ui", muted: true },
+            { from: "content-defaults", to: "admin-ui", muted: true }
+          ]
+        },
+        data: {
+          title: "数据层与权限边界",
+          desc: "Supabase 既保存页面内容，也托管媒体库元数据；前台和后台访问同一份数据，但权限和使用方式不同。",
+          nodes: [
+            { id: "queries", x: 90, y: 140, w: 220, h: 112, color: "#c66a3d" },
+            { id: "admin-queries", x: 90, y: 420, w: 220, h: 112, color: "#165d52" },
+            { id: "database", x: 450, y: 270, w: 280, h: 132, color: "#3863a8" },
+            { id: "media", x: 860, y: 270, w: 220, h: 112, color: "#3863a8" }
+          ],
+          edges: [
+            { from: "queries", to: "database" },
+            { from: "admin-queries", to: "database" },
+            { from: "media", to: "database", muted: true }
+          ]
+        },
+        peripheral: {
+          title: "外围能力视图",
+          desc: "媒体库和表单 worker 都是站点之外但强相关的能力，通常也是排查问题时最容易跨边界的部分。",
+          nodes: [
+            { id: "admin-ui", x: 90, y: 100, w: 220, h: 112, color: "#165d52" },
+            { id: "media", x: 390, y: 100, w: 240, h: 112, color: "#3863a8" },
+            { id: "components", x: 90, y: 430, w: 220, h: 112, color: "#c66a3d" },
+            { id: "worker", x: 390, y: 430, w: 240, h: 112, color: "#3863a8" },
+            { id: "database", x: 780, y: 100, w: 250, h: 112, color: "#3863a8" }
+          ],
+          edges: [
+            { from: "admin-ui", to: "media" },
+            { from: "media", to: "database", muted: true },
+            { from: "components", to: "worker" }
+          ]
+        }
+      };
+
+      let currentView = "overview";
+      let currentNode = "routes";
+
+      const navEl = document.getElementById("section-nav");
+      const svgEl = document.getElementById("map-svg");
+      const detailEl = document.getElementById("detail-content");
+      const viewTitleEl = document.getElementById("view-title");
+      const viewDescEl = document.getElementById("view-desc");
+
+      function makeNav() {
+        navEl.innerHTML = "";
+        sections.forEach((section) => {
+          const btn = document.createElement("button");
+          btn.className = "section-btn" + (section.id === currentView ? " active" : "");
+          btn.innerHTML = `<strong>${section.label}</strong><span>${section.blurb}</span>`;
+          btn.addEventListener("click", () => {
+            currentView = section.id;
+            const firstNode = views[currentView].nodes[0];
+            currentNode = firstNode ? firstNode.id : currentNode;
+            render();
+          });
+          navEl.appendChild(btn);
+        });
+      }
+
+      function drawArrowDefs() {
+        return `
+          <defs>
+            <marker id="arrow" markerWidth="12" markerHeight="12" refX="11" refY="6" orient="auto">
+              <path d="M0,0 L12,6 L0,12 z" fill="#c8b9a6"></path>
+            </marker>
+            <marker id="arrow-active" markerWidth="12" markerHeight="12" refX="11" refY="6" orient="auto">
+              <path d="M0,0 L12,6 L0,12 z" fill="#c66a3d"></path>
+            </marker>
+          </defs>
+        `;
+      }
+
+      function centerOf(node) {
+        return { x: node.x + node.w / 2, y: node.y + node.h / 2 };
+      }
+
+      function isEdgeActive(edge) {
+        return edge.from === currentNode || edge.to === currentNode;
+      }
+
+      function edgePath(fromNode, toNode) {
+        const a = centerOf(fromNode);
+        const b = centerOf(toNode);
+        const dx = Math.abs(b.x - a.x);
+        const c1x = a.x + Math.max(60, dx * 0.28);
+        const c2x = b.x - Math.max(60, dx * 0.28);
+        return `M ${a.x} ${a.y} C ${c1x} ${a.y}, ${c2x} ${b.y}, ${b.x} ${b.y}`;
+      }
+
+      function renderSvg() {
+        const view = views[currentView];
+        viewTitleEl.textContent = view.title;
+        viewDescEl.textContent = view.desc;
+
+        const nodeMap = Object.fromEntries(view.nodes.map((node) => [node.id, node]));
+        const edgesMarkup = view.edges
+          .map((edge) => {
+            const fromNode = nodeMap[edge.from];
+            const toNode = nodeMap[edge.to];
+            const active = isEdgeActive(edge);
+            const cls = ["edge", edge.muted ? "muted" : "", active ? "active" : ""].filter(Boolean).join(" ");
+            const marker = active ? "url(#arrow-active)" : "url(#arrow)";
+            return `<path class="${cls}" d="${edgePath(fromNode, toNode)}" marker-end="${marker}"></path>`;
+          })
+          .join("");
+
+        const nodesMarkup = view.nodes
+          .map((node) => {
+            const detail = nodeDetails[node.id];
+            const active = currentNode === node.id ? " active" : "";
+            const sub = detail.tag;
+            return `
+              <g class="node${active}" data-node-id="${node.id}" tabindex="0" role="button" aria-label="${detail.title}">
+                <rect x="${node.x}" y="${node.y}" width="${node.w}" height="${node.h}" fill="white"></rect>
+                <rect class="node-pill" x="${node.x + 18}" y="${node.y + 18}" width="${Math.min(110, node.w - 36)}" height="28" rx="14" fill="${node.color}"></rect>
+                <text x="${node.x + 32}" y="${node.y + 37}" font-size="12" font-weight="600" fill="${node.color}">${sub}</text>
+                <text class="node-title" x="${node.x + 22}" y="${node.y + 72}">${detail.title}</text>
+                <text class="node-sub" x="${node.x + 22}" y="${node.y + 94}">${detail.summary.slice(0, 32)}${detail.summary.length > 32 ? "..." : ""}</text>
+              </g>
+            `;
+          })
+          .join("");
+
+        svgEl.innerHTML = drawArrowDefs() + edgesMarkup + nodesMarkup;
+
+        svgEl.querySelectorAll("[data-node-id]").forEach((el) => {
+          el.addEventListener("click", () => {
+            currentNode = el.getAttribute("data-node-id");
+            render();
+          });
+          el.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              currentNode = el.getAttribute("data-node-id");
+              render();
+            }
+          });
+        });
+      }
+
+      function renderDetail() {
+        const detail = nodeDetails[currentNode];
+        const relatedHtml = detail.related
+          .map((id) => {
+            const node = nodeDetails[id];
+            return `<button class="chip" data-related-node="${id}" type="button">${node.title}</button>`;
+          })
+          .join("");
+
+        const routeHtml = detail.routes
+          .map((route) => `<span class="route">${route}</span>`)
+          .join("");
+
+        const fileHtml = detail.files
+          .map(
+            ([path, desc]) =>
+              `<a href="${path}"><strong>${desc}</strong><br /><span>${path}</span></a>`
+          )
+          .join("");
+
+        const flowHtml = detail.flow.map((step) => `<li>${step}</li>`).join("");
+
+        detailEl.innerHTML = `
+          <div class="detail-card">
+            <div class="detail-tag">${detail.tag}</div>
+            <h3>${detail.title}</h3>
+            <p>${detail.summary}</p>
+          </div>
+
+          <div class="detail-grid">
+            <div class="detail-card">
+              <h4>主要职责</h4>
+              <ul class="mini-flow">
+                ${detail.responsibilities.map((item) => `<li>${item}</li>`).join("")}
+              </ul>
+            </div>
+
+            <div class="detail-card">
+              <h4>关键文件</h4>
+              <div class="file-list">${fileHtml}</div>
+            </div>
+
+            <div class="detail-card">
+              <h4>关键关键词 / 路径</h4>
+              <div class="route-list">${routeHtml}</div>
+            </div>
+
+            <div class="detail-card">
+              <h4>上下游关系</h4>
+              <div class="chip-list">${relatedHtml}</div>
+            </div>
+
+            <div class="detail-card">
+              <h4>推荐理解顺序</h4>
+              <ol class="mini-flow">${flowHtml}</ol>
+            </div>
+          </div>
+
+          <div class="footer-note">
+            说明：这张地图聚焦当前仓库的核心实现，尤其是
+            <code>apps/ems-site</code>、<code>supabase</code>、<code>workers/contact-worker</code>。
+            如果后面页面模板或数据结构继续扩展，优先更新这里的“内容模型”和“数据层”节点。
+          </div>
+        `;
+
+        detailEl.querySelectorAll("[data-related-node]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            currentNode = btn.getAttribute("data-related-node");
+            render();
+          });
+        });
+      }
+
+      function ensureNodeExists() {
+        const view = views[currentView];
+        const exists = view.nodes.some((node) => node.id === currentNode);
+        if (!exists && view.nodes[0]) currentNode = view.nodes[0].id;
+      }
+
+      function render() {
+        ensureNodeExists();
+        makeNav();
+        renderSvg();
+        renderDetail();
+      }
+
+      render();
+    </script>
+  </body>
+</html>

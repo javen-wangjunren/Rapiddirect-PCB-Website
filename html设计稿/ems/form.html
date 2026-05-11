@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Get a Quote - Floating Center Card</title>
+<style>
+    :root {
+        --primary-color: #ef533f;
+        --primary-hover: #d64734;
+        --primary-light: #fff0ed;
+        --bg-top: #f8f9fa;
+        --card-bg: #ffffff;
+        --text-dark: #1a1a1a;
+        --text-gray: #666666;
+        --border-color: #e2e8f0;
+        --input-bg: #ffffff;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    /* --- 模块外层容器 (处理背景分层) --- */
+    .quote-section {
+        position: relative;
+        padding: 80px 20px 100px 20px;
+        min-height: 700px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* 顶部浅色背景 */
+    .bg-split-top {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 50%;
+        background-color: var(--bg-top);
+        z-index: 0;
+    }
+
+    /* 底部深色实拍图背景 */
+    .bg-split-bottom {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 50%;
+        /* TODO: 替换为您真实的工厂/设备实拍图 */
+        background-image: url('https://via.placeholder.com/1920x600/111111/333333?text=Your+Factory+Background+Image');
+        background-size: cover;
+        background-position: center;
+        z-index: 0;
+    }
+
+    /* 底部背景的深色遮罩，确保其不会过于抢眼 */
+    .bg-split-bottom::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-color: rgba(17, 17, 17, 0.85); 
+    }
+
+    /* --- 居中悬浮表单卡片 --- */
+    .container {
+        width: 100%;
+        max-width: 800px;
+        position: relative;
+        z-index: 1; /* 确保悬浮在背景层之上 */
+    }
+
+    .form-card {
+        background: var(--card-bg);
+        border-radius: 16px;
+        padding: 50px 60px;
+        box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+    }
+
+    .form-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .form-header h2 {
+        font-size: 32px;
+        color: var(--text-dark);
+        margin-bottom: 12px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+    }
+
+    .form-header p {
+        font-size: 15px;
+        color: var(--text-gray);
+    }
+
+    /* --- 表单内部网格布局 --- */
+    .form-row {
+        display: flex;
+        gap: 24px;
+        margin-bottom: 24px;
+    }
+
+    .form-group {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group.full-width {
+        margin-bottom: 24px;
+    }
+
+    .form-group label {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 8px;
+    }
+
+    .form-group label span.required {
+        color: var(--primary-color);
+    }
+
+    .form-group label span.optional {
+        color: #999999;
+        font-weight: 500;
+        margin-left: 4px;
+    }
+
+    /* 输入框样式 */
+    .form-control {
+        padding: 14px 16px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        background-color: var(--input-bg);
+        font-size: 15px;
+        color: var(--text-dark);
+        transition: all 0.3s ease;
+    }
+
+    .form-control::placeholder {
+        color: #cbd5e1;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 4px rgba(239, 83, 63, 0.1);
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    /* --- 附件上传交互区 (Drag & Drop) --- */
+    .upload-area {
+        border: 2px dashed #cbd5e1;
+        border-radius: 8px;
+        padding: 30px;
+        text-align: center;
+        background-color: #f8f9fa;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+    }
+
+    .upload-area:hover {
+        border-color: var(--primary-color);
+        background-color: var(--primary-light);
+    }
+
+    .upload-icon {
+        color: var(--primary-color);
+    }
+
+    .upload-text {
+        font-size: 15px;
+        color: var(--text-dark);
+        font-weight: 600;
+    }
+
+    .upload-subtext {
+        font-size: 13px;
+        color: var(--text-gray);
+    }
+
+    /* --- 提交按钮 --- */
+    .submit-btn {
+        width: 100%;
+        padding: 18px;
+        background-color: var(--primary-color);
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 20px rgba(239, 83, 63, 0.2);
+        margin-top: 10px;
+    }
+
+    .submit-btn:hover {
+        background-color: var(--primary-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 25px rgba(239, 83, 63, 0.3);
+    }
+
+    /* =========================================
+       移动端自适应 (Responsive)
+       ========================================= */
+    @media (max-width: 768px) {
+        .quote-section {
+            padding: 60px 15px;
+        }
+
+        .form-card {
+            padding: 40px 30px;
+        }
+
+        .form-header h2 {
+            font-size: 28px;
+        }
+
+        .form-row {
+            flex-direction: column;
+            gap: 24px;
+        }
+        
+        .bg-split-top {
+            height: 30%; /* 手机端由于表单变长，调整背景比例 */
+        }
+        .bg-split-bottom {
+            height: 70%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .form-card {
+            padding: 30px 20px;
+        }
+    }
+</style>
+</head>
+<body>
+
+<section class="quote-section">
+    <div class="bg-split-top"></div>
+    <div class="bg-split-bottom"></div>
+
+    <div class="container">
+        <div class="form-card">
+            
+            <div class="form-header">
+                <h2>Get Free Quote Now</h2>
+                <p>Leave your contact information and project details, we will contact you ASAP!</p>
+            </div>
+            
+            <form action="#" method="POST">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Name <span class="required">*</span></label>
+                        <input type="text" class="form-control" placeholder="John Smith" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Company <span class="required">*</span></label>
+                        <input type="text" class="form-control" placeholder="Your Company Inc." required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Email Address <span class="required">*</span></label>
+                        <input type="email" class="form-control" placeholder="john@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number <span class="required">*</span></label>
+                        <input type="tel" class="form-control" placeholder="+1 (555) 123-4567" required>
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Message <span class="required">*</span></label>
+                    <textarea class="form-control" placeholder="Please specify your requirements, quantity, delivery timeline, or any special requests..." required></textarea>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Attachment <span class="optional">(Optional)</span></label>
+                    <div class="upload-area">
+                        <svg class="upload-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        <span class="upload-text">Click to upload or drag and drop</span>
+                        <span class="upload-subtext">Supported formats: ZIP, RAR, PDF, Gerber (Max 20MB)</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">SUBMIT REQUEST</button>
+                
+            </form>
+        </div>
+    </div>
+</section>
+
+</body>
+</html>

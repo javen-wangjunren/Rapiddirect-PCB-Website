@@ -1,0 +1,97 @@
+---
+import { getHref } from '../../lib/assets';
+import { adminNavGroups, type AdminNavItem } from './adminNav';
+
+export interface Props {
+  activePath: string;
+  variant?: 'static' | 'drawer';
+}
+
+const { activePath, variant = 'static' } = Astro.props;
+
+const isActive = (item: AdminNavItem) => {
+  if (!item.href) return false;
+  const target = getHref(item.href);
+  if (item.exact) return activePath === target;
+  if (target === '/') return activePath === '/';
+  return activePath === target || activePath.startsWith(target);
+};
+
+const linkClass = (item: AdminNavItem) => {
+  return `relative flex h-[var(--admin-control-md)] items-center gap-2 rounded-[var(--admin-radius-sm)] px-3 text-sm transition ${
+    isActive(item)
+      ? 'bg-[var(--admin-sidebar-active)] text-[var(--admin-sidebar-fg-active)]'
+      : 'text-[var(--admin-sidebar-fg)] hover:bg-[var(--admin-sidebar-hover)] hover:text-[var(--admin-sidebar-fg-active)]'
+  }`;
+};
+---
+
+<aside
+  class="admin-sidebar flex h-full flex-col border-r border-[var(--admin-sidebar-border)] bg-[var(--admin-sidebar-bg)] text-[var(--admin-sidebar-fg)]"
+  data-variant={variant}
+>
+  <div class="flex items-center gap-2 px-3 py-4">
+    <a
+      href={getHref('/admin/pages/')}
+      class="flex min-w-0 flex-1 items-center justify-start gap-2 rounded-[var(--admin-radius-sm)] px-3 py-2"
+    >
+      <img
+        src={getHref('/logo-rd.png')}
+        alt="RapidDirect"
+        class="h-auto w-1/2 max-w-full"
+        loading="eager"
+        decoding="async"
+      />
+    </a>
+    {variant === 'drawer' ? (
+      <button
+        type="button"
+        class="ml-auto inline-flex h-[var(--admin-control-md)] w-[var(--admin-control-md)] items-center justify-center rounded-[var(--admin-radius-sm)] text-[var(--admin-sidebar-fg)] hover:bg-[var(--admin-sidebar-hover)] hover:text-[var(--admin-sidebar-fg-active)]"
+        aria-label="Close menu"
+        data-admin-close-sidebar
+      >
+        ✕
+      </button>
+    ) : null}
+  </div>
+
+  <nav class="flex-1 overflow-y-auto px-3 pb-6">
+    <div class="space-y-4">
+      {adminNavGroups.map((group) => (
+        <div class="space-y-1">
+          {group.title ? (
+            <div class="px-3 pb-1 text-[11px] font-medium uppercase tracking-wider text-[var(--admin-sidebar-fg-muted)]">
+              {group.title}
+            </div>
+          ) : null}
+          {group.items.map((item) => (
+            <a href={getHref(item.href)} class={linkClass(item)} data-admin-close-sidebar>
+              <span
+                aria-hidden="true"
+                class={`absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r ${
+                  isActive(item) ? 'bg-[var(--admin-sidebar-accent)]' : 'bg-transparent'
+                }`}
+              />
+              {item.icon ? <span class="admin-sidebar-icon text-xs">{item.icon}</span> : null}
+              <span class="admin-sidebar-label">{item.label}</span>
+            </a>
+          ))}
+        </div>
+      ))}
+    </div>
+  </nav>
+
+  {variant === 'static' ? (
+    <div class="px-3 pb-4">
+      <button
+        type="button"
+        class="flex h-[var(--admin-control-md)] w-full items-center gap-2 rounded-[var(--admin-radius-sm)] px-3 text-sm text-[var(--admin-sidebar-fg)] hover:bg-[var(--admin-sidebar-hover)] hover:text-[var(--admin-sidebar-fg-active)]"
+        aria-label="Toggle sidebar"
+        data-admin-toggle-sidebar
+      >
+        <span class="admin-sidebar-icon admin-sidebar-toggle-icon text-xs">◀</span>
+        <span class="admin-sidebar-label admin-sidebar-toggle-label">Collapse Menu</span>
+      </button>
+    </div>
+  ) : null}
+</aside>

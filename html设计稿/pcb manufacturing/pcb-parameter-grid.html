@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PCB Capabilities - Toggle Cards</title>
+<style>
+    :root {
+        --primary-color: #ef533f;
+        --bg-color: #f8f9fa;
+        --card-bg: #ffffff;
+        --text-dark: #1a1a1a;
+        --text-gray: #666666;
+        --border-color: #eaeaea;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+
+    .capabilities-section { padding: 80px 20px; background-color: var(--bg-color); }
+    .container { max-width: 1000px; margin: 0 auto; }
+
+    .section-header { text-align: center; margin-bottom: 40px; }
+    .section-header h2 { font-size: 32px; color: var(--text-dark); margin-bottom: 12px; }
+    .section-header p { color: var(--text-gray); font-size: 16px; max-width: 600px; margin: 0 auto; }
+
+    /* 分段控制器 (Toggle Switch) */
+    .toggle-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 40px;
+    }
+
+    .toggle-switch {
+        display: inline-flex;
+        background-color: #e2e8f0;
+        border-radius: 50px;
+        padding: 4px;
+        position: relative;
+    }
+
+    .toggle-btn {
+        padding: 12px 30px;
+        border-radius: 50px;
+        border: none;
+        background: transparent;
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-gray);
+        cursor: pointer;
+        z-index: 1;
+        transition: color 0.3s ease;
+        min-width: 160px;
+    }
+
+    .toggle-btn.active { color: #ffffff; }
+
+    /* 滑块背景 */
+    .toggle-slider {
+        position: absolute;
+        top: 4px;
+        bottom: 4px;
+        left: 4px;
+        width: calc(50% - 4px);
+        background-color: var(--primary-color);
+        border-radius: 50px;
+        transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        box-shadow: 0 4px 10px rgba(239, 83, 63, 0.3);
+    }
+
+    .toggle-switch[data-state="mass"] .toggle-slider {
+        transform: translateX(100%);
+    }
+
+    /* 数据卡片网格 */
+    .specs-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+        animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .spec-card {
+        background: var(--card-bg);
+        padding: 24px;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        transition: all 0.3s ease;
+    }
+
+    .spec-card:hover {
+        border-color: var(--primary-color);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+    }
+
+    .spec-label {
+        font-size: 13px;
+        color: var(--text-gray);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .spec-value {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text-dark);
+    }
+
+    /* 默认隐藏批量数据 */
+    .specs-grid.mass-data { display: none; }
+</style>
+</head>
+<body>
+
+<section class="capabilities-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Process Capabilities</h2>
+            <p>Toggle between our rapid prototyping limits and standard mass production specifications.</p>
+        </div>
+
+        <div class="toggle-wrapper">
+            <div class="toggle-switch" id="modeToggle" data-state="proto">
+                <div class="toggle-slider"></div>
+                <button class="toggle-btn active" onclick="switchMode('proto')">Prototyping</button>
+                <button class="toggle-btn" onclick="switchMode('mass')">Mass Production</button>
+            </div>
+        </div>
+
+        <div class="specs-grid proto-data" id="grid-proto">
+            <div class="spec-card"><span class="spec-label">Layer Count</span><span class="spec-value">4 - 24 Layers</span></div>
+            <div class="spec-card"><span class="spec-label">Board Thickness</span><span class="spec-value">0.4 - 6.0mm</span></div>
+            <div class="spec-card"><span class="spec-label">HDI Structure (Max)</span><span class="spec-value">Any layer</span></div>
+            <div class="spec-card"><span class="spec-label">Min Laser Via</span><span class="spec-value">3mil (0.075mm)</span></div>
+            <div class="spec-card"><span class="spec-label">Impedance Tolerance</span><span class="spec-value">+/- 7%</span></div>
+            <div class="spec-card"><span class="spec-label">Min PTH Diameter</span><span class="spec-value">6mil (0.15mm)</span></div>
+            <div class="spec-card"><span class="spec-label">Min Trace / Space</span><span class="spec-value">2.5 / 2.5mil</span></div>
+            <div class="spec-card"><span class="spec-label">TG Value</span><span class="spec-value">170°C</span></div>
+        </div>
+
+        <div class="specs-grid mass-data" id="grid-mass">
+            <div class="spec-card"><span class="spec-label">Layer Count</span><span class="spec-value">4 - 16 Layers</span></div>
+            <div class="spec-card"><span class="spec-label">Board Thickness</span><span class="spec-value">0.6 - 3.2mm</span></div>
+            <div class="spec-card"><span class="spec-label">HDI Structure (Max)</span><span class="spec-value">4+N+4</span></div>
+            <div class="spec-card"><span class="spec-label">Min Laser Via</span><span class="spec-value">4mil (0.1mm)</span></div>
+            <div class="spec-card"><span class="spec-label">Impedance Tolerance</span><span class="spec-value">+/- 10%</span></div>
+            <div class="spec-card"><span class="spec-label">Min PTH Diameter</span><span class="spec-value">8mil (0.2mm)</span></div>
+            <div class="spec-card"><span class="spec-label">Min Trace / Space</span><span class="spec-value">2.5 / 2.5mil</span></div>
+            <div class="spec-card"><span class="spec-label">TG Value</span><span class="spec-value">170°C</span></div>
+        </div>
+
+    </div>
+</section>
+
+<script>
+    function switchMode(mode) {
+        const toggleSwitch = document.getElementById('modeToggle');
+        const btns = toggleSwitch.querySelectorAll('.toggle-btn');
+        const gridProto = document.getElementById('grid-proto');
+        const gridMass = document.getElementById('grid-mass');
+
+        // 更新 toggle 状态 (用于 CSS 滑块动画)
+        toggleSwitch.setAttribute('data-state', mode);
+
+        // 更新按钮颜色
+        btns[0].classList.toggle('active', mode === 'proto');
+        btns[1].classList.toggle('active', mode === 'mass');
+
+        // 切换显示的数据网格
+        if (mode === 'proto') {
+            gridProto.style.display = 'grid';
+            gridMass.style.display = 'none';
+        } else {
+            gridProto.style.display = 'none';
+            gridMass.style.display = 'grid';
+        }
+    }
+</script>
+
+</body>
+</html>

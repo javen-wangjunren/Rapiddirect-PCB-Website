@@ -1,0 +1,1431 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EMS 上线执行顺序总表</title>
+    <style>
+      :root {
+        --bg: #eef2f6;
+        --bg-strong: #e4ebf3;
+        --panel: rgba(255, 255, 255, 0.9);
+        --panel-strong: #ffffff;
+        --ink: #132033;
+        --muted: #5f6f86;
+        --line: #d7dee8;
+        --line-strong: #c5ceda;
+        --accent: #d56a3a;
+        --accent-soft: rgba(213, 106, 58, 0.12);
+        --accent-deep: #9f4721;
+        --blue: #1f5eff;
+        --blue-soft: rgba(31, 94, 255, 0.1);
+        --green: #0f766e;
+        --green-soft: rgba(15, 118, 110, 0.1);
+        --gold: #8a5a00;
+        --gold-soft: rgba(138, 90, 0, 0.1);
+        --shadow: 0 18px 48px rgba(27, 45, 74, 0.1);
+        --radius-xl: 28px;
+        --radius-lg: 22px;
+        --radius-md: 16px;
+        --radius-sm: 12px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        font-family: "Fira Sans", "Avenir Next", "PingFang SC", "Noto Sans SC", sans-serif;
+        background:
+          radial-gradient(circle at top left, rgba(31, 94, 255, 0.12), transparent 28%),
+          radial-gradient(circle at top right, rgba(213, 106, 58, 0.16), transparent 26%),
+          linear-gradient(180deg, #f7fafc 0%, #edf2f7 100%);
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .shell {
+        max-width: 1480px;
+        margin: 0 auto;
+        padding: 28px;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid rgba(197, 206, 218, 0.8);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(14px);
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.25fr) 360px;
+        gap: 22px;
+        margin-bottom: 22px;
+      }
+
+      .hero-main {
+        position: relative;
+        overflow: hidden;
+        padding: 34px 34px 30px;
+      }
+
+      .hero-main::after {
+        content: "";
+        position: absolute;
+        right: -48px;
+        top: -48px;
+        width: 240px;
+        height: 240px;
+        border-radius: 999px;
+        background: radial-gradient(circle, rgba(213, 106, 58, 0.2), transparent 68%);
+      }
+
+      .hero-main::before {
+        content: "";
+        position: absolute;
+        left: -60px;
+        bottom: -80px;
+        width: 280px;
+        height: 180px;
+        background: radial-gradient(circle, rgba(31, 94, 255, 0.14), transparent 66%);
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        gap: 10px;
+        align-items: center;
+        padding: 8px 12px;
+        border-radius: 999px;
+        font-family: "Fira Code", "SFMono-Regular", monospace;
+        font-size: 12px;
+        line-height: 1;
+        color: var(--green);
+        background: rgba(15, 118, 110, 0.12);
+      }
+
+      h1 {
+        margin: 18px 0 12px;
+        font-size: clamp(40px, 5vw, 72px);
+        line-height: 0.96;
+        letter-spacing: -0.05em;
+      }
+
+      .hero-copy {
+        max-width: 860px;
+        margin: 0;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.8;
+      }
+
+      .hero-note {
+        margin-top: 22px;
+        display: inline-flex;
+        gap: 10px;
+        align-items: center;
+        padding: 14px 16px;
+        border-radius: var(--radius-md);
+        border: 1px solid rgba(31, 94, 255, 0.18);
+        background: rgba(31, 94, 255, 0.08);
+        font-size: 14px;
+        line-height: 1.7;
+      }
+
+      .hero-grid {
+        margin-top: 24px;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .hero-grid .card {
+        border-radius: 18px;
+        border: 1px solid rgba(197, 206, 218, 0.8);
+        background: rgba(255, 255, 255, 0.78);
+        padding: 16px;
+      }
+
+      .hero-grid strong {
+        display: block;
+        font-size: 14px;
+        margin-bottom: 8px;
+      }
+
+      .hero-grid span {
+        display: block;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.65;
+      }
+
+      .hero-side {
+        padding: 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .hero-side h2 {
+        margin: 0;
+        font-size: 18px;
+      }
+
+      .status-card,
+      .mini-block {
+        border-radius: 18px;
+        border: 1px solid rgba(197, 206, 218, 0.82);
+        background: rgba(255, 255, 255, 0.74);
+        padding: 16px 18px;
+      }
+
+      .status-card .label,
+      .mini-block .label {
+        display: block;
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 10px;
+      }
+
+      .status-card .value {
+        display: block;
+        font-size: 30px;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+      }
+
+      .status-card p,
+      .mini-block p {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      .mini-block ul {
+        margin: 10px 0 0;
+        padding-left: 18px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      .main {
+        display: grid;
+        grid-template-columns: 280px minmax(0, 1fr);
+        gap: 22px;
+        align-items: start;
+      }
+
+      .sidebar {
+        position: sticky;
+        top: 20px;
+        padding: 18px;
+      }
+
+      .sidebar h2 {
+        margin: 6px 0 14px;
+        font-size: 16px;
+      }
+
+      .nav-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .nav-item {
+        display: block;
+        text-decoration: none;
+        border-radius: 16px;
+        border: 1px solid rgba(197, 206, 218, 0.82);
+        background: rgba(255, 255, 255, 0.76);
+        padding: 14px 15px;
+        transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+      }
+
+      .nav-item:hover {
+        transform: translateY(-1px);
+        border-color: rgba(213, 106, 58, 0.45);
+        background: linear-gradient(135deg, rgba(213, 106, 58, 0.12), rgba(255, 255, 255, 0.96));
+      }
+
+      .nav-item strong {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 14px;
+      }
+
+      .nav-item span {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      .content {
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+      }
+
+      .section {
+        padding: 24px 24px 22px;
+      }
+
+      .section-title {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: start;
+        margin-bottom: 18px;
+      }
+
+      .section-title h2 {
+        margin: 0;
+        font-size: 28px;
+        letter-spacing: -0.04em;
+      }
+
+      .section-title p {
+        margin: 8px 0 0;
+        max-width: 780px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.75;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        line-height: 1;
+        white-space: nowrap;
+      }
+
+      .pill.green {
+        color: var(--green);
+        background: var(--green-soft);
+      }
+
+      .pill.blue {
+        color: var(--blue);
+        background: var(--blue-soft);
+      }
+
+      .pill.gold {
+        color: var(--gold);
+        background: var(--gold-soft);
+      }
+
+      .architecture {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .arch-card {
+        min-height: 210px;
+        border-radius: 20px;
+        border: 1px solid rgba(197, 206, 218, 0.82);
+        background: rgba(255, 255, 255, 0.76);
+        padding: 18px;
+        position: relative;
+      }
+
+      .arch-card .tag {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-family: "Fira Code", "SFMono-Regular", monospace;
+        font-size: 11px;
+        background: rgba(19, 32, 51, 0.08);
+        color: var(--ink);
+        margin-bottom: 12px;
+      }
+
+      .arch-card h3 {
+        margin: 0 0 10px;
+        font-size: 18px;
+      }
+
+      .arch-card p {
+        margin: 0 0 12px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      .arch-card ul {
+        margin: 0;
+        padding-left: 18px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.65;
+      }
+
+      .decision-grid {
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: 16px;
+      }
+
+      .decision-rationale {
+        margin-top: 16px;
+        border-radius: 22px;
+        border: 1px solid rgba(197, 206, 218, 0.82);
+        background:
+          linear-gradient(135deg, rgba(19, 32, 51, 0.04), rgba(255, 255, 255, 0.92)),
+          rgba(255, 255, 255, 0.8);
+        padding: 22px;
+      }
+
+      .decision-rationale h3 {
+        margin: 0 0 10px;
+        font-size: 22px;
+        letter-spacing: -0.03em;
+      }
+
+      .decision-rationale > p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.8;
+      }
+
+      .rationale-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 18px;
+      }
+
+      .rationale-card {
+        border-radius: 18px;
+        border: 1px solid rgba(197, 206, 218, 0.82);
+        background: rgba(255, 255, 255, 0.84);
+        padding: 16px;
+      }
+
+      .rationale-card .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-family: "Fira Code", "SFMono-Regular", monospace;
+        font-size: 11px;
+        margin-bottom: 12px;
+      }
+
+      .rationale-card.reject .badge {
+        background: rgba(213, 106, 58, 0.12);
+        color: var(--accent-deep);
+      }
+
+      .rationale-card.accept .badge {
+        background: rgba(15, 118, 110, 0.12);
+        color: var(--green);
+      }
+
+      .rationale-card h4 {
+        margin: 0 0 8px;
+        font-size: 17px;
+      }
+
+      .rationale-card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.75;
+      }
+
+      .rationale-summary {
+        margin-top: 16px;
+        padding: 16px 18px;
+        border-radius: 18px;
+        border: 1px solid rgba(15, 118, 110, 0.18);
+        background: rgba(15, 118, 110, 0.06);
+        font-size: 14px;
+        line-height: 1.8;
+      }
+
+      .decision-card {
+        border-radius: 20px;
+        padding: 20px;
+        border: 1px solid rgba(197, 206, 218, 0.82);
+        background: rgba(255, 255, 255, 0.76);
+      }
+
+      .decision-card.recommended {
+        background:
+          linear-gradient(135deg, rgba(15, 118, 110, 0.08), rgba(255, 255, 255, 0.92)),
+          rgba(255, 255, 255, 0.78);
+        border-color: rgba(15, 118, 110, 0.24);
+      }
+
+      .decision-card.caution {
+        background:
+          linear-gradient(135deg, rgba(213, 106, 58, 0.08), rgba(255, 255, 255, 0.92)),
+          rgba(255, 255, 255, 0.78);
+        border-color: rgba(213, 106, 58, 0.24);
+      }
+
+      .decision-card h3 {
+        margin: 0 0 8px;
+        font-size: 22px;
+        letter-spacing: -0.03em;
+      }
+
+      .decision-card p {
+        margin: 0 0 14px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.75;
+      }
+
+      .decision-card ul {
+        margin: 0;
+        padding-left: 18px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.75;
+      }
+
+      .sequence {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .step {
+        position: relative;
+        border-radius: 22px;
+        padding: 20px;
+        border: 1px solid rgba(197, 206, 218, 0.82);
+        background: rgba(255, 255, 255, 0.76);
+        min-height: 254px;
+      }
+
+      .step-head {
+        display: flex;
+        gap: 14px;
+        align-items: start;
+        margin-bottom: 14px;
+      }
+
+      .step-index {
+        width: 40px;
+        height: 40px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+        color: white;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Fira Code", "SFMono-Regular", monospace;
+        font-size: 15px;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+
+      .step-head h3 {
+        margin: 0 0 5px;
+        font-size: 20px;
+        letter-spacing: -0.03em;
+      }
+
+      .step-head p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      .step-body {
+        display: grid;
+        gap: 12px;
+      }
+
+      .step-block {
+        border-radius: 16px;
+        border: 1px solid rgba(215, 222, 232, 0.9);
+        background: rgba(248, 250, 252, 0.86);
+        padding: 14px 15px;
+      }
+
+      .step-block strong {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 13px;
+      }
+
+      .step-block ul {
+        margin: 0;
+        padding-left: 18px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      .matrix {
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 920px;
+      }
+
+      th,
+      td {
+        padding: 14px 14px;
+        text-align: left;
+        vertical-align: top;
+        border-bottom: 1px solid var(--line);
+        font-size: 14px;
+        line-height: 1.7;
+      }
+
+      th {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+      }
+
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      .mono {
+        font-family: "Fira Code", "SFMono-Regular", monospace;
+        font-size: 12px;
+      }
+
+      .env-grid,
+      .gate-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .env-card,
+      .gate-card {
+        border-radius: 20px;
+        border: 1px solid rgba(197, 206, 218, 0.82);
+        background: rgba(255, 255, 255, 0.76);
+        padding: 18px;
+      }
+
+      .env-card h3,
+      .gate-card h3 {
+        margin: 0 0 10px;
+        font-size: 18px;
+      }
+
+      .chip-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+        border-radius: 999px;
+        background: rgba(19, 32, 51, 0.07);
+        color: var(--ink);
+        font-family: "Fira Code", "SFMono-Regular", monospace;
+        font-size: 12px;
+      }
+
+      .env-card p,
+      .gate-card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.75;
+      }
+
+      .gate-card ul {
+        margin: 12px 0 0;
+        padding-left: 18px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.75;
+      }
+
+      .footer-note {
+        margin-top: 22px;
+        padding: 18px 20px;
+        border-radius: 20px;
+        background: linear-gradient(135deg, rgba(31, 94, 255, 0.1), rgba(213, 106, 58, 0.1));
+        border: 1px solid rgba(197, 206, 218, 0.82);
+        color: var(--ink);
+        font-size: 14px;
+        line-height: 1.75;
+      }
+
+      @media (max-width: 1200px) {
+        .hero,
+        .main,
+        .decision-grid,
+        .rationale-grid,
+        .architecture,
+        .sequence,
+        .env-grid,
+        .gate-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          position: static;
+        }
+      }
+
+      @media (max-width: 860px) {
+        .shell {
+          padding: 18px;
+        }
+
+        .hero-main,
+        .hero-side,
+        .section {
+          padding: 20px;
+        }
+
+        .hero-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .section-title {
+          flex-direction: column;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+
+        .nav-item {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <section class="hero">
+        <div class="panel hero-main">
+          <div class="eyebrow">EMS Launch Runbook / Reverse Proxy + Worker + Resend</div>
+          <h1>EMS 上线执行顺序总表</h1>
+          <p class="hero-copy">
+            这份文档把当前项目的真实结构拆成一条可执行路线：主域仍然是
+            <strong>rapiddirect.com</strong>，对外页面路径保持 <strong>/ems/*</strong>，其中
+            <strong>/ems/pcb-assembly/</strong> 也是主域下的正式页面；项目本体建议先部署到一台独立服务器，
+            再通过 Cloudflare 做路径分流、缓存、安全与 Worker 接口绑定。
+          </p>
+          <div class="hero-note">
+            <strong>当前推荐结论：</strong>
+            先走
+            <strong>“独立服务器作为 EMS Origin + Cloudflare 负责边缘流量层”</strong>，
+            暂时不要为了低流量而把整个站点直接迁成 Cloudflare Runtime。
+          </div>
+          <div class="hero-grid">
+            <div class="card">
+              <strong>为什么不建议现在直接上 Cloudflare 托管</strong>
+              <span>当前前端使用的是 <span class="mono">@astrojs/node</span> standalone，直接切到 Cloudflare 不是“换个部署平台”而是一次运行时迁移。</span>
+            </div>
+            <div class="card">
+              <strong>为什么推荐独立服务器</strong>
+              <span>你后续有“独立出去”的明确可能，先让应用在独立 origin 跑稳，后面换域名、拆站、迁主路由都会更自然。</span>
+            </div>
+            <div class="card">
+              <strong>Cloudflare 仍然是必需层</strong>
+              <span>即便应用部署在服务器，Cloudflare 依然负责 <span class="mono">/ems/*</span> 分流、<span class="mono">/api/contact</span> Worker、Turnstile、安全与缓存。</span>
+            </div>
+          </div>
+        </div>
+
+        <aside class="panel hero-side">
+          <h2>本次上线的关键判断</h2>
+          <div class="status-card">
+            <span class="label">Recommended Path</span>
+            <span class="value">Server First</span>
+            <p>先部署到新的 Node 服务器，让架构独立成型；Cloudflare 负责入口层与安全层。</p>
+          </div>
+          <div class="mini-block">
+            <span class="label">Current Runtime</span>
+            <p>前端项目当前是 <span class="mono">@astrojs/node</span>，说明它天然更适合先上 Node 服务器，而不是直接跑 Cloudflare Worker Runtime。</p>
+          </div>
+          <div class="mini-block">
+            <span class="label">Critical External Services</span>
+            <ul>
+              <li>Cloudflare: 路径分流、Worker、Turnstile、Cache</li>
+              <li>Supabase: 页面内容、后台、媒体库</li>
+              <li>Resend: 询盘邮件发送</li>
+            </ul>
+          </div>
+        </aside>
+      </section>
+
+      <div class="main">
+        <aside class="panel sidebar">
+          <h2>文档导航</h2>
+          <nav class="nav-list">
+            <a class="nav-item" href="#architecture">
+              <strong>1. 当前架构</strong>
+              <span>主域、独立 origin、Worker、Supabase、Resend 的关系</span>
+            </a>
+            <a class="nav-item" href="#decision">
+              <strong>2. 部署方案判断</strong>
+              <span>新服务器优先 vs 直接上 Cloudflare</span>
+            </a>
+            <a class="nav-item" href="#sequence">
+              <strong>3. 执行顺序</strong>
+              <span>从冻结方案到验收上线的完整步骤</span>
+            </a>
+            <a class="nav-item" href="#matrix">
+              <strong>4. 配置矩阵</strong>
+              <span>Cloudflare / Resend / Server / Supabase 各配什么</span>
+            </a>
+            <a class="nav-item" href="#env">
+              <strong>5. 环境变量</strong>
+              <span>前端、Worker、服务器各自需要的值</span>
+            </a>
+            <a class="nav-item" href="#gates">
+              <strong>6. 上线闸门</strong>
+              <span>哪些项没过就不要切流量</span>
+            </a>
+          </nav>
+        </aside>
+
+        <div class="content">
+          <section class="panel section" id="architecture">
+            <div class="section-title">
+              <div>
+                <h2>1. 当前架构应该怎么理解</h2>
+                <p>
+                  这次最容易绕晕的点，是你对外看到的是同一个主域
+                  <span class="mono">rapiddirect.com</span>，
+                  但背后其实至少有两条链路：一条是 <span class="mono">/ems/*</span> 页面内容链路，一条是
+                  <span class="mono">/api/contact</span> 表单接口链路。把它拆开后，配置顺序就会清楚很多。
+                </p>
+              </div>
+              <div class="pill blue">对外一个域名，对内多条服务链路</div>
+            </div>
+
+            <div class="architecture">
+              <article class="arch-card">
+                <div class="tag">Public Entry</div>
+                <h3>主域入口</h3>
+                <p>用户始终访问主站域名，而不是临时域名。</p>
+                <ul>
+                  <li><span class="mono">rapiddirect.com/ems/</span></li>
+                  <li><span class="mono">rapiddirect.com/ems/pcb-assembly/</span></li>
+                  <li><span class="mono">rapiddirect.com/ems/login/</span></li>
+                </ul>
+              </article>
+
+              <article class="arch-card">
+                <div class="tag">Edge Layer</div>
+                <h3>Cloudflare</h3>
+                <p>负责边缘代理、路由分流、安全和缓存，不一定负责承载整个 Node 应用。</p>
+                <ul>
+                  <li><span class="mono">/ems/*</span> 分流到 EMS origin</li>
+                  <li><span class="mono">/api/contact*</span> 绑定 Worker</li>
+                  <li>Turnstile、TLS、Redirect、Cache Rules</li>
+                </ul>
+              </article>
+
+              <article class="arch-card">
+                <div class="tag">App Origin</div>
+                <h3>EMS 独立服务器</h3>
+                <p>运行当前 Astro Node 版本站点，承接前台和后台页面。</p>
+                <ul>
+                  <li>Astro SSR 前台</li>
+                  <li><span class="mono">/ems/admin/*</span> 后台</li>
+                  <li>Node 进程、Nginx、部署目录</li>
+                </ul>
+              </article>
+
+              <article class="arch-card">
+                <div class="tag">Data Layer</div>
+                <h3>Supabase</h3>
+                <p>页面内容、SEO 数据、媒体库和后台鉴权都在这里。</p>
+                <ul>
+                  <li><span class="mono">pages / seo_meta / page_content</span></li>
+                  <li><span class="mono">media_assets / media_folders</span></li>
+                  <li>Auth + Storage + RLS</li>
+                </ul>
+              </article>
+
+              <article class="arch-card">
+                <div class="tag">Inquiry Flow</div>
+                <h3>Worker + Resend</h3>
+                <p>询盘不进入主站 PHP 或 Node 后端，而是直接走 Cloudflare Worker。</p>
+                <ul>
+                  <li>Worker 校验 Turnstile</li>
+                  <li>Worker 用 API Key 调 Resend</li>
+                  <li>Resend 以企业域名邮箱身份发出通知</li>
+                </ul>
+              </article>
+            </div>
+          </section>
+
+          <section class="panel section" id="decision">
+            <div class="section-title">
+              <div>
+                <h2>2. 部署方案判断</h2>
+                <p>
+                  你现在纠结的，本质不是“流量大小”，而是“当前运行时适配成本”和“后续是否要独立出去”。
+                  低流量不一定等于应该直接上 Cloudflare Runtime，尤其是当现有项目本身就是 Node 目标时。
+                </p>
+              </div>
+              <div class="pill green">建议先稳，再追求更轻的托管形态</div>
+            </div>
+
+            <div class="decision-grid">
+              <article class="decision-card recommended">
+                <h3>推荐方案：新服务器先上线，Cloudflare 负责入口层</h3>
+                <p>
+                  这是和当前项目最贴合的方案。你把 EMS 应用先放到一台独立服务器上，让它自己成为一个完整 origin，
+                  然后由 Cloudflare 在主域层做路径接入。这样既保住主域 URL，又不强迫项目现在立刻做运行时迁移。
+                </p>
+                <ul>
+                  <li>和当前 <span class="mono">@astrojs/node</span> 配置最匹配，部署动作最直接。</li>
+                  <li>后续如果 EMS 要独立域名、独立站点，迁移成本最低。</li>
+                  <li>主域下仍可保留 <span class="mono">/ems/*</span> 的 SEO 规划，不影响用户感知。</li>
+                  <li>Cloudflare 继续承担缓存、Worker、Turnstile、安全能力，不会浪费。</li>
+                </ul>
+              </article>
+
+              <article class="decision-card caution">
+                <h3>备选方案：直接把整个项目上到 Cloudflare</h3>
+                <p>
+                  不是不能做，但它不是“简单省服务器”，而是意味着要把当前 Node 部署目标重新适配到 Cloudflare 的运行环境。
+                  如果你现在的目标是尽快上线并把架构理顺，这条路会增加一轮额外不确定性。
+                </p>
+                <ul>
+                  <li>需要把 Astro 的部署目标从 Node 重新适配到 Cloudflare 方案。</li>
+                  <li>后台、Supabase、SSR、静态资源、缓存语义都要重新回归测试。</li>
+                  <li>后面当然能做，但更适合放到“站点跑稳之后”的第二阶段优化。</li>
+                  <li>如果现在强行做，真正节省的不是很多，反而可能拖慢首发节奏。</li>
+                </ul>
+              </article>
+            </div>
+
+            <div class="decision-rationale">
+              <h3>为什么不选 v0 / Pages / 纯静态托管，为什么选独立服务器 + Cloudflare</h3>
+              <p>
+                这不是在否定这些平台本身，而是结合你们当前项目的实际形态做选择。你们现在面对的重点不是“找一个最便宜的托管”，
+                而是同时守住 <span class="mono">/ems/*</span> 主域子路径、SSR 与后台动态内容、可控缓存、以及未来独立出去的迁移空间。
+              </p>
+
+              <div class="rationale-grid">
+                <article class="rationale-card reject">
+                  <div class="badge">Not Chosen / v0</div>
+                  <h4>不选 v0</h4>
+                  <p>
+                    v0 更适合快速生成页面和 demo，但你们这里已经进入真实业务阶段。主域子路径反向代理、缓存策略、资源路径和动态内容刷新都需要明确可控，
+                    一旦中间再叠一层平台默认行为，排障会很痛苦。
+                  </p>
+                </article>
+
+                <article class="rationale-card reject">
+                  <div class="badge">Not Chosen / Pages</div>
+                  <h4>不优先选 Pages</h4>
+                  <p>
+                    你们当前项目使用的是 <span class="mono">@astrojs/node</span>，直接改成 Pages 不是“换个发布入口”，而是一次运行时适配。
+                    首发阶段这样做收益有限，却会引入额外测试面。
+                  </p>
+                </article>
+
+                <article class="rationale-card reject">
+                  <div class="badge">Not Chosen / Static</div>
+                  <h4>不选纯静态托管</h4>
+                  <p>
+                    这个项目并不只是几张静态页面。它有 Supabase 动态内容、后台登录、媒体库、询盘接口和 React 交互组件，
+                    所以“纯静态发布 + 文件托管”并不能完整覆盖当前运行需求。
+                  </p>
+                </article>
+
+                <article class="rationale-card accept">
+                  <div class="badge">Chosen / Server + CF</div>
+                  <h4>选择独立服务器 + Cloudflare</h4>
+                  <p>
+                    这条路径最符合现在的代码结构，也最利于后续演进。服务器负责承载 Node 应用本身，Cloudflare 负责主域接入、缓存、安全、Worker 和 Turnstile，
+                    角色边界清楚，后面要独立成站也最顺。
+                  </p>
+                </article>
+              </div>
+
+              <div class="rationale-summary">
+                <strong>决策总结：</strong>
+                现在的最佳策略不是“把一切都塞进某个平台求省事”，而是
+                <strong>让应用运行层和边缘流量层分工明确</strong>。
+                也就是：<strong>应用先放独立服务器，Cloudflare 继续做主域入口层</strong>。
+                这样既适合当前技术架构，也给未来 EMS 独立出去留下最小迁移成本。
+              </div>
+            </div>
+          </section>
+
+          <section class="panel section" id="sequence">
+            <div class="section-title">
+              <div>
+                <h2>3. 上线执行顺序</h2>
+                <p>
+                  下面这条顺序是按“先冻结架构，再准备服务，再做边缘接入，最后切流量”来排的。
+                  这样做的好处是，不会出现域名先改了、邮件还没通、Worker 还没部署这种交叉阻塞。
+                </p>
+              </div>
+              <div class="pill gold">推荐按顺序推进，不要跳步骤</div>
+            </div>
+
+            <div class="sequence">
+              <article class="step">
+                <div class="step-head">
+                  <div class="step-index">01</div>
+                  <div>
+                    <h3>冻结上线方案</h3>
+                    <p>先确定这次首发不做全站 Cloudflare Runtime 迁移，而是“独立服务器 + Cloudflare 入口层”。</p>
+                  </div>
+                </div>
+                <div class="step-body">
+                  <div class="step-block">
+                    <strong>本步产出</strong>
+                    <ul>
+                      <li>确定 EMS 独立 origin 存在</li>
+                      <li>确定主站仍对外使用 <span class="mono">rapiddirect.com/ems/*</span></li>
+                      <li>确定 <span class="mono">/api/contact</span> 仍由 Cloudflare Worker 承担</li>
+                    </ul>
+                  </div>
+                  <div class="step-block">
+                    <strong>目的</strong>
+                    <ul>
+                      <li>避免团队一边准备服务器，一边又临时切去 Cloudflare 托管</li>
+                      <li>把后续所有配置都绑定到一个稳定架构假设上</li>
+                    </ul>
+                  </div>
+                </div>
+              </article>
+
+              <article class="step">
+                <div class="step-head">
+                  <div class="step-index">02</div>
+                  <div>
+                    <h3>准备新服务器与部署底座</h3>
+                    <p>先把应用未来的独立落点准备好，哪怕现在还是挂在主域的 <span class="mono">/ems/*</span> 下。</p>
+                  </div>
+                </div>
+                <div class="step-body">
+                  <div class="step-block">
+                    <strong>需要完成</strong>
+                    <ul>
+                      <li>新服务器开通，安装 Node、Nginx、PM2 或 systemd</li>
+                      <li>准备部署目录、日志目录、回滚策略</li>
+                      <li>确认服务器能稳定跑 Astro Node standalone</li>
+                    </ul>
+                  </div>
+                  <div class="step-block">
+                    <strong>目的</strong>
+                    <ul>
+                      <li>让 EMS 应用先成为一个真正可独立运行的 origin</li>
+                      <li>为未来独立域名、拆站、迁移预留空间</li>
+                    </ul>
+                  </div>
+                </div>
+              </article>
+
+              <article class="step">
+                <div class="step-head">
+                  <div class="step-index">03</div>
+                  <div>
+                    <h3>准备生产数据与第三方服务</h3>
+                    <p>把 Supabase、Resend、Turnstile 这些真正会阻塞上线的生产能力先打通。</p>
+                  </div>
+                </div>
+                <div class="step-body">
+                  <div class="step-block">
+                    <strong>需要完成</strong>
+                    <ul>
+                      <li>Supabase 生产数据、RLS、媒体 bucket 再确认一遍</li>
+                      <li>Resend 验证发信域名，创建 Production API Key</li>
+                      <li>Turnstile 创建生产 widget，拿到 site key / secret key</li>
+                    </ul>
+                  </div>
+                  <div class="step-block">
+                    <strong>目的</strong>
+                    <ul>
+                      <li>避免站点上线后页面能打开，但询盘提交失败</li>
+                      <li>避免后台能登录、页面能编辑，但发信链路未就绪</li>
+                    </ul>
+                  </div>
+                </div>
+              </article>
+
+              <article class="step">
+                <div class="step-head">
+                  <div class="step-index">04</div>
+                  <div>
+                    <h3>部署应用到新服务器</h3>
+                    <p>先在真实服务器把站点跑起来，再谈主域接入，否则 Cloudflare 规则会无源可接。</p>
+                  </div>
+                </div>
+                <div class="step-body">
+                  <div class="step-block">
+                    <strong>需要完成</strong>
+                    <ul>
+                      <li>注入前端环境变量并部署构建产物</li>
+                      <li>确保 <span class="mono">/ems/</span>、<span class="mono">/ems/pcb-assembly/</span>、<span class="mono">/ems/login/</span> 可访问</li>
+                      <li>本机或临时域名先完成一轮 smoke test</li>
+                    </ul>
+                  </div>
+                  <div class="step-block">
+                    <strong>目的</strong>
+                    <ul>
+                      <li>在切主域之前先证明应用本身没问题</li>
+                      <li>把排障范围限制在“应用部署层”，不要和 Cloudflare 配置混在一起</li>
+                    </ul>
+                  </div>
+                </div>
+              </article>
+
+              <article class="step">
+                <div class="step-head">
+                  <div class="step-index">05</div>
+                  <div>
+                    <h3>配置 Cloudflare 主域接入</h3>
+                    <p>这一步是把主域上的 <span class="mono">/ems/*</span> 正式接到 EMS 应用 origin 上。</p>
+                  </div>
+                </div>
+                <div class="step-body">
+                  <div class="step-block">
+                    <strong>需要完成</strong>
+                    <ul>
+                      <li>确认主域 DNS 在 Cloudflare 且流量走代理</li>
+                      <li>配置 <span class="mono">/ems/*</span> 分流到 EMS origin 的方案</li>
+                      <li>打开 HTTPS，保持对外 canonical 仍是主域 URL</li>
+                    </ul>
+                  </div>
+                  <div class="step-block">
+                    <strong>目的</strong>
+                    <ul>
+                      <li>让外部用户无感知地从主域访问 EMS 子站</li>
+                      <li>延续你现有的 SEO 和 URL 规划，不暴露临时域名</li>
+                    </ul>
+                  </div>
+                </div>
+              </article>
+
+              <article class="step">
+                <div class="step-head">
+                  <div class="step-index">06</div>
+                  <div>
+                    <h3>部署 Contact Worker 并绑定路由</h3>
+                    <p>把询盘接口独立出来，是这次架构里最清晰的一段，不要让它混进主应用 origin。</p>
+                  </div>
+                </div>
+                <div class="step-body">
+                  <div class="step-block">
+                    <strong>需要完成</strong>
+                    <ul>
+                      <li>部署 <span class="mono">workers/contact-worker</span></li>
+                      <li>设置 <span class="mono">RESEND_API_KEY</span>、<span class="mono">TURNSTILE_SECRET_KEY</span> 等 secrets/vars</li>
+                      <li>绑定路由到 <span class="mono">rapiddirect.com/api/contact*</span></li>
+                    </ul>
+                  </div>
+                  <div class="step-block">
+                    <strong>目的</strong>
+                    <ul>
+                      <li>让前端默认的 <span class="mono">/api/contact</span> 在生产直接可用</li>
+                      <li>保证表单校验、发信、安全逻辑集中在 Worker 内完成</li>
+                    </ul>
+                  </div>
+                </div>
+              </article>
+
+              <article class="step">
+                <div class="step-head">
+                  <div class="step-index">07</div>
+                  <div>
+                    <h3>配置缓存、跳转与 SEO 边缘规则</h3>
+                    <p>这一步决定你上线后是“稳定快速”，还是“改完后台前台不刷新、HTML 被误缓存”。</p>
+                  </div>
+                </div>
+                <div class="step-body">
+                  <div class="step-block">
+                    <strong>需要完成</strong>
+                    <ul>
+                      <li><span class="mono">/api/*</span> 明确不缓存</li>
+                      <li><span class="mono">/ems/_astro/*</span> 长缓存</li>
+                      <li><span class="mono">/ems/*</span> HTML 不要错误强缓存</li>
+                      <li>HTTPS、主域规范、必要的 301 跳转</li>
+                    </ul>
+                  </div>
+                  <div class="step-block">
+                    <strong>目的</strong>
+                    <ul>
+                      <li>保护动态页面正确性</li>
+                      <li>同时把静态资源性能做上去</li>
+                    </ul>
+                  </div>
+                </div>
+              </article>
+
+              <article class="step">
+                <div class="step-head">
+                  <div class="step-index">08</div>
+                  <div>
+                    <h3>做完整的生产联调</h3>
+                    <p>不是只看首页打开，而是把“页面、后台、媒体、表单、邮件、SEO”全部走一遍。</p>
+                  </div>
+                </div>
+                <div class="step-body">
+                  <div class="step-block">
+                    <strong>至少验证这些</strong>
+                    <ul>
+                      <li>前台首页与 <span class="mono">pcb-assembly</span> 页面内容正确</li>
+                      <li>后台改内容后前台刷新生效</li>
+                      <li>媒体库上传与引用正常</li>
+                      <li>询盘提交成功，邮箱收到通知且 reply-to 正确</li>
+                    </ul>
+                  </div>
+                  <div class="step-block">
+                    <strong>目的</strong>
+                    <ul>
+                      <li>确认不是“每个组件各自看起来都正常”，而是整条业务链路真的闭环</li>
+                    </ul>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <section class="panel section" id="matrix">
+            <div class="section-title">
+              <div>
+                <h2>4. 配置矩阵</h2>
+                <p>
+                  如果你要把这次上线拆给多人并行做，这张矩阵会最有用。它回答的是：
+                  每个平台到底要配什么，以及每项配置是为了什么。
+                </p>
+              </div>
+              <div class="pill blue">按平台拆任务最不容易漏项</div>
+            </div>
+
+            <div class="matrix">
+              <table>
+                <thead>
+                  <tr>
+                    <th>平台</th>
+                    <th>配置项</th>
+                    <th>需要做什么</th>
+                    <th>目的</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Cloudflare</strong></td>
+                    <td><span class="mono">DNS / Proxied</span></td>
+                    <td>确认主域在 Cloudflare 且经过代理流量。</td>
+                    <td>让后续分流、缓存、Worker Route、Turnstile 保护都能生效。</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Cloudflare</strong></td>
+                    <td><span class="mono">/ems/*</span> 分流</td>
+                    <td>将 EMS 子路径接到独立 origin。</td>
+                    <td>保持主域 URL 不变，同时让 EMS 应用独立运行。</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Cloudflare</strong></td>
+                    <td><span class="mono">SSL / HTTPS</span></td>
+                    <td>开启严格 HTTPS 模式与必要跳转。</td>
+                    <td>保证主域访问安全且 canonical 统一。</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Cloudflare</strong></td>
+                    <td><span class="mono">Worker Route</span></td>
+                    <td>绑定 <span class="mono">rapiddirect.com/api/contact*</span> 到 Contact Worker。</td>
+                    <td>让表单接口走同域路径，减少跨域复杂度。</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Cloudflare</strong></td>
+                    <td><span class="mono">Cache Rules</span></td>
+                    <td>API 不缓存，静态资源长缓存，HTML 不误缓存。</td>
+                    <td>兼顾动态正确性与资源性能。</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Resend</strong></td>
+                    <td>验证发信域名</td>
+                    <td>完成域名 DNS 验证，允许以企业邮箱身份发信。</td>
+                    <td>保证询盘通知能以正式域名邮箱发出，而不是测试邮箱。</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Resend</strong></td>
+                    <td>Production API Key</td>
+                    <td>创建只用于生产 Worker 的发信 API Key。</td>
+                    <td>让 Worker 拿到调用 Resend 发信的程序级权限。</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Turnstile</strong></td>
+                    <td>生产 Widget</td>
+                    <td>创建 widget，绑定正式 hostname，拿 site key / secret key。</td>
+                    <td>拦截垃圾询盘，减少机器人请求直接打邮箱。</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Server</strong></td>
+                    <td>Node 运行环境</td>
+                    <td>准备 Node、Nginx、进程守护与日志。</td>
+                    <td>承载当前 Astro Node 应用，作为 EMS origin。</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Server</strong></td>
+                    <td>部署流程</td>
+                    <td>构建、发布、重启、回滚链路打通。</td>
+                    <td>上线和后续迭代都更稳，不依赖手工临时操作。</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Supabase</strong></td>
+                    <td>生产数据与权限</td>
+                    <td>检查表、RLS、seed、媒体 bucket、Auth。</td>
+                    <td>保证前台、后台、媒体库都能在生产正常运行。</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Application</strong></td>
+                    <td>SEO / 路径输出</td>
+                    <td>补 canonical、sitemap、robots、单 H1、自检链接。</td>
+                    <td>防止主域子路径上线后出现 SEO 偏移与抓取噪音。</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="panel section" id="env">
+            <div class="section-title">
+              <div>
+                <h2>5. 环境变量与密钥清单</h2>
+                <p>
+                  这部分最适合在真正开始配置之前就列好。它不是“临时补一个 key”，而是整套系统要跑起来的基础清单。
+                </p>
+              </div>
+              <div class="pill green">先列全，再逐个落位</div>
+            </div>
+
+            <div class="env-grid">
+              <article class="env-card">
+                <h3>前端应用</h3>
+                <p>这些值用于 EMS 站点本体，主要影响前台页面和后台对 Supabase 的连接能力。</p>
+                <div class="chip-list">
+                  <span class="chip">PUBLIC_SUPABASE_URL</span>
+                  <span class="chip">PUBLIC_SUPABASE_ANON_KEY</span>
+                  <span class="chip">PUBLIC_CONTACT_ENDPOINT=/api/contact</span>
+                  <span class="chip">PUBLIC_TURNSTILE_SITE_KEY</span>
+                  <span class="chip">PUBLIC_MEDIA_FOLDER_ID_ENABLED</span>
+                </div>
+              </article>
+
+              <article class="env-card">
+                <h3>Cloudflare Worker</h3>
+                <p>这些值只应该进入 Worker，不应该暴露给浏览器。</p>
+                <div class="chip-list">
+                  <span class="chip">TURNSTILE_SECRET_KEY</span>
+                  <span class="chip">RESEND_API_KEY</span>
+                  <span class="chip">FROM_EMAIL</span>
+                  <span class="chip">TO_EMAIL</span>
+                  <span class="chip">ALLOWED_ORIGIN=https://rapiddirect.com</span>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <section class="panel section" id="gates">
+            <div class="section-title">
+              <div>
+                <h2>6. 最终上线闸门</h2>
+                <p>
+                  下面这些项，只要有一项没过，就不建议把真实流量切上去。它们是“能不能稳定对外”的最低门槛。
+                </p>
+              </div>
+              <div class="pill gold">上线前最后一轮核查</div>
+            </div>
+
+            <div class="gate-grid">
+              <article class="gate-card">
+                <h3>基础可用性</h3>
+                <p>确认主域子路径、后台、媒体和数据闭环都真实可用。</p>
+                <ul>
+                  <li><span class="mono">/ems/</span> 与 <span class="mono">/ems/pcb-assembly/</span> 可访问且资源路径正确</li>
+                  <li><span class="mono">/ems/login/</span> 和后台页面可正常登录与保存</li>
+                  <li>后台改内容后，前台刷新能够立即看到更新</li>
+                  <li>媒体库上传、复制链接、页面引用都正常</li>
+                </ul>
+              </article>
+
+              <article class="gate-card">
+                <h3>询盘链路</h3>
+                <p>这部分必须从浏览器真实提交流程验证，不能只看 Worker 部署成功。</p>
+                <ul>
+                  <li>Turnstile widget 正常显示与校验</li>
+                  <li><span class="mono">/api/contact</span> 返回成功响应</li>
+                  <li>收件邮箱能收到 Resend 通知</li>
+                  <li>点击回复时，收件人是客户填写的邮箱，而不是系统地址</li>
+                </ul>
+              </article>
+
+              <article class="gate-card">
+                <h3>边缘与缓存</h3>
+                <p>如果这里配错，站点经常会出现“明明改了内容却不生效”的假象。</p>
+                <ul>
+                  <li>API 明确不缓存</li>
+                  <li><span class="mono">_astro</span> 静态资源长缓存</li>
+                  <li>HTML 未被错误设置为 Cache Everything</li>
+                  <li>HTTPS 和主域规范跳转符合预期</li>
+                </ul>
+              </article>
+
+              <article class="gate-card">
+                <h3>SEO 与对外输出</h3>
+                <p>因为这是主域子路径站，canonical 和索引规则必须非常干净。</p>
+                <ul>
+                  <li>canonical 指向 <span class="mono">https://rapiddirect.com/ems/*</span></li>
+                  <li>sitemap 只输出正式主域路径</li>
+                  <li>robots 策略和临时环境隔离清楚</li>
+                  <li>不暴露测试域名作为正式页面入口</li>
+                </ul>
+              </article>
+            </div>
+
+            <div class="footer-note">
+              <strong>一句话总结：</strong>
+              这次最稳的首发路径，不是“先省掉服务器”，而是
+              <strong>先让 EMS 应用在独立服务器上跑稳，再用 Cloudflare 把它优雅地接进主域</strong>。
+              这样你既能保住现在的 <span class="mono">/ems/*</span> SEO 规划，也能给未来独立成站留下最小迁移成本。
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

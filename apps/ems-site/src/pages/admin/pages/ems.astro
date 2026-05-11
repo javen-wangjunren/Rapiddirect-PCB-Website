@@ -1,0 +1,10 @@
+---
+export const prerender = true;
+
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import AdminPageEditor from '../../../components/admin/AdminPageEditor';
+---
+
+<AdminLayout title="EMS 页面编辑器">
+  <AdminPageEditor initialSlug="/ems/" client:load />
+</AdminLayout>

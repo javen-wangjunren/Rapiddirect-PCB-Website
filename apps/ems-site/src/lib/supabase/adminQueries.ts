@@ -74,10 +74,18 @@ export const getPageBundleBySlugForAdmin = async (
   supabase: SupabaseClient,
   slug: string
 ): Promise<AdminPageBundle | null> => {
+  const trimmed = slug.trim();
+  const candidates = Array.from(
+    new Set([
+      trimmed,
+      trimmed.endsWith('/') ? trimmed.slice(0, -1) : `${trimmed}/`
+    ].filter(Boolean))
+  );
   const pageRes = await supabase
     .from('pages')
     .select('id,slug,title,template_type,status')
-    .eq('slug', slug)
+    .in('slug', candidates)
+    .limit(1)
     .maybeSingle();
 
   if (pageRes.error || !pageRes.data) return null;

@@ -32,6 +32,13 @@ export const adminNavGroups: AdminNavGroup[] = [
     ]
   },
   {
+    title: 'Global Settings',
+    items: [
+      { label: 'Header', href: '/admin/global-settings/header/', icon: '⚙' },
+      { label: 'Footer', href: '/admin/global-settings/footer/', icon: '⚙' }
+    ]
+  },
+  {
     title: 'Shortcuts',
     items: [{ label: 'View Site', href: '/', icon: '↗', exact: true }]
   }

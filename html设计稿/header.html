@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PCB Site Header - Seamless</title>
+<style>
+    :root {
+        --rd-orange: #f25537; /* 主站点的品牌橙 */
+        --rd-orange-hover: #d94527;
+        --rd-navy: #0f172a; /* 主站点的深色字 */
+        --rd-text-gray: #475569;
+        --bg-white: #ffffff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, sans-serif; }
+
+    .site-header {
+        background-color: var(--bg-white);
+        border-bottom: 1px solid #f1f5f9;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        padding: 0 40px; /* 宽屏留白 */
+    }
+
+    .header-container {
+        max-width: 1440px;
+        height: 80px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    /* Logo Area */
+    .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+    }
+    
+    .logo-placeholder {
+        width: 40px;
+        height: 40px;
+        background-color: #e2e8f0;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        color: #94a3b8;
+    }
+
+    .logo-text {
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--rd-navy);
+        letter-spacing: -0.5px;
+    }
+
+    .logo-text span {
+        color: var(--rd-orange);
+    }
+
+    /* Navigation */
+    .main-nav {
+        display: flex;
+        align-items: center;
+        gap: 32px;
+    }
+
+    .nav-item {
+        position: relative;
+        text-decoration: none;
+        color: var(--rd-navy);
+        font-size: 16px;
+        font-weight: 700;
+        transition: color 0.2s ease;
+        padding: 28px 0; /* 增加触发热区 */
+    }
+
+    .nav-item:hover {
+        color: var(--rd-orange);
+    }
+
+    /* Dropdown */
+    .has-dropdown {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        cursor: pointer;
+    }
+
+    .dropdown-icon {
+        width: 16px;
+        height: 16px;
+        transition: transform 0.3s ease;
+    }
+
+    .has-dropdown:hover .dropdown-icon {
+        transform: rotate(180deg);
+        color: var(--rd-orange);
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        left: -20px;
+        background-color: var(--bg-white);
+        min-width: 240px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        border: 1px solid #f1f5f9;
+        border-radius: 8px;
+        padding: 12px 0;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(10px);
+        transition: all 0.3s ease;
+    }
+
+    .has-dropdown:hover .dropdown-menu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .dropdown-link {
+        display: block;
+        padding: 12px 24px;
+        color: var(--rd-text-gray);
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+    .dropdown-link:hover {
+        color: var(--rd-orange);
+        background-color: #fffaf9;
+        padding-left: 28px; /* 轻微向右位移增加交互感 */
+    }
+
+    /* Action Area */
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .cta-button {
+        background-color: var(--rd-orange);
+        color: #ffffff;
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: 700;
+        padding: 14px 28px;
+        border-radius: 4px; /* 呼应主站的微小圆角 */
+        transition: background-color 0.2s ease;
+    }
+
+    .cta-button:hover {
+        background-color: var(--rd-orange-hover);
+    }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+    <div class="header-container">
+        
+        <a href="#" class="logo-container">
+            <div class="logo-placeholder">IMG</div>
+            <div class="logo-text">RAPID<span>PCB</span></div>
+        </a>
+
+        <nav class="main-nav">
+            <a href="#" class="nav-item">PCB Fabrication</a> 
+            <a href="#" class="nav-item">PCB Assembly</a>
+            <a href="#" class="nav-item">PCB Design</a>
+            <a href="#" class="nav-item">Component Sourcing</a>
+            
+            <div class="nav-item has-dropdown">
+                Mechanical Services
+                <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                
+                <div class="dropdown-menu">
+                    <a href="#" class="dropdown-link">CNC Machining</a>
+                    <a href="#" class="dropdown-link">3D Printing</a>
+                    <a href="#" class="dropdown-link">Sheet Metal Fabrication</a>
+                    <a href="#" class="dropdown-link">Injection Molding</a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="header-actions">
+            <a href="#" class="cta-button">Get A Quote</a>
+        </div>
+
+    </div>
+</header>
+
+</body>
+</html>

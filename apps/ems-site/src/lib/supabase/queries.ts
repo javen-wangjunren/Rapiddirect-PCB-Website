@@ -14,11 +14,19 @@ export const getPublishedPageBundleBySlug = async (
   supabase: SupabaseClient,
   slug: string
 ): Promise<PageBundle | null> => {
+  const trimmed = slug.trim();
+  const candidates = Array.from(
+    new Set([
+      trimmed,
+      trimmed.endsWith('/') ? trimmed.slice(0, -1) : `${trimmed}/`
+    ].filter(Boolean))
+  );
   const pageRes = await supabase
     .from('pages')
     .select('id,slug,title,template_type,status')
-    .eq('slug', slug)
+    .in('slug', candidates)
     .eq('status', 'published')
+    .limit(1)
     .maybeSingle();
 
   if (pageRes.error || !pageRes.data) {
@@ -45,4 +53,3 @@ export const getPublishedPageBundleBySlug = async (
     seo
   };
 };
-

@@ -1,0 +1,162 @@
+---
+import type { PcbDesignWorkflowContent } from '../../types/pcb-design';
+import { getAssetPath } from '../../lib/assets';
+
+export interface Props {
+  data: PcbDesignWorkflowContent;
+}
+
+const { data } = Astro.props;
+const stages = Array.isArray(data?.stages) ? data.stages : [];
+---
+
+<section class="bg-[#F5F5F5] py-20 text-[#1a1a1a]">
+  <div class="mx-auto max-w-[1200px] px-5">
+    
+    {/* Header */}
+    <div class="mb-12 text-center">
+      <h2 class="mb-3 text-4xl font-extrabold tracking-[-1px] sm:text-5xl">{data.title}</h2>
+      <p class="mx-auto max-w-[600px] text-base text-[#555555]">{data.description}</p>
+    </div>
+
+    {/* Navigation */}
+    <nav class="mb-10 flex flex-wrap items-center justify-center gap-3">
+      {stages.map((stage, index) => (
+        <div class="flex items-center gap-3">
+          <button
+            class={`nav-btn whitespace-nowrap rounded-[50px] border border-[#e5e7eb] px-6 py-3 text-sm font-bold transition-all duration-300 ${
+              index === 0
+                ? 'bg-black text-white border-black shadow-[0_4px_12px_rgba(0,0,0,0.1)] active'
+                : 'bg-white text-[#555555] hover:bg-gray-50'
+            }`}
+            data-target={stage.id}
+          >
+            {stage.label}
+          </button>
+          {index < stages.length - 1 && (
+            <div class="hidden h-px w-10 bg-[#e5e7eb] md:block"></div>
+          )}
+        </div>
+      ))}
+    </nav>
+
+    {/* Console Wrapper */}
+    <div
+      id="console-box"
+      class="relative min-h-[500px] overflow-hidden rounded-3xl border border-[#e5e7eb] shadow-[0_20px_50px_rgba(0,0,0,0.03)] transition-colors duration-500 ease-in-out"
+      style={`background-color: ${stages[0]?.bg_color || '#FFFFFF'};`}
+    >
+      {stages.map((stage, index) => (
+        <div
+          id={stage.id}
+          data-bg={stage.bg_color}
+          class={`stage-card flex flex-col p-10 md:p-[60px] lg:flex-row ${
+            index === 0 ? 'active flex animate-[fadeIn_0.4s_ease_forwards] gap-[60px]' : 'hidden'
+          }`}
+        >
+          {stage.is_mfg ? (
+            /* Manufacturing Stage (Special Layout) */
+            <div class="flex w-full flex-col items-center justify-center py-10 text-center md:py-20">
+              <h3 class="mb-4 text-3xl font-extrabold text-white sm:text-4xl">{stage.mfg_title}</h3>
+              <p class="mb-8 max-w-[650px] text-[17px] text-[#aaaaaa]">{stage.mfg_description}</p>
+              {stage.mfg_cta && (
+                <a
+                  href={stage.mfg_cta.href}
+                  class="rounded-[50px] bg-[#ef533f] px-12 py-[18px] text-base font-bold text-white shadow-[0_10px_20px_rgba(239,83,63,0.2)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#d64734]"
+                >
+                  {stage.mfg_cta.label}
+                </a>
+              )}
+            </div>
+          ) : (
+            /* Standard Stage Layout */
+            <>
+              {/* Left Column */}
+              <div class="mb-10 flex-none text-center lg:mb-0 lg:w-[35%] lg:text-left">
+                <h3 class="mb-6 text-3xl font-extrabold">{stage.left_title}</h3>
+                {stage.image_url ? (
+                  <img
+                    src={getAssetPath(stage.image_url)}
+                    alt={stage.image_alt || stage.left_title}
+                    class="w-full rounded-[20px] object-cover"
+                  />
+                ) : (
+                  <div class="flex aspect-square w-full items-center justify-center rounded-[20px] bg-black/5 text-sm text-[#94a3b8]">
+                    {stage.image_placeholder}
+                  </div>
+                )}
+              </div>
+
+              {/* Right Column (Steps) */}
+              <div class="flex flex-1 flex-col justify-center gap-10 lg:pl-10">
+                {(stage.steps || []).map((step) => (
+                  <div class="flex flex-col gap-3">
+                    <span class="w-fit rounded-[50px] bg-[#ef533f]/10 px-3 py-1 text-xs font-bold uppercase tracking-[1px] text-[#ef533f]">
+                      {step.tag}
+                    </span>
+                    <h4 class="text-xl font-bold text-[#1a1a1a]">{step.title}</h4>
+                    <p class="text-[15px] leading-[1.6] text-[#555555]">{step.description}</p>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      ))}
+    </div>
+
+  </div>
+</section>
+
+<script>
+  function initWorkflowConsole() {
+    const navBtns = document.querySelectorAll('.nav-btn');
+    const cards = document.querySelectorAll('.stage-card');
+    const consoleBox = document.getElementById('console-box');
+
+    if (!consoleBox) return;
+
+    navBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        // 1. Update Navigation Buttons
+        navBtns.forEach(b => {
+          b.classList.remove('bg-black', 'text-white', 'border-black', 'shadow-[0_4px_12px_rgba(0,0,0,0.1)]', 'active');
+          b.classList.add('bg-white', 'text-[#555555]');
+        });
+        
+        btn.classList.remove('bg-white', 'text-[#555555]');
+        btn.classList.add('bg-black', 'text-white', 'border-black', 'shadow-[0_4px_12px_rgba(0,0,0,0.1)]', 'active');
+
+        // 2. Update Card Visibility & Background
+        const targetId = btn.getAttribute('data-target');
+        
+        cards.forEach(card => {
+          card.classList.remove('active', 'flex', 'animate-[fadeIn_0.4s_ease_forwards]', 'gap-[60px]');
+          card.classList.add('hidden');
+          
+          if (card.getAttribute('id') === targetId) {
+            card.classList.remove('hidden');
+            card.classList.add('active', 'flex', 'animate-[fadeIn_0.4s_ease_forwards]', 'gap-[60px]');
+            
+            // 3. Update container background color
+            const bgColor = card.getAttribute('data-bg');
+            if (bgColor) {
+              consoleBox.style.backgroundColor = bgColor;
+            }
+          }
+        });
+      });
+    });
+  }
+
+  // Run on initial load and after Astro page transitions
+  document.addEventListener('DOMContentLoaded', initWorkflowConsole);
+  document.addEventListener('astro:page-load', initWorkflowConsole);
+</script>
+
+<style>
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>

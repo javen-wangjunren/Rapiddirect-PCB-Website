@@ -1,0 +1,66 @@
+---
+import type { PcbDesignCtaContent } from '../../types/pcb-design';
+
+export interface Props {
+  data: PcbDesignCtaContent;
+}
+
+const { data } = Astro.props;
+const trustBadges = Array.isArray(data?.trust_badges) ? data.trust_badges : [];
+---
+
+<section class="relative flex items-center justify-center overflow-hidden bg-[#0a0b0d] px-5 py-[120px] text-center md:py-[100px]">
+  
+  {/* Tech Glow Background */}
+  <div class="pointer-events-none absolute left-1/2 top-[-50%] z-[1] h-[800px] w-[800px] -translate-x-1/2 bg-[radial-gradient(circle,rgba(239,83,63,0.1)_0%,rgba(10,11,13,0)_70%)]"></div>
+  
+  {/* Grid Background */}
+  <div class="pointer-events-none absolute inset-0 z-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[length:40px_40px]"></div>
+
+  <div class="relative z-[2] mx-auto max-w-[900px]">
+    
+    <h2 
+      class="mb-6 text-[36px] font-extrabold leading-[1.2] tracking-[-1px] text-white md:text-[48px]"
+      set:html={data.title}
+    ></h2>
+    
+    <p class="mx-auto mb-12 max-w-[700px] text-[18px] leading-[1.6] text-[#94a3b8]">
+      {data.description}
+    </p>
+
+    {/* Dual Buttons */}
+    <div class="mb-10 flex flex-col justify-center gap-4 md:flex-row md:gap-5">
+      <a
+        href={data.primary_button?.href}
+        class="inline-flex w-full items-center justify-center gap-2.5 rounded-[50px] bg-[#ef533f] px-10 py-[18px] text-[18px] font-bold text-white shadow-[0_10px_25px_rgba(239,83,63,0.25)] transition-all duration-300 hover:-translate-y-[3px] hover:bg-[#d64734] hover:shadow-[0_15px_35px_rgba(239,83,63,0.35)] md:w-auto"
+      >
+        {data.primary_button?.label}
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </a>
+      
+      <a
+        href={data.secondary_button?.href}
+        class="inline-flex w-full items-center justify-center gap-2.5 rounded-[50px] border-2 border-[rgba(255,255,255,0.2)] bg-transparent px-10 py-[18px] text-[18px] font-bold text-white transition-all duration-300 hover:-translate-y-[3px] hover:border-white hover:bg-[rgba(255,255,255,0.05)] md:w-auto"
+      >
+        {data.secondary_button?.label}
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+      </a>
+    </div>
+
+    {/* Trust Badges */}
+    <div class="flex flex-col items-center justify-center gap-[15px] border-t border-[rgba(255,255,255,0.1)] pt-[30px] md:flex-row md:flex-wrap md:gap-[30px]">
+      {trustBadges.map(badge => (
+        <div class="flex items-center gap-2 text-[14px] font-semibold text-[#cbd5e1]">
+          <span class="h-[18px] w-[18px] text-[#ef533f]" set:html={badge.icon_svg}></span>
+          {badge.label}
+        </div>
+      ))}
+    </div>
+
+  </div>
+</section>

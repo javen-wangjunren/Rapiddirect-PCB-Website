@@ -1,0 +1,83 @@
+---
+import { siteHeaderDefaults } from '../../content/defaults/site-header';
+import { getAssetPath, getHref } from '../../lib/assets';
+
+type ChildLink = { label?: string; href?: string };
+type NavItem = { label?: string; href?: string; children?: ChildLink[] };
+type HeaderData = {
+  logo_url?: string;
+  cta_text?: string;
+  cta_href?: string;
+  nav_items?: NavItem[];
+};
+
+const { data = siteHeaderDefaults } = Astro.props as { data?: HeaderData };
+
+const logoUrl = data?.logo_url?.trim() ? getAssetPath(data.logo_url) : '';
+const ctaText = data?.cta_text?.trim() || siteHeaderDefaults.cta_text;
+const ctaHref = data?.cta_href?.trim() || siteHeaderDefaults.cta_href;
+const navItems = (data?.nav_items?.length ? data.nav_items : siteHeaderDefaults.nav_items) as NavItem[];
+---
+
+<header class="site-header sticky top-0 z-[1000] border-b border-slate-100 bg-white px-10">
+  <div class="mx-auto flex h-20 max-w-[1440px] items-center justify-between">
+    <a href={getHref('/')} class="flex items-center gap-3 no-underline" aria-label="RapidDirect home">
+      {logoUrl ? (
+        <img src={logoUrl} alt="RapidDirect" class="h-10 w-auto object-contain" loading="eager" decoding="async" />
+      ) : (
+        <div class="flex h-10 w-10 items-center justify-center rounded bg-slate-200 text-[10px] text-slate-400">
+          IMG
+        </div>
+      )}
+      <span class="text-[22px] font-extrabold tracking-[-0.5px] text-[#0f172a]">
+        RAPID<span class="text-[#f25537]">PCB</span>
+      </span>
+    </a>
+
+    <nav class="flex items-center gap-8">
+      {navItems.map((item) => {
+        const hasChildren = item.children && item.children.length > 0;
+        if (hasChildren) {
+          return (
+            <div class="nav-item has-dropdown relative flex cursor-pointer items-center gap-1 py-7 text-base font-bold text-[#0f172a] transition-colors hover:text-[#f25537]">
+              {item.label}
+              <svg class="dropdown-icon h-4 w-4 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+              <div class="dropdown-menu absolute left-[-20px] top-full min-w-[240px] rounded-lg border border-slate-100 bg-white px-0 py-3 opacity-0 shadow-[0_10px_30px_rgba(0,0,0,0.08)] transition-all duration-300 invisible translate-y-2.5 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0">
+                {item.children!.map((child) => (
+                  <a href={getHref(child.href ?? '#')} class="block px-6 py-3 text-[15px] font-medium text-[#475569] no-underline transition-all hover:text-[#f25537] hover:bg-[#fffaf9] hover:pl-7">
+                    {child.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+          );
+        }
+        return (
+          <a href={getHref(item.href ?? '#')} class="nav-item py-7 text-base font-bold text-[#0f172a] no-underline transition-colors hover:text-[#f25537]">
+            {item.label}
+          </a>
+        );
+      })}
+    </nav>
+
+    <div class="flex items-center gap-5">
+      <a href={getHref(ctaHref)} class="rounded px-7 py-3.5 text-base font-bold text-white no-underline transition-colors bg-[#f25537] hover:bg-[#d94527]">
+        {ctaText}
+      </a>
+    </div>
+  </div>
+</header>
+
+<style>
+  .has-dropdown:hover .dropdown-icon {
+    transform: rotate(180deg);
+    color: #f25537;
+  }
+  .has-dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+</style>

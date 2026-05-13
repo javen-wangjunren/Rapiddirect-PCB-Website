@@ -1,10 +1,11 @@
 import { getAssetPath } from '../../lib/assets';
+import type { TemplateType } from '../../types/page';
 
 export interface EmsEditorPublishSidebarProps {
   status: 'draft' | 'published';
   onStatusChange: (value: 'draft' | 'published') => void;
-  templateType: 'ems_home' | 'ems_service' | 'pcb_assembly';
-  onTemplateTypeChange: (value: 'ems_home' | 'ems_service' | 'pcb_assembly') => void;
+  templateType: TemplateType;
+  onTemplateTypeChange: (value: TemplateType) => void;
   previewHref: string;
   saving: boolean;
   canPublish: boolean;
@@ -63,6 +64,7 @@ export default function EmsEditorPublishSidebar({
             <option value="ems_home">ems_home</option>
             <option value="ems_service">ems_service</option>
             <option value="pcb_assembly">pcb_assembly</option>
+            <option value="site_footer">site_footer</option>
           </select>
         </div>
 

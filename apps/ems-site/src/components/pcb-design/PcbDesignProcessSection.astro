@@ -1,0 +1,183 @@
+---
+import type { PcbDesignProcessContent } from '../../types/pcb-design';
+import { getAssetPath } from '../../lib/assets';
+
+export interface Props {
+  data: PcbDesignProcessContent;
+}
+
+const { data } = Astro.props;
+const items = Array.isArray(data?.items) ? data.items : [];
+const benefits = Array.isArray(data?.trust_base?.benefits) ? data.trust_base.benefits : [];
+---
+
+<section class="overflow-hidden bg-[#F5F5F5] py-[100px] text-[#1a1a1a]">
+  <div class="container mx-auto max-w-[1200px] px-5 relative">
+    
+    {/* Header */}
+    <div class="mb-[80px] text-center">
+      <h2 class="mb-4 text-4xl font-extrabold tracking-[-1px] text-[#1a1a1a] sm:text-5xl">
+        {data.title}
+      </h2>
+      <p class="mx-auto max-w-[800px] text-lg leading-[1.6] text-[#666666]">
+        {data.description}
+      </p>
+    </div>
+
+    {/* Timeline Wrapper */}
+    <div id="timeline" class="relative mx-auto mb-[100px] max-w-[1100px] lg:w-[90%] xl:w-full">
+      {/* Central Line */}
+      <div class="absolute bottom-0 left-[20px] top-0 w-1 -translate-x-1/2 rounded bg-[#d1d5db] z-10 lg:left-1/2"></div>
+      
+      {/* Progress Line */}
+      <div id="timeline-progress" class="absolute left-[20px] top-0 w-1 -translate-x-1/2 rounded bg-[#ef533f] z-20 h-0 transition-[height] duration-100 ease-linear lg:left-1/2"></div>
+
+      {items.map((item, index) => {
+        // Determine layout based on index (odd vs even for desktop staggered layout)
+        const isOdd = index % 2 !== 0;
+        
+        return (
+          <div class={`timeline-item relative z-30 mb-[60px] flex w-full flex-col items-start opacity-0 translate-y-[40px] transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] lg:mb-[80px] lg:flex-row lg:items-center lg:justify-between ${isOdd ? 'lg:flex-row-reverse' : ''}`}>
+            
+            {/* Dot */}
+            <div class="timeline-dot absolute left-[20px] top-[30px] z-50 h-[18px] w-[18px] -translate-x-1/2 -translate-y-1/2 rounded-full border-4 border-[#d1d5db] bg-white transition-all duration-400 ease-out lg:left-1/2 lg:top-1/2"></div>
+
+            {/* Text Card */}
+            <div class={`timeline-content text-card mb-5 ml-[60px] flex w-[calc(100%-60px)] flex-col rounded-xl border border-[#e5e7eb] bg-white p-[30px] shadow-[0_5px_20px_rgba(0,0,0,0.03)] transition-transform duration-300 ease-out lg:mb-0 lg:ml-0 lg:w-[44%] ${isOdd ? 'order-1 lg:order-none' : 'order-1 lg:order-none'}`}>
+              <div set:html={item.icon_svg}></div>
+              <h3 class="mb-2.5 text-[19px] font-bold text-[#1a1a1a]">{item.title}</h3>
+              <p class="mb-[18px] flex-grow text-[14px] leading-[1.6] text-[#666666]" set:html={item.description}></p>
+              
+              <div class="flex flex-wrap gap-2">
+                {(item.tags || []).map(tag => (
+                  <span class="rounded-[50px] bg-[#F0F0F0] px-3 py-[5px] text-[12px] font-semibold text-[#475569]">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Photo Module */}
+            <div class={`timeline-content photo-module group relative ml-[60px] flex aspect-[16/9] w-[calc(100%-60px)] items-center justify-center overflow-hidden rounded-xl border border-[#e5e7eb] bg-[#f0f2f5] transition-transform duration-300 ease-out lg:ml-0 lg:aspect-[4/3] lg:w-[44%] ${isOdd ? 'order-2 lg:order-none' : 'order-2 lg:order-none'}`}>
+              {item.image_url ? (
+                <img
+                  src={getAssetPath(item.image_url)}
+                  alt={item.image_alt || item.title}
+                  class="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                />
+              ) : (
+                <span class="absolute text-[14px] font-medium text-[#94a3b8] px-4 text-center">
+                  {item.image_placeholder}
+                </span>
+              )}
+            </div>
+
+          </div>
+        );
+      })}
+    </div>
+
+    {/* Trust Base */}
+    <div id="trust-base" class="mx-auto max-w-[1000px] rounded-[20px] border border-[#e5e7eb] bg-white p-10 text-center shadow-[0_15px_40px_rgba(0,0,0,0.04)] opacity-0 translate-y-[40px] transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] md:p-[60px_50px]">
+      <h3 class="mb-[35px] text-[28px] font-extrabold text-[#1a1a1a]">
+        {data.trust_base?.title}
+      </h3>
+      
+      <div class="mb-[45px] grid grid-cols-1 gap-6 text-left sm:grid-cols-2 lg:grid-cols-4">
+        {benefits.map(benefit => (
+          <div class="rounded-[10px] bg-[#F5F5F5] p-5">
+            <h4 class="mb-2 flex items-center gap-2 text-[15px] font-bold text-[#1a1a1a]">
+              <span set:html={benefit.icon_svg}></span>
+              {benefit.title}
+            </h4>
+            <p class="text-[13px] leading-[1.5] text-[#666666]">
+              {benefit.description}
+            </p>
+          </div>
+        ))}
+      </div>
+      
+      {data.trust_base?.cta && (
+        <a
+          href={data.trust_base.cta.href}
+          class="inline-flex items-center gap-[10px] rounded-[50px] bg-[#ef533f] px-10 py-4 text-[17px] font-bold text-white shadow-[0_8px_20px_rgba(239,83,63,0.2)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#d64734] hover:shadow-[0_12px_30px_rgba(239,83,63,0.3)]"
+        >
+          {data.trust_base.cta.label}
+        </a>
+      )}
+    </div>
+
+  </div>
+</section>
+
+<script>
+  function initPipelineAnimation() {
+    const timelineItems = document.querySelectorAll('.timeline-item');
+    const trustBase = document.getElementById('trust-base');
+    const progressBar = document.getElementById('timeline-progress');
+    const timeline = document.getElementById('timeline');
+
+    if (!timeline) return;
+
+    // Observer for card fade-in animation
+    const observerOptions = {
+      root: null,
+      rootMargin: '0px 0px -15% 0px',
+      threshold: 0.1
+    };
+
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.remove('opacity-0', 'translate-y-[40px]');
+          entry.target.classList.add('opacity-100', 'translate-y-0');
+          
+          // If it's a timeline item, also trigger the dot styling
+          if (entry.target.classList.contains('timeline-item')) {
+            const dot = entry.target.querySelector('.timeline-dot');
+            if (dot) {
+              dot.classList.remove('border-[#d1d5db]', 'bg-white');
+              dot.classList.add('border-[#ef533f]', 'bg-[#ef533f]', 'shadow-[0_0_0_5px_rgba(239,83,63,0.15)]');
+            }
+          }
+        }
+      });
+    }, observerOptions);
+
+    timelineItems.forEach(item => revealObserver.observe(item));
+    if (trustBase) revealObserver.observe(trustBase);
+
+    // Scroll listener for the central progress line
+    const scrollHandler = () => {
+      const timelineRect = timeline.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      
+      // Calculate progress based on central line intersection
+      if (timelineRect.top < viewportHeight / 2) {
+        let progressHeight = (viewportHeight / 2) - timelineRect.top;
+        
+        // Max height limited by total timeline length
+        if (progressHeight > timelineRect.height) {
+          progressHeight = timelineRect.height;
+        }
+        
+        if (progressBar) {
+          progressBar.style.height = `${progressHeight}px`;
+        }
+      } else {
+        if (progressBar) {
+          progressBar.style.height = '0px';
+        }
+      }
+    };
+
+    window.addEventListener('scroll', scrollHandler);
+    
+    // Initial check
+    scrollHandler();
+  }
+
+  // Run on initial load and after Astro page transitions
+  document.addEventListener('DOMContentLoaded', initPipelineAnimation);
+  document.addEventListener('astro:page-load', initPipelineAnimation);
+</script>

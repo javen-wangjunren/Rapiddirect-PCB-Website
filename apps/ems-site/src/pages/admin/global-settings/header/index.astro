@@ -1,0 +1,16 @@
+---
+export const prerender = false;
+
+import AdminPageEditor from '../../../../components/admin/AdminPageEditor';
+import AdminLayout from '../../../../layouts/AdminLayout.astro';
+
+const headerSlug = '/ems/_global/header/';
+---
+
+<AdminLayout title="Global Settings - Header">
+  <AdminPageEditor
+    initialSlug={headerSlug}
+    createIfMissing={{ title: 'Global Header', template_type: 'site_header' }}
+    client:load
+  />
+</AdminLayout>

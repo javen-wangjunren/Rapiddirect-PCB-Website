@@ -1,0 +1,16 @@
+---
+export const prerender = false;
+
+import AdminPageEditor from '../../../../components/admin/AdminPageEditor';
+import AdminLayout from '../../../../layouts/AdminLayout.astro';
+
+const footerSlug = '/ems/_global/footer/';
+---
+
+<AdminLayout title="Global Settings - Footer">
+  <AdminPageEditor
+    initialSlug={footerSlug}
+    createIfMissing={{ title: 'Global Footer', template_type: 'site_footer' }}
+    client:load
+  />
+</AdminLayout>

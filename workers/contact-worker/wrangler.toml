@@ -1,9 +1,12 @@
-name = "pcb-ems-contact"
+name = "pcp-contact"
 main = "src/index.ts"
 compatibility_date = "2026-04-24"
 
+routes = [
+  { pattern = "rapiddirect.com/api/contact*", zone_name = "rapiddirect.com" }
+]
+
 [vars]
 ALLOWED_ORIGIN = "https://rapiddirect.com"
-FROM_EMAIL = "RapidDirect EMS <no-reply@rapiddirect.com>"
-TO_EMAIL = "you@example.com"
-
+FROM_EMAIL = "quote@rapiddirect.com"
+TO_EMAIL = "pcb@rapiddirect.com"

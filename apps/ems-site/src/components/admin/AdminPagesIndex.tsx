@@ -356,6 +356,7 @@ function AdminPagesIndexInner() {
               <option value="ems_home">ems_home</option>
               <option value="ems_service">ems_service</option>
               <option value="pcb_assembly">pcb_assembly</option>
+              <option value="pcb_design">pcb_design</option>
             </Select>
           </label>
 

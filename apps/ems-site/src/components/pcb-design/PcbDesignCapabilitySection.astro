@@ -1,0 +1,63 @@
+---
+import type { PcbDesignCapabilityContent } from '../../types/pcb-design';
+import { getAssetPath } from '../../lib/assets';
+
+export interface Props {
+  data: PcbDesignCapabilityContent;
+}
+
+const { data } = Astro.props;
+const tools = Array.isArray(data?.tools) ? data.tools : [];
+const specs = Array.isArray(data?.specs) ? data.specs : [];
+---
+
+<section class="overflow-hidden bg-[#F5F5F5] py-24 sm:py-32">
+  <div class="mx-auto flex max-w-[1280px] flex-col items-center gap-16 px-6 lg:flex-row lg:gap-20">
+    
+    {/* Left Column: Info & Tools */}
+    <div class="flex-none text-center lg:w-[42%] lg:text-left">
+      <span class="mb-4 block text-sm font-bold uppercase tracking-[2px] text-[#ef533f]">
+        {data.tag}
+      </span>
+      <h2 class="mb-6 text-4xl font-extrabold leading-[1.1] tracking-[-1.5px] text-[#1a1a1a] sm:text-5xl">
+        {data.title_prefix} <span class="text-[#ef533f]">{data.title_highlight}</span>
+      </h2>
+      <p class="mb-12 text-lg leading-[1.6] text-[#666666]">
+        {data.description}
+      </p>
+      
+      <span class="mb-4 block text-[13px] font-semibold uppercase tracking-[0.5px] text-[#666666]">
+        {data.tools_label}
+      </span>
+      <div class="flex flex-wrap justify-center gap-3 lg:justify-start">
+        {tools.map((tool) => (
+          <div class="flex items-center justify-center rounded-[50px] border border-[#e5e7eb] bg-white px-5 py-2.5 text-sm font-semibold text-[#1a1a1a] shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 hover:-translate-y-[2px] hover:border-[#ef533f] hover:text-[#ef533f] hover:shadow-[0_4px_12px_rgba(239,83,63,0.08)]">
+            <img class="h-[22px] w-auto max-w-[140px]" src={getAssetPath(tool.logo_url)} alt={tool.alt_text} />
+          </div>
+        ))}
+      </div>
+    </div>
+
+    {/* Right Column: Specs */}
+    <div class="relative w-full flex-1 rounded-[24px] border border-[#e5e7eb] bg-white p-8 shadow-[0_20px_50px_rgba(0,0,0,0.04)] sm:p-12 lg:p-[50px]">
+      {/* Optional decorative dots logic can be added here if needed */}
+      <div class="absolute right-6 top-6 font-mono text-[11px] tracking-[1px] text-[#94a3b8]"></div>
+      
+      <div class="flex flex-col">
+        {specs.map((spec, index) => (
+          <div class={`group flex flex-col items-start gap-3 py-6 transition-all duration-300 hover:pl-2.5 sm:flex-row sm:items-center sm:justify-between ${index !== specs.length - 1 ? 'border-b border-dashed border-[#e5e7eb]' : ''}`}>
+            <div class="flex items-center gap-4">
+              <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-[#fff0ed] text-[#ef533f]" set:html={spec.icon_svg} />
+              <h4 class="text-lg font-bold text-[#1a1a1a]">{spec.name}</h4>
+            </div>
+            <div class="text-left sm:text-right sm:pl-0 pl-[60px]">
+              <div class="text-lg font-extrabold text-[#ef533f]">{spec.value}</div>
+              <span class="mt-1 block text-[13px] font-medium text-[#666666]">{spec.sub_value}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+  </div>
+</section>

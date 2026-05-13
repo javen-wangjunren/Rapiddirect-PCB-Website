@@ -1,0 +1,159 @@
+---
+import { siteFooterDefaults } from '../../content/defaults/site-footer';
+import { getAssetPath, getHref } from '../../lib/assets';
+
+type LinkItem = { label?: string; href?: string };
+type MenuGroup = { title?: string; links?: LinkItem[] };
+type FooterData = {
+  logo_url?: string;
+  company_info?: {
+    phones?: string[];
+    email?: string;
+    address_lines?: string[];
+  };
+  social_links?: { platform?: string; href?: string }[];
+  menus?: {
+    capabilities?: MenuGroup;
+    resources?: MenuGroup;
+    about?: MenuGroup;
+  };
+  footer_bottom?: {
+    copyright?: string;
+    legal_links?: LinkItem[];
+  };
+};
+
+const { data = siteFooterDefaults } = Astro.props as { data?: FooterData };
+
+const companyInfo = data?.company_info ?? siteFooterDefaults.company_info;
+const socialLinks = Array.isArray(data?.social_links) ? data?.social_links : siteFooterDefaults.social_links;
+const menus = [
+  data?.menus?.capabilities ?? siteFooterDefaults.menus.capabilities,
+  data?.menus?.resources ?? siteFooterDefaults.menus.resources,
+  data?.menus?.about ?? siteFooterDefaults.menus.about
+];
+const footerBottom = data?.footer_bottom ?? siteFooterDefaults.footer_bottom;
+const logoUrl = data?.logo_url?.trim() ? getAssetPath(data.logo_url) : '';
+---
+
+<footer class="border-t border-slate-200 bg-white">
+  <div class="mx-auto max-w-7xl px-6 py-20">
+    <div class="flex flex-col justify-between gap-14 lg:flex-row lg:gap-16">
+      <div class="w-full max-w-[360px]">
+        <a href={getHref('/')} class="inline-flex items-center" aria-label="RapidDirect home">
+          {logoUrl ? (
+            <img src={logoUrl} alt="RapidDirect" class="h-10 w-auto object-contain" loading="lazy" decoding="async" />
+          ) : (
+            <div class="flex h-10 w-28 items-center justify-center rounded-md border border-dashed border-slate-300 text-xs font-medium uppercase tracking-[0.18em] text-slate-400">
+              Logo
+            </div>
+          )}
+        </a>
+
+        <ul class="mt-8 space-y-5 text-[15px] leading-7 text-slate-900">
+          <li class="flex items-start gap-4">
+            <svg class="mt-1 h-5 w-5 shrink-0 text-[#f25537]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+            </svg>
+            <div>
+              {(companyInfo.phones ?? []).map((line, idx) => (
+                <>
+                  {idx > 0 ? <br /> : null}
+                  {line}
+                </>
+              ))}
+            </div>
+          </li>
+          <li class="flex items-start gap-4">
+            <svg class="mt-1 h-5 w-5 shrink-0 text-[#f25537]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+            <div>{companyInfo.email ?? ''}</div>
+          </li>
+          <li class="flex items-start gap-4">
+            <svg class="mt-1 h-5 w-5 shrink-0 text-[#f25537]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            <div>
+              {(companyInfo.address_lines ?? []).map((line, idx) => (
+                <>
+                  {idx > 0 ? <br /> : null}
+                  {line}
+                </>
+              ))}
+            </div>
+          </li>
+        </ul>
+
+        <div class="mt-8 flex flex-wrap gap-4">
+          {socialLinks.map((item) => {
+            const platform = (item.platform ?? '').toLowerCase();
+            const href = item.href ?? '#';
+            const ariaLabel = item.platform ?? 'Social';
+            return (
+              <a
+                href={href}
+                class="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 text-[#f25537] transition hover:border-[#f25537] hover:bg-[#f25537] hover:text-white"
+                aria-label={ariaLabel}
+              >
+                {platform === 'facebook' ? (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                  </svg>
+                ) : platform === 'x' ? (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 4l16 16"></path>
+                    <path d="M4 20L20 4"></path>
+                  </svg>
+                ) : platform === 'youtube' ? (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33 2.78 2.78 0 0 0 1.94 2c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z"></path>
+                    <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+                  </svg>
+                ) : platform === 'linkedin' ? (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                    <rect x="2" y="9" width="4" height="12"></rect>
+                    <circle cx="4" cy="4" r="2"></circle>
+                  </svg>
+                ) : (
+                  <span class="text-xs font-semibold">{(item.platform ?? '?').slice(0, 1).toUpperCase()}</span>
+                )}
+              </a>
+            );
+          })}
+        </div>
+      </div>
+
+      <div class="grid flex-1 grid-cols-1 gap-10 md:grid-cols-2 xl:grid-cols-3">
+        {menus.map((menu) => (
+          <div class="min-w-0">
+            <h4 class="mb-6 text-base font-extrabold uppercase tracking-[0.08em] text-slate-900">{menu.title}</h4>
+            <ul class="space-y-4">
+              {(menu.links ?? []).map((link) => (
+                <li>
+                  <a href={getHref(link.href ?? '#')} class="text-[15px] text-slate-600 transition hover:text-[#f25537]">
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="mt-14 flex flex-col gap-4 border-t border-slate-200 pt-8 text-sm md:flex-row md:items-center md:justify-between">
+      <div class="font-medium text-slate-900">{footerBottom.copyright ?? ''}</div>
+      <div class="flex flex-wrap gap-x-6 gap-y-3 text-slate-900">
+        {(footerBottom.legal_links ?? []).map((link) => (
+          <a href={getHref(link.href ?? '#')} class="transition hover:text-[#f25537]">
+            {link.label}
+          </a>
+        ))}
+      </div>
+    </div>
+  </div>
+</footer>

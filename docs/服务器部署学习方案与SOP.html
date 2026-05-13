@@ -1,0 +1,1502 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>服务器部署学习方案与 SOP</title>
+    <style>
+      :root {
+        --bg: #eef2ff;
+        --bg-soft: #f8faff;
+        --panel: rgba(255, 255, 255, 0.92);
+        --panel-strong: #ffffff;
+        --ink: #1f2554;
+        --muted: #5d648f;
+        --line: #d8ddfb;
+        --line-strong: #bfc7f5;
+        --primary: #4f46e5;
+        --primary-soft: rgba(79, 70, 229, 0.12);
+        --green: #0f9f5f;
+        --green-soft: rgba(15, 159, 95, 0.12);
+        --orange: #d97706;
+        --orange-soft: rgba(217, 119, 6, 0.12);
+        --red: #d33d5c;
+        --red-soft: rgba(211, 61, 92, 0.12);
+        --shadow: 0 20px 48px rgba(39, 54, 112, 0.12);
+        --radius-xl: 28px;
+        --radius-lg: 22px;
+        --radius-md: 16px;
+        --radius-sm: 12px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        font-family: "IBM Plex Sans", "Avenir Next", "PingFang SC", "Noto Sans SC", sans-serif;
+        background:
+          radial-gradient(circle at top left, rgba(79, 70, 229, 0.12), transparent 28%),
+          radial-gradient(circle at top right, rgba(34, 197, 94, 0.14), transparent 26%),
+          linear-gradient(180deg, #f7f8ff 0%, #eef2ff 100%);
+      }
+
+      a {
+        color: inherit;
+      }
+
+      code,
+      pre {
+        font-family: "JetBrains Mono", "SFMono-Regular", monospace;
+      }
+
+      .shell {
+        max-width: 1500px;
+        margin: 0 auto;
+        padding: 28px;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid rgba(191, 199, 245, 0.8);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(12px);
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.3fr) 360px;
+        gap: 22px;
+        margin-bottom: 22px;
+      }
+
+      .hero-main {
+        position: relative;
+        overflow: hidden;
+        padding: 34px;
+      }
+
+      .hero-main::before {
+        content: "";
+        position: absolute;
+        inset: auto auto -80px -60px;
+        width: 280px;
+        height: 220px;
+        background: radial-gradient(circle, rgba(79, 70, 229, 0.18), transparent 68%);
+      }
+
+      .hero-main::after {
+        content: "";
+        position: absolute;
+        right: -48px;
+        top: -48px;
+        width: 220px;
+        height: 220px;
+        background: radial-gradient(circle, rgba(34, 197, 94, 0.18), transparent 70%);
+        border-radius: 999px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: var(--primary-soft);
+        color: var(--primary);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+        line-height: 1;
+      }
+
+      h1 {
+        margin: 18px 0 12px;
+        font-size: clamp(38px, 5vw, 70px);
+        line-height: 0.96;
+        letter-spacing: -0.05em;
+      }
+
+      .hero-copy {
+        margin: 0;
+        max-width: 860px;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.85;
+      }
+
+      .hero-note {
+        margin-top: 22px;
+        padding: 16px 18px;
+        border-radius: var(--radius-md);
+        border: 1px solid rgba(79, 70, 229, 0.18);
+        background: rgba(79, 70, 229, 0.08);
+        font-size: 14px;
+        line-height: 1.8;
+      }
+
+      .hero-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 24px;
+      }
+
+      .hero-card {
+        border-radius: 18px;
+        border: 1px solid rgba(191, 199, 245, 0.82);
+        background: rgba(255, 255, 255, 0.82);
+        padding: 16px;
+      }
+
+      .hero-card strong {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 14px;
+      }
+
+      .hero-card span {
+        display: block;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      .hero-side {
+        padding: 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .hero-side h2 {
+        margin: 0;
+        font-size: 18px;
+      }
+
+      .stat,
+      .side-card {
+        border-radius: 18px;
+        border: 1px solid rgba(191, 199, 245, 0.82);
+        background: rgba(255, 255, 255, 0.8);
+        padding: 16px 18px;
+      }
+
+      .stat .label,
+      .side-card .label {
+        display: block;
+        margin-bottom: 10px;
+        color: var(--muted);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .stat .value {
+        display: block;
+        font-size: 30px;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+      }
+
+      .stat p,
+      .side-card p,
+      .side-card ul {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.75;
+      }
+
+      .side-card ul {
+        padding-left: 18px;
+      }
+
+      .main {
+        display: grid;
+        grid-template-columns: 290px minmax(0, 1fr);
+        gap: 22px;
+        align-items: start;
+      }
+
+      .sidebar {
+        position: sticky;
+        top: 20px;
+        padding: 18px;
+      }
+
+      .sidebar h2 {
+        margin: 6px 0 14px;
+        font-size: 16px;
+      }
+
+      .nav-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .nav-item {
+        display: block;
+        text-decoration: none;
+        border-radius: 16px;
+        border: 1px solid rgba(191, 199, 245, 0.82);
+        background: rgba(255, 255, 255, 0.76);
+        padding: 14px 15px;
+        transition: 180ms ease;
+      }
+
+      .nav-item:hover {
+        transform: translateY(-1px);
+        border-color: rgba(79, 70, 229, 0.4);
+        background: linear-gradient(135deg, rgba(79, 70, 229, 0.12), rgba(255, 255, 255, 0.96));
+      }
+
+      .nav-item strong {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 14px;
+      }
+
+      .nav-item span {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.65;
+      }
+
+      .content {
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+      }
+
+      .section {
+        padding: 24px;
+      }
+
+      .section-title {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: start;
+        margin-bottom: 18px;
+      }
+
+      .section-title h2 {
+        margin: 0;
+        font-size: 30px;
+        letter-spacing: -0.04em;
+      }
+
+      .section-title p {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.8;
+        max-width: 820px;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        line-height: 1;
+        white-space: nowrap;
+      }
+
+      .pill.primary {
+        color: var(--primary);
+        background: var(--primary-soft);
+      }
+
+      .pill.green {
+        color: var(--green);
+        background: var(--green-soft);
+      }
+
+      .pill.orange {
+        color: var(--orange);
+        background: var(--orange-soft);
+      }
+
+      .map-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .map-card {
+        border-radius: 20px;
+        border: 1px solid rgba(191, 199, 245, 0.82);
+        background: rgba(255, 255, 255, 0.82);
+        padding: 18px;
+        min-height: 200px;
+      }
+
+      .map-card .tag,
+      .term-card .tag,
+      .sop-card .tag,
+      .decision-card .tag {
+        display: inline-block;
+        margin-bottom: 12px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(31, 37, 84, 0.07);
+        color: var(--ink);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+      }
+
+      .map-card h3,
+      .term-card h3,
+      .sop-card h3,
+      .decision-card h3,
+      .phase-card h3 {
+        margin: 0 0 8px;
+        font-size: 18px;
+      }
+
+      .map-card p,
+      .term-card p,
+      .sop-card p,
+      .decision-card p,
+      .phase-card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.75;
+      }
+
+      .timeline {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .timeline-card {
+        border-radius: 20px;
+        border: 1px solid rgba(191, 199, 245, 0.82);
+        background: rgba(255, 255, 255, 0.8);
+        padding: 18px;
+      }
+
+      .timeline-head {
+        display: flex;
+        gap: 14px;
+        align-items: start;
+        margin-bottom: 12px;
+      }
+
+      .timeline-index {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        background: linear-gradient(135deg, var(--primary), #312e81);
+        color: #fff;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .timeline-card h3 {
+        margin: 0 0 6px;
+        font-size: 20px;
+      }
+
+      .timeline-card p,
+      .timeline-card ul {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.75;
+      }
+
+      .timeline-card ul {
+        padding-left: 18px;
+        margin-top: 10px;
+      }
+
+      .term-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .term-card {
+        border-radius: 20px;
+        border: 1px solid rgba(191, 199, 245, 0.82);
+        background: rgba(255, 255, 255, 0.82);
+        padding: 18px;
+      }
+
+      .term-card .plain {
+        margin-top: 12px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        background: rgba(79, 70, 229, 0.06);
+        border: 1px solid rgba(79, 70, 229, 0.12);
+        color: var(--ink);
+        font-size: 13px;
+        line-height: 1.75;
+      }
+
+      .command-table,
+      .decision-table {
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 960px;
+      }
+
+      th,
+      td {
+        padding: 14px 14px;
+        text-align: left;
+        vertical-align: top;
+        border-bottom: 1px solid var(--line);
+        font-size: 14px;
+        line-height: 1.75;
+      }
+
+      th {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+      }
+
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      .mono {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+      }
+
+      .sop-grid,
+      .decision-grid,
+      .phase-grid,
+      .simplify-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .sop-card,
+      .decision-card,
+      .phase-card {
+        border-radius: 20px;
+        border: 1px solid rgba(191, 199, 245, 0.82);
+        background: rgba(255, 255, 255, 0.82);
+        padding: 20px;
+      }
+
+      .sop-card ul,
+      .decision-card ul,
+      .phase-card ul {
+        margin: 12px 0 0;
+        padding-left: 18px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.8;
+      }
+
+      .code-block {
+        margin-top: 14px;
+        padding: 14px 16px;
+        border-radius: 16px;
+        background: #181d3f;
+        color: #ecf0ff;
+        overflow-x: auto;
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      .decision-card.good {
+        background:
+          linear-gradient(135deg, rgba(15, 159, 95, 0.08), rgba(255, 255, 255, 0.92)),
+          rgba(255, 255, 255, 0.82);
+        border-color: rgba(15, 159, 95, 0.22);
+      }
+
+      .decision-card.warn {
+        background:
+          linear-gradient(135deg, rgba(217, 119, 6, 0.08), rgba(255, 255, 255, 0.92)),
+          rgba(255, 255, 255, 0.82);
+        border-color: rgba(217, 119, 6, 0.22);
+      }
+
+      .decision-card.info {
+        background:
+          linear-gradient(135deg, rgba(79, 70, 229, 0.08), rgba(255, 255, 255, 0.92)),
+          rgba(255, 255, 255, 0.82);
+        border-color: rgba(79, 70, 229, 0.2);
+      }
+
+      .summary {
+        margin-top: 18px;
+        padding: 18px 20px;
+        border-radius: 18px;
+        border: 1px solid rgba(79, 70, 229, 0.16);
+        background: rgba(79, 70, 229, 0.06);
+        font-size: 14px;
+        line-height: 1.85;
+      }
+
+      .footer-note {
+        margin-top: 8px;
+        padding: 18px 20px;
+        border-radius: 18px;
+        border: 1px solid rgba(34, 197, 94, 0.18);
+        background: rgba(34, 197, 94, 0.08);
+        font-size: 14px;
+        line-height: 1.85;
+      }
+
+      @media (max-width: 1240px) {
+        .hero,
+        .main,
+        .map-grid,
+        .timeline,
+        .term-grid,
+        .sop-grid,
+        .decision-grid,
+        .phase-grid,
+        .simplify-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          position: static;
+        }
+      }
+
+      @media (max-width: 860px) {
+        .shell {
+          padding: 18px;
+        }
+
+        .hero-main,
+        .hero-side,
+        .section {
+          padding: 20px;
+        }
+
+        .hero-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .section-title {
+          flex-direction: column;
+        }
+      }
+
+      @media (max-width: 680px) {
+        .shell {
+          padding: 14px;
+        }
+
+        .hero-main,
+        .hero-side,
+        .section {
+          padding: 20px;
+        }
+
+        h1 {
+          font-size: 36px;
+          line-height: 1.03;
+        }
+
+        .hero-copy,
+        .section-title p,
+        .summary,
+        .footer-note {
+          font-size: 14px;
+          line-height: 1.85;
+        }
+
+        .hero-note,
+        .stat p,
+        .side-card p,
+        .side-card ul,
+        .map-card p,
+        .timeline-copy,
+        .term-card p,
+        .term-card li,
+        .phase-card p,
+        .phase-card li,
+        .step-card p,
+        .step-card li {
+          font-size: 13px;
+        }
+
+        .hero-card,
+        .side-card,
+        .stat,
+        .map-card,
+        .term-card,
+        .phase-card,
+        .step-card,
+        .summary,
+        .footer-note {
+          padding: 16px;
+          border-radius: 16px;
+        }
+
+        .pill,
+        .eyebrow {
+          width: 100%;
+          justify-content: center;
+          text-align: center;
+        }
+
+        table {
+          min-width: 760px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+
+        .nav-item {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <section class="hero">
+        <div class="panel hero-main">
+          <div class="eyebrow">Server Learning Handbook / Astro + VPS + Reverse Proxy</div>
+          <h1>服务器部署学习方案与 SOP</h1>
+          <p class="hero-copy">
+            这份文档是写给“完全不懂服务器和代码的人”的。目标不是把你训练成运维工程师，而是帮你建立一张
+            <strong>能看懂、能复盘、能照着做</strong>的地图。你昨天不是“学不会”，而是一下子同时接触了
+            <strong>命令行、Linux 用户权限、Node 应用、Nginx、Cloudflare、反向代理、GitHub 发布</strong>这几门课。
+          </p>
+          <div class="hero-note">
+            <strong>请先记住一句话：</strong>
+            你真正需要掌握的，不是所有底层原理，而是把复杂流程变成
+            <strong>固定模板 + 固定命令 + 固定判断顺序</strong>。
+          </div>
+          <div class="hero-grid">
+            <div class="hero-card">
+              <strong>你的身份</strong>
+              <span>SEO 从业者，不需要成为全栈或运维，只需要做到“会部署、会更新、会判断问题在哪一层”。</span>
+            </div>
+            <div class="hero-card">
+              <strong>你的真实目标</strong>
+              <span>以后拿到一个 Astro 网站，不再慌，知道该用什么方式部署、该在什么目录执行什么命令。</span>
+            </div>
+            <div class="hero-card">
+              <strong>这份文档的角色</strong>
+              <span>把昨天那一整天的碎片操作，整理成一套能复用的知识大纲和部署 SOP。</span>
+            </div>
+          </div>
+        </div>
+
+        <aside class="panel hero-side">
+          <h2>先看结论</h2>
+          <div class="stat">
+            <span class="label">Learning Goal</span>
+            <span class="value">够用即可</span>
+            <p>重点不是学很深，而是学到“以后能部署和更新任何一个类似的网站”。</p>
+          </div>
+          <div class="side-card">
+            <span class="label">你的 4 个知识面</span>
+            <ul>
+              <li>命令行工具</li>
+              <li>服务器基础与权限</li>
+              <li>反向代理与端口</li>
+              <li>GitHub 与发布流程</li>
+            </ul>
+          </div>
+          <div class="side-card">
+            <span class="label">最重要的心态</span>
+            <p>以后不要把“命令”当成记忆负担，而要把它们理解成一组固定动作：登录、进目录、拉代码、构建、重启、验证。</p>
+          </div>
+          <div class="side-card">
+            <span class="label">相关文档</span>
+            <ul>
+              <li><a href="./index.html">返回文档总首页</a></li>
+              <li><a href="./AI时代如何学习与走出舒适区.html">看 AI 时代学习方法</a></li>
+              <li><a href="./EMS上线执行顺序总表.html">看 EMS 上线执行总表</a></li>
+            </ul>
+          </div>
+        </aside>
+      </section>
+
+      <div class="main">
+        <aside class="panel sidebar">
+          <h2>文档导航</h2>
+          <nav class="nav-list">
+            <a class="nav-item" href="./index.html">
+              <strong>← 返回总首页</strong>
+              <span>回到所有 HTML 文档的导航中心</span>
+            </a>
+            <a class="nav-item" href="#map">
+              <strong>1. 全景地图</strong>
+              <span>先看整套网站链路，不再被单个名词吓到</span>
+            </a>
+            <a class="nav-item" href="#yesterday">
+              <strong>2. 昨天发生了什么</strong>
+              <span>把你昨天的每一步串起来</span>
+            </a>
+            <a class="nav-item" href="#terms">
+              <strong>3. 名词翻译</strong>
+              <span>把 SSH、Nginx、PM2 讲成人话</span>
+            </a>
+            <a class="nav-item" href="#commands">
+              <strong>4. 命令行速查</strong>
+              <span>命令是什么、干嘛用、像什么</span>
+            </a>
+            <a class="nav-item" href="#sop">
+              <strong>5. 部署 SOP</strong>
+              <span>以后部署 Astro 网站照着做</span>
+            </a>
+            <a class="nav-item" href="#simplify">
+              <strong>6. 如何简化</strong>
+              <span>脚本、自动化、面板化怎么选</span>
+            </a>
+            <a class="nav-item" href="#plan">
+              <strong>7. 学习方案</strong>
+              <span>作为小白，学到什么程度就够</span>
+            </a>
+          </nav>
+        </aside>
+
+        <div class="content">
+          <section class="panel section" id="map">
+            <div class="section-title">
+              <div>
+                <h2>1. 先看全景地图</h2>
+                <p>
+                  你昨天真正碰到的，不是一个“服务器命令问题”，而是一条完整的网站链路。只要你先看懂这条链路，后面每个名词都会有位置感。
+                </p>
+              </div>
+              <div class="pill primary">先看地图，再学每个站点</div>
+            </div>
+
+            <div class="map-grid">
+              <article class="map-card">
+                <div class="tag">Local</div>
+                <h3>本地电脑</h3>
+                <p>你平时写代码、改文件、测试页面的地方。可以把它理解成“设计室和编辑室”。</p>
+              </article>
+              <article class="map-card">
+                <div class="tag">GitHub</div>
+                <h3>代码仓库</h3>
+                <p>相当于“云端总文件柜”。以后标准做法是：本地改完，先推 GitHub，再让服务器拉更新。</p>
+              </article>
+              <article class="map-card">
+                <div class="tag">DigitalOcean</div>
+                <h3>EMS 独立服务器</h3>
+                <p>真正运行 Astro/Node 应用的电脑。这里有 Ubuntu、Node、PM2、Nginx 和你的项目代码。</p>
+              </article>
+              <article class="map-card">
+                <div class="tag">Cloudways</div>
+                <h3>主站服务器</h3>
+                <p>继续负责主站。你最后选择让它把 <span class="mono">/ems/*</span> 反向代理到 EMS 独立服务器。</p>
+              </article>
+              <article class="map-card">
+                <div class="tag">Cloudflare</div>
+                <h3>大门口和保安</h3>
+                <p>主要负责 DNS、CDN、SSL 和流量入口。原本尝试让它直接改源站，但 Enterprise 功能限制了这条路。</p>
+              </article>
+              <article class="map-card">
+                <div class="tag">Nginx</div>
+                <h3>前台接待员</h3>
+                <p>外部请求先打到 Nginx，再由它转给内部真正干活的 Node 应用。</p>
+              </article>
+              <article class="map-card">
+                <div class="tag">Node / Astro</div>
+                <h3>真正出页面的人</h3>
+                <p>Astro 源码会被 build 成 Node 可运行产物，最终由 Node 进程输出网页内容。</p>
+              </article>
+              <article class="map-card">
+                <div class="tag">PM2</div>
+                <h3>值班经理</h3>
+                <p>负责盯着 Node 进程，让网站常驻运行，重启服务器后也能自动再拉起。</p>
+              </article>
+            </div>
+
+            <div class="summary">
+              <strong>最重要的链路一句话：</strong>
+              用户访问主站路径
+              <span class="mono">rapiddirect.com/ems/*</span>，主站 Cloudways 收到后再把这段请求代理到
+              <span class="mono">pcb.rapiddirect.com/ems/*</span>，而这个子域名背后就是你在 DigitalOcean 上跑起来的 Astro/Node 网站。
+            </div>
+          </section>
+
+          <section class="panel section" id="yesterday">
+            <div class="section-title">
+              <div>
+                <h2>2. 昨天其实发生了什么</h2>
+                <p>
+                  你会晕，不是因为你笨，而是昨天连续完成了“选方案、买服务器、配权限、拉代码、跑 Node、配 Nginx、试反向代理、改主站方案”整套流程。
+                </p>
+              </div>
+              <div class="pill green">这不是一天一课，这是一天八课</div>
+            </div>
+
+            <div class="timeline">
+              <article class="timeline-card">
+                <div class="timeline-head">
+                  <div class="timeline-index">01</div>
+                  <div>
+                    <h3>放弃 Cloudways 直接跑 Node</h3>
+                    <p>你先确认了 Cloudways 对 Node 不是原生支持，而是借 PHP 容器和代理绕过去。</p>
+                  </div>
+                </div>
+                <ul>
+                  <li>你判断这条路对未来独立站不够干净。</li>
+                  <li>所以决定单独买一台 DigitalOcean 服务器跑 EMS。</li>
+                </ul>
+              </article>
+
+              <article class="timeline-card">
+                <div class="timeline-head">
+                  <div class="timeline-index">02</div>
+                  <div>
+                    <h3>选服务器配置</h3>
+                    <p>你选择了 Ubuntu、Basic、合适的 CPU/RAM，而不是一上来安装面板或加各种托管能力。</p>
+                  </div>
+                </div>
+                <ul>
+                  <li>这是在选“新办公室的大小和配置”。</li>
+                  <li>重点是能稳定跑 Node 网站，而不是一开始堆很多附加功能。</li>
+                </ul>
+              </article>
+
+              <article class="timeline-card">
+                <div class="timeline-head">
+                  <div class="timeline-index">03</div>
+                  <div>
+                    <h3>学会 SSH 登录</h3>
+                    <p>你开始接触 SSH、公钥、私钥、用户、密码登录等概念。</p>
+                  </div>
+                </div>
+                <ul>
+                  <li>SSH 就是“远程遥控器”。</li>
+                  <li>公钥像门锁认可的钥匙信息，私钥像你自己手上的钥匙。</li>
+                </ul>
+              </article>
+
+              <article class="timeline-card">
+                <div class="timeline-head">
+                  <div class="timeline-index">04</div>
+                  <div>
+                    <h3>做服务器初始化</h3>
+                    <p>你创建了日常运维用户，更新系统，配置基础安全和依赖。</p>
+                  </div>
+                </div>
+                <ul>
+                  <li>这是在装修办公室：先通电、配门禁、分工位。</li>
+                  <li>其中 <span class="mono">javen</span> 是日常用户，<span class="mono">root</span> 是超级管理员。</li>
+                </ul>
+              </article>
+
+              <article class="timeline-card">
+                <div class="timeline-head">
+                  <div class="timeline-index">05</div>
+                  <div>
+                    <h3>安装 Node、pnpm、PM2</h3>
+                    <p>你让这台服务器具备了运行 Astro/Node 网站的能力。</p>
+                  </div>
+                </div>
+                <ul>
+                  <li>Node 是运行网站程序的引擎。</li>
+                  <li>PM2 是让网站程序一直在线的值班经理。</li>
+                </ul>
+              </article>
+
+              <article class="timeline-card">
+                <div class="timeline-head">
+                  <div class="timeline-index">06</div>
+                  <div>
+                    <h3>从 GitHub 拉代码</h3>
+                    <p>你不是用 SFTP 作为主流程，而是把 GitHub 作为主发布入口。</p>
+                  </div>
+                </div>
+                <ul>
+                  <li>这是对的，因为以后版本能追踪、能回滚。</li>
+                  <li>服务器只是运行环境，不应该成为主编辑器。</li>
+                </ul>
+              </article>
+
+              <article class="timeline-card">
+                <div class="timeline-head">
+                  <div class="timeline-index">07</div>
+                  <div>
+                    <h3>Build 并启动 Astro 应用</h3>
+                    <p>你在正确的应用目录 <span class="mono">apps/ems-site</span> 里完成了构建和启动。</p>
+                  </div>
+                </div>
+                <ul>
+                  <li><span class="mono">pnpm build</span> 把源码做成产物。</li>
+                  <li><span class="mono">dist/server/entry.mjs</span> 是最终运行入口。</li>
+                </ul>
+              </article>
+
+              <article class="timeline-card">
+                <div class="timeline-head">
+                  <div class="timeline-index">08</div>
+                  <div>
+                    <h3>用 Nginx 把网站对外开放</h3>
+                    <p>你把外部访问的 80 端口转发到了内部 Node 服务端口。</p>
+                  </div>
+                </div>
+                <ul>
+                  <li>没有 Nginx，Node 程序只是“在办公室里工作”。</li>
+                  <li>有了 Nginx，外部用户才能正常访问页面。</li>
+                </ul>
+              </article>
+
+              <article class="timeline-card">
+                <div class="timeline-head">
+                  <div class="timeline-index">09</div>
+                  <div>
+                    <h3>试图用 Cloudflare Origin Rules</h3>
+                    <p>你尝试让 Cloudflare 把 <span class="mono">rapiddirect.com/ems/*</span> 指到新的源站。</p>
+                  </div>
+                </div>
+                <ul>
+                  <li>思路没错。</li>
+                  <li>但真正需要的 DNS/Host override 在你当前套餐下不可用。</li>
+                </ul>
+              </article>
+
+              <article class="timeline-card">
+                <div class="timeline-head">
+                  <div class="timeline-index">10</div>
+                  <div>
+                    <h3>试图在主站 .htaccess 里做代理</h3>
+                    <p>你试了 Apache 的 <span class="mono">[P]</span> 代理规则，但主站环境返回了 500。</p>
+                  </div>
+                </div>
+                <ul>
+                  <li>这一步暴露出 Cloudways 当前栈对 <span class="mono">.htaccess</span> 反向代理不支持。</li>
+                  <li>不是思路错，是实现方式不被当前环境接受。</li>
+                </ul>
+              </article>
+
+              <article class="timeline-card">
+                <div class="timeline-head">
+                  <div class="timeline-index">11</div>
+                  <div>
+                    <h3>切回主站 Nginx 级别反代</h3>
+                    <p>Cloudways 客服确认，要由他们在主站 Nginx 层加 location block 来完成代理。</p>
+                  </div>
+                </div>
+                <ul>
+                  <li>这就是你现在距离“全链路跑通”最后的一步。</li>
+                  <li>本质上是让主站把 <span class="mono">/ems/*</span> 转给新服务器。</li>
+                </ul>
+              </article>
+            </div>
+          </section>
+
+          <section class="panel section" id="terms">
+            <div class="section-title">
+              <div>
+                <h2>3. 名词翻译：把专业词讲成人话</h2>
+                <p>
+                  下面这些词，你不用追求“标准教材定义”，先追求“脑子里能有画面”。只要有画面，后面做事就不会慌。
+                </p>
+              </div>
+              <div class="pill orange">先看懂角色，再记名词</div>
+            </div>
+
+            <div class="term-grid">
+              <article class="term-card">
+                <div class="tag">SSH</div>
+                <h3>SSH</h3>
+                <p>远程登录服务器的方式。你坐在自己电脑前，却能像坐在服务器面前一样发命令。</p>
+                <div class="plain">形象理解：SSH 就像一把“远程遥控器”。</div>
+              </article>
+
+              <article class="term-card">
+                <div class="tag">Key Pair</div>
+                <h3>公钥 / 私钥</h3>
+                <p>服务器记住公钥，本地保管私钥。公钥负责“允许谁进门”，私钥负责“真正开门”。</p>
+                <div class="plain">形象理解：公钥像门禁系统里存的指纹模板，私钥像你自己的手指。</div>
+              </article>
+
+              <article class="term-card">
+                <div class="tag">Users</div>
+                <h3>root / javen</h3>
+                <p><span class="mono">root</span> 是超级管理员，什么都能改；<span class="mono">javen</span> 是日常运维用户，更安全。</p>
+                <div class="plain">形象理解：root 是大楼总控钥匙，javen 是日常办公卡。</div>
+              </article>
+
+              <article class="term-card">
+                <div class="tag">Node.js</div>
+                <h3>Node.js</h3>
+                <p>让服务器能运行 JavaScript 程序的运行环境。Astro build 之后生成的服务端产物，要靠它执行。</p>
+                <div class="plain">形象理解：Node 就像厨房的炉灶，没有它厨师有菜谱也做不了菜。</div>
+              </article>
+
+              <article class="term-card">
+                <div class="tag">pnpm / npm</div>
+                <h3>npm / pnpm</h3>
+                <p>安装项目依赖的工具。网站不是只靠你自己的代码，还需要 Astro、React 这些外部包。</p>
+                <div class="plain">形象理解：它们像采购系统，负责把做菜需要的原材料搬进仓库。</div>
+              </article>
+
+              <article class="term-card">
+                <div class="tag">PM2</div>
+                <h3>PM2</h3>
+                <p>负责管理 Node 进程的工具。它会让网站常驻运行，进程挂了可以重启，机器重启后还能自动恢复。</p>
+                <div class="plain">形象理解：PM2 是值班经理，盯着员工别下班溜走。</div>
+              </article>
+
+              <article class="term-card">
+                <div class="tag">Nginx</div>
+                <h3>Nginx</h3>
+                <p>对外接待流量的 Web Server。外部请求先到它，再由它转给内部真正跑网站的 Node 程序。</p>
+                <div class="plain">形象理解：Nginx 是前台接待员，不自己做页面，但负责把顾客带到正确窗口。</div>
+              </article>
+
+              <article class="term-card">
+                <div class="tag">Port</div>
+                <h3>端口</h3>
+                <p>一个程序在服务器上的门牌号。80 是 HTTP，443 是 HTTPS，4321 是你这次 Astro 程序的内部门牌号。</p>
+                <div class="plain">形象理解：一栋楼里很多房间，每个房间门牌号不同，端口就是房间号。</div>
+              </article>
+
+              <article class="term-card">
+                <div class="tag">Reverse Proxy</div>
+                <h3>反向代理</h3>
+                <p>外面的人以为自己在访问 A，其实后台被转到 B。地址栏不变，但服务来源换了。</p>
+                <div class="plain">形象理解：顾客在前台点餐，前台把订单送到另一家后厨做，但顾客并不知道。</div>
+              </article>
+
+              <article class="term-card">
+                <div class="tag">.htaccess</div>
+                <h3>.htaccess</h3>
+                <p>Apache 的目录级规则文件。你在主站上尝试用它写代理规则，但当前 Cloudways 场景不支持这条实现方式。</p>
+                <div class="plain">形象理解：这是“这层楼自己贴在门口的管理告示”。</div>
+              </article>
+
+              <article class="term-card">
+                <div class="tag">mod_proxy</div>
+                <h3>mod_proxy</h3>
+                <p>Apache 的代理能力模块。没有它，<span class="mono">.htaccess</span> 里的代理规则写了也没法工作。</p>
+                <div class="plain">形象理解：这是前台接待台的“转单功能插件”。</div>
+              </article>
+
+              <article class="term-card">
+                <div class="tag">Origin Rule</div>
+                <h3>Cloudflare Origin Rule</h3>
+                <p>Cloudflare 在边缘层改“请求最终发去哪里”的规则。你本来想用它，但关键 override 受套餐限制。</p>
+                <div class="plain">形象理解：这是门口保安在内部改派送目的地，而不是让大楼前台改。</div>
+              </article>
+            </div>
+          </section>
+
+          <section class="panel section" id="commands">
+            <div class="section-title">
+              <div>
+                <h2>4. 命令行速查：命令是什么、干嘛用、像什么</h2>
+                <p>
+                  你不用把命令都背成考试题，而是记成“我在做什么动作”。以后看到这些命令，脑子里能对应动作就够了。
+                </p>
+              </div>
+              <div class="pill primary">命令 = 一种固定动作</div>
+            </div>
+
+            <div class="command-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>命令 / 快捷键</th>
+                    <th>它在干什么</th>
+                    <th>形象理解</th>
+                    <th>你这次什么时候用到</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="mono">pwd</span></td>
+                    <td>查看当前所在目录</td>
+                    <td>看自己现在站在办公室哪一间</td>
+                    <td>确认是不是站在正确项目目录</td>
+                  </tr>
+                  <tr>
+                    <td><span class="mono">ls -la</span></td>
+                    <td>列出当前目录所有文件</td>
+                    <td>打开抽屉看看里面有什么</td>
+                    <td>确认是否有 <span class="mono">package.json</span>、<span class="mono">dist</span>、<span class="mono">.ssh</span></td>
+                  </tr>
+                  <tr>
+                    <td><span class="mono">cd</span></td>
+                    <td>进入某个目录</td>
+                    <td>从一个房间走到另一个房间</td>
+                    <td>切到仓库根目录、应用目录</td>
+                  </tr>
+                  <tr>
+                    <td><span class="mono">cp</span></td>
+                    <td>复制文件</td>
+                    <td>复印一份文件</td>
+                    <td>复制 <span class="mono">authorized_keys</span> 给新用户</td>
+                  </tr>
+                  <tr>
+                    <td><span class="mono">mkdir</span></td>
+                    <td>创建目录</td>
+                    <td>新建一个文件夹</td>
+                    <td>创建项目目录、<span class="mono">.ssh</span> 目录</td>
+                  </tr>
+                  <tr>
+                    <td><span class="mono">sudo</span></td>
+                    <td>临时用管理员身份执行命令</td>
+                    <td>借用总控钥匙办事</td>
+                    <td>改系统配置、装软件、改 Nginx</td>
+                  </tr>
+                  <tr>
+                    <td><span class="mono">apt</span></td>
+                    <td>Ubuntu 安装软件的工具</td>
+                    <td>系统软件应用商店</td>
+                    <td>更新系统、安装 Nginx、curl 等</td>
+                  </tr>
+                  <tr>
+                    <td><span class="mono">ufw</span></td>
+                    <td>防火墙管理工具</td>
+                    <td>大楼门禁系统</td>
+                    <td>开放 22 / 80 / 443</td>
+                  </tr>
+                  <tr>
+                    <td><span class="mono">git clone</span> / <span class="mono">git pull</span></td>
+                    <td>拉取 GitHub 代码</td>
+                    <td>把云端文件柜里的最新文件拿下来</td>
+                    <td>第一次部署、以后更新代码</td>
+                  </tr>
+                  <tr>
+                    <td><span class="mono">nvm</span></td>
+                    <td>管理 Node 版本</td>
+                    <td>切换不同型号的炉灶</td>
+                    <td>安装和固定 Node 22</td>
+                  </tr>
+                  <tr>
+                    <td><span class="mono">npm</span> / <span class="mono">pnpm</span></td>
+                    <td>安装项目依赖</td>
+                    <td>采购做菜原材料</td>
+                    <td><span class="mono">pnpm install</span>、<span class="mono">pnpm build</span></td>
+                  </tr>
+                  <tr>
+                    <td><span class="mono">curl</span></td>
+                    <td>用命令行访问一个网址</td>
+                    <td>不用浏览器，直接敲门看对方有没有回应</td>
+                    <td>测试本机 4321、测试 Nginx 是否代理成功</td>
+                  </tr>
+                  <tr>
+                    <td><span class="mono">chmod</span></td>
+                    <td>改文件权限</td>
+                    <td>规定谁能看、谁能改、谁能进</td>
+                    <td>设置 <span class="mono">.ssh</span> 权限</td>
+                  </tr>
+                  <tr>
+                    <td><span class="mono">chown</span></td>
+                    <td>改文件所有者</td>
+                    <td>把某个文件转给某个人负责</td>
+                    <td>把目录和 key 文件归给 <span class="mono">javen</span></td>
+                  </tr>
+                  <tr>
+                    <td><span class="mono">Ctrl + C</span></td>
+                    <td>中断当前命令</td>
+                    <td>喊停</td>
+                    <td>结束前台运行的 Node 进程</td>
+                  </tr>
+                  <tr>
+                    <td><span class="mono">Ctrl + O</span></td>
+                    <td>在 nano 里保存</td>
+                    <td>按下保存按钮</td>
+                    <td>保存 Nginx 配置文件</td>
+                  </tr>
+                  <tr>
+                    <td><span class="mono">Ctrl + X</span></td>
+                    <td>退出 nano</td>
+                    <td>关掉编辑器窗口</td>
+                    <td>退出 Nginx 配置编辑界面</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="panel section" id="sop">
+            <div class="section-title">
+              <div>
+                <h2>5. 部署 SOP：以后再部署 Astro 网站，按这套来</h2>
+                <p>
+                  这部分是你真正能重复使用的。以后不要再把部署想成“现场发挥”，而是当成一套工厂化流程。
+                </p>
+              </div>
+              <div class="pill green">SOP = 固定流程，不靠记忆</div>
+            </div>
+
+            <div class="decision-grid">
+              <article class="decision-card good">
+                <div class="tag">Decision Tree</div>
+                <h3>先判断网站属于哪一类</h3>
+                <ul>
+                  <li>独立域名 / 子域名，且没复杂后端：优先 Vercel / Netlify / Cloudflare Pages。</li>
+                  <li>独立域名 / 子域名，但需要 Node SSR：优先 VPS（DigitalOcean 这类）。</li>
+                  <li>挂在主站路径下，比如 <span class="mono">example.com/ems/*</span>：复杂度最高，要额外处理反向代理。</li>
+                </ul>
+              </article>
+
+              <article class="decision-card warn">
+                <div class="tag">Important</div>
+                <h3>主站路径挂载永远更复杂</h3>
+                <ul>
+                  <li>因为它天然牵涉“谁对外、谁在后台、谁改路径、谁改源站”。</li>
+                  <li>以后只要业务允许，优先考虑子域名，比如 <span class="mono">ems.example.com</span>，会简单很多。</li>
+                </ul>
+              </article>
+            </div>
+
+            <div class="sop-grid">
+              <article class="sop-card">
+                <div class="tag">SOP 1</div>
+                <h3>服务器初始化</h3>
+                <p>这是以后每次新买服务器都几乎一样的步骤。</p>
+                <ul>
+                  <li>买服务器，选 Ubuntu LTS。</li>
+                  <li>配 SSH key，登录 root。</li>
+                  <li>更新系统、装基础工具。</li>
+                  <li>创建日常用户，给 sudo 权限。</li>
+                  <li>开防火墙，只放行 22 / 80 / 443。</li>
+                  <li>安装 Node、pnpm、PM2、Nginx。</li>
+                </ul>
+              </article>
+
+              <article class="sop-card">
+                <div class="tag">SOP 2</div>
+                <h3>代码部署</h3>
+                <p>以后一律以 GitHub 为主，不把 SFTP 当主发布方式。</p>
+                <ul>
+                  <li><span class="mono">git clone</span> 仓库</li>
+                  <li>进入实际应用目录</li>
+                  <li><span class="mono">pnpm install</span></li>
+                  <li><span class="mono">pnpm build</span></li>
+                  <li><span class="mono">pm2 start</span> 或 <span class="mono">pm2 restart</span></li>
+                </ul>
+              </article>
+
+              <article class="sop-card">
+                <div class="tag">SOP 3</div>
+                <h3>对外访问</h3>
+                <p>先把应用跑起来，再让外部世界能访问。</p>
+                <ul>
+                  <li>Node 应用先在本机端口跑起来，比如 4321。</li>
+                  <li>Nginx 把 80/443 转发到内部端口。</li>
+                  <li>先用服务器 IP 或源站子域名测试。</li>
+                  <li>最后再接正式域名和 Cloudflare。</li>
+                </ul>
+              </article>
+
+              <article class="sop-card">
+                <div class="tag">SOP 4</div>
+                <h3>上线前验收</h3>
+                <p>不是“能打开首页”就算上线，而是整条业务链要闭环。</p>
+                <ul>
+                  <li>首页和关键子页面能访问</li>
+                  <li>资源不 404</li>
+                  <li>后台登录正常</li>
+                  <li>表单正常</li>
+                  <li>缓存和代理没有把页面搞错</li>
+                </ul>
+              </article>
+            </div>
+
+            <div class="summary">
+              <strong>你的标准发布命令块：</strong>
+              <div class="code-block"><pre>cd /var/www/ems-site/Rapiddirect-PCB-Website
+git pull
+
+cd /var/www/ems-site/Rapiddirect-PCB-Website/apps/ems-site
+pnpm build
+pm2 restart ems-site</pre></div>
+              如果改了依赖，再多加一步：
+              <div class="code-block"><pre>pnpm install</pre></div>
+            </div>
+          </section>
+
+          <section class="panel section" id="simplify">
+            <div class="section-title">
+              <div>
+                <h2>6. 如何简化：以后不想敲这么多命令怎么办</h2>
+                <p>
+                  这是你最关心的部分。答案是：同类流程还是会存在，但可以被“标准化、脚本化、半自动化、面板化”。
+                </p>
+              </div>
+              <div class="pill orange">复杂度不会消失，但可以被封装</div>
+            </div>
+
+            <div class="simplify-grid">
+              <article class="decision-card good">
+                <div class="tag">Level 1</div>
+                <h3>命令清单化</h3>
+                <p>把常用命令整理成固定文档，部署和更新都照抄，不靠记忆。</p>
+                <div class="code-block"><pre>cd /var/www/ems-site/Rapiddirect-PCB-Website
+git pull
+cd apps/ems-site
+pnpm build
+pm2 restart ems-site</pre></div>
+              </article>
+
+              <article class="decision-card good">
+                <div class="tag">Level 2</div>
+                <h3>写成 deploy.sh 脚本</h3>
+                <p>这是最适合你下一阶段做的。以后只需要执行一条命令。</p>
+                <div class="code-block"><pre>#!/bin/bash
+set -e
+
+cd /var/www/ems-site/Rapiddirect-PCB-Website
+git pull
+
+cd /var/www/ems-site/Rapiddirect-PCB-Website/apps/ems-site
+pnpm build
+pm2 restart ems-site</pre></div>
+              </article>
+
+              <article class="decision-card info">
+                <div class="tag">Level 3</div>
+                <h3>GitHub Actions 自动部署</h3>
+                <p>本地 push 后，GitHub 自动 SSH 到服务器，执行拉代码、构建、重启。</p>
+                <ul>
+                  <li>优点：你几乎不用手动登录服务器。</li>
+                  <li>缺点：初次配置比脚本复杂一点。</li>
+                </ul>
+              </article>
+
+              <article class="decision-card warn">
+                <div class="tag">Level 4</div>
+                <h3>面板化管理</h3>
+                <p>如果以后你会管理多个 Astro/Node 网站，再考虑 Easypanel 或 Coolify 这类更现代的面板。</p>
+                <ul>
+                  <li>好处：GitHub 自动部署、应用管理更图形化。</li>
+                  <li>前提：你先把底层流程学明白，不然面板只会把复杂度藏起来。</li>
+                </ul>
+              </article>
+            </div>
+
+            <div class="decision-grid">
+              <article class="decision-card good">
+                <div class="tag">Recommended</div>
+                <h3>对你来说最合理的简化路线</h3>
+                <ul>
+                  <li>第一步：固定一套技术栈和目录结构。</li>
+                  <li>第二步：整理标准命令清单。</li>
+                  <li>第三步：做 <span class="mono">deploy.sh</span> 脚本。</li>
+                  <li>第四步：以后再考虑 GitHub Actions。</li>
+                  <li>第五步：当站点数量变多，再上现代面板。</li>
+                </ul>
+              </article>
+
+              <article class="decision-card warn">
+                <div class="tag">Not Yet</div>
+                <h3>现在不建议你立刻做的事</h3>
+                <ul>
+                  <li>不要立刻学 Docker / Kubernetes。</li>
+                  <li>不要一开始就做很重的自动化。</li>
+                  <li>不要让 SFTP 成为主发布方式。</li>
+                  <li>不要每次都换一套部署架构。</li>
+                </ul>
+              </article>
+            </div>
+          </section>
+
+          <section class="panel section" id="plan">
+            <div class="section-title">
+              <div>
+                <h2>7. 给小白的学习方案：学到什么程度就够</h2>
+                <p>
+                  你的目标不是“知道一切”，而是“以后自己能完成部署和更新，不再被术语压住”。所以学习顺序必须有轻重。
+                </p>
+              </div>
+              <div class="pill green">先会更新，再会部署，再会排障</div>
+            </div>
+
+            <div class="phase-grid">
+              <article class="phase-card">
+                <h3>阶段 1：先学会更新网站</h3>
+                <p>这是离你的本职工作最近、最有用的一层。</p>
+                <ul>
+                  <li>会 SSH 登录</li>
+                  <li>会进入正确目录</li>
+                  <li>会 <span class="mono">git pull</span></li>
+                  <li>会 <span class="mono">pnpm build</span></li>
+                  <li>会 <span class="mono">pm2 restart</span></li>
+                </ul>
+              </article>
+
+              <article class="phase-card">
+                <h3>阶段 2：再学会部署网站</h3>
+                <p>知道一个新的 Astro/Node 网站怎么从 0 跑起来。</p>
+                <ul>
+                  <li>理解 Node / PM2 / Nginx 分工</li>
+                  <li>理解端口和反向代理</li>
+                  <li>能照着 SOP 初始化一台服务器</li>
+                </ul>
+              </article>
+
+              <article class="phase-card">
+                <h3>阶段 3：最后学会排障</h3>
+                <p>知道问题大概出在 GitHub、服务器、Nginx、Cloudflare、还是主站代理层。</p>
+                <ul>
+                  <li>会看日志</li>
+                  <li>会用 <span class="mono">curl</span> 测试链路</li>
+                  <li>会判断 404、500、502 大概属于哪层</li>
+                </ul>
+              </article>
+
+              <article class="phase-card">
+                <h3>阶段 4：再考虑自动化</h3>
+                <p>只有手动流程跑顺了，自动化才会真正帮你，而不是把问题藏起来。</p>
+                <ul>
+                  <li>先做脚本</li>
+                  <li>再做 GitHub Actions</li>
+                  <li>最后视站点数量考虑面板</li>
+                </ul>
+              </article>
+            </div>
+
+            <div class="summary">
+              <strong>对你这种角色，真正“够用”的目标是：</strong>
+              你不需要变成专业运维，而是要能做到：<strong>看懂这条链路、按 SOP 做事、按命令清单发布、知道问题在哪一层</strong>。达到这个程度，网站部署这件事就不再是你害怕的领域，而会变成一个可重复执行的流程。
+            </div>
+
+            <div class="footer-note">
+              <strong>最后送你一句总纲：</strong>
+              以后再碰到新的 Astro 网站，不要先问“这个命令怎么背”，而是先问：
+              <strong>这个网站属于哪一类、代码在哪、谁在运行它、谁在对外接待、谁在做代理</strong>。
+              只要你把这五个问题想清楚，部署就会从“黑箱”变成“拼图”。
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

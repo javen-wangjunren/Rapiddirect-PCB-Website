@@ -1,0 +1,215 @@
+---
+import type { PcbDesignSimulationContent } from '../../types/pcb-design';
+import { getAssetPath } from '../../lib/assets';
+
+export interface Props {
+  data: PcbDesignSimulationContent;
+}
+
+const { data } = Astro.props;
+const tabs = Array.isArray(data?.tabs) ? data.tabs : [];
+---
+
+<section class="overflow-hidden bg-[#F5F5F5] py-[100px] text-[#1a1a1a]">
+  <div class="mx-auto max-w-[1280px] px-5">
+    
+    {/* Header */}
+    <div class="mb-[60px] text-center">
+      <h2 class="mb-4 text-3xl font-extrabold tracking-[-1px] md:text-4xl">
+        {data.title}
+      </h2>
+      <p class="mx-auto max-w-[800px] text-lg leading-[1.6] text-[#555555]">
+        {data.description}
+      </p>
+    </div>
+
+    {/* Interactive Showcase */}
+    <div class="mb-[60px] flex flex-col items-stretch gap-[30px] lg:flex-row">
+      
+      {/* Tabs Column */}
+      <div class="flex flex-row overflow-x-auto pb-2.5 lg:w-[35%] lg:flex-none lg:flex-col lg:gap-3 lg:overflow-visible lg:pb-0 hide-scrollbar" style="scroll-snap-type: x mandatory;">
+        {tabs.map((tab, index) => (
+          <button
+            class={`sim-tab group flex flex-none snap-start items-center gap-4 rounded-2xl border px-5 py-3 lg:px-6 lg:py-5 transition-all duration-300 ${
+              index === 0
+                ? 'active -translate-y-1 lg:-translate-y-0 lg:translate-x-2.5 border-[#e5e7eb] bg-white shadow-[0_10px_30px_rgba(0,0,0,0.04)]'
+                : 'border-transparent bg-transparent hover:bg-white/50'
+            }`}
+            data-target={tab.id}
+          >
+            <div class={`tab-icon flex h-10 w-10 flex-none items-center justify-center rounded-lg transition-all duration-300 ${
+              index === 0
+                ? 'bg-[#fff0ed] text-[#ef533f]'
+                : 'bg-white text-[#555555] shadow-[0_2px_8px_rgba(0,0,0,0.05)]'
+            }`} set:html={tab.icon_svg}>
+            </div>
+            <span class={`tab-text text-base transition-colors duration-300 whitespace-nowrap lg:whitespace-normal ${
+              index === 0 ? 'font-bold text-[#1a1a1a]' : 'font-semibold text-[#555555]'
+            }`}>
+              {tab.name}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {/* Display Column */}
+      <div class="relative flex min-h-[550px] flex-1 flex-col rounded-[24px] border border-[#e5e7eb] bg-white p-5 shadow-[0_20px_50px_rgba(0,0,0,0.05)] md:p-[30px]">
+        {tabs.map((tab, index) => (
+          <div
+            id={tab.id}
+            class={`sim-panel h-full flex-col animate-[fadeInRight_0.4s_ease_forwards] ${
+              index === 0 ? 'active flex' : 'hidden'
+            }`}
+          >
+            {/* Screen */}
+            <div class="relative mb-[30px] flex h-[200px] w-full items-center justify-center overflow-hidden rounded-2xl bg-[#111111] md:h-[300px]" style="background-image: linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px); background-size: 20px 20px;">
+              {tab.panel.image_url ? (
+                <img
+                  src={getAssetPath(tab.panel.image_url)}
+                  alt={tab.panel.title}
+                  class="absolute inset-0 h-full w-full object-cover opacity-85"
+                />
+              ) : (
+                <span class="font-mono text-sm tracking-[1px] text-white/50 px-4 text-center">
+                  {tab.panel.image_placeholder}
+                </span>
+              )}
+            </div>
+
+            {/* Details */}
+            <div class="flex flex-col">
+              <h3 class="mb-3 text-xl font-extrabold text-[#1a1a1a] md:text-2xl">{tab.panel.title}</h3>
+              <p class="mb-6 text-[15px] leading-[1.6] text-[#555555]" set:html={tab.panel.description}></p>
+              
+              <div class="flex flex-wrap gap-3">
+                {(tab.panel.benefits || []).map((benefit) => (
+                  <div class="flex items-center gap-2 rounded-[50px] bg-[#f1f5f9] px-4 py-2 text-[13px] font-semibold text-[#475569]">
+                    <span class="text-base text-[#10b981]">✓</span> {benefit}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+    </div>
+
+    {/* Footer */}
+    {data.footer && (
+      <div class="mx-auto max-w-[900px] border-t border-[#e5e7eb] pt-5 text-center">
+        <p class="mb-[30px] text-base leading-[1.6] text-[#555555]">
+          {data.footer.description}
+        </p>
+        <a
+          href={data.footer.cta.href}
+          class="inline-block rounded-[50px] border-2 border-[#e5e7eb] bg-white px-10 py-4 text-base font-bold text-[#1a1a1a] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#ef533f] hover:text-[#ef533f] hover:shadow-[0_10px_20px_rgba(239,83,63,0.1)]"
+        >
+          {data.footer.cta.label}
+        </a>
+      </div>
+    )}
+
+  </div>
+</section>
+
+<script>
+  function initSimulationShowcase() {
+    const tabs = document.querySelectorAll('.sim-tab');
+    const panels = document.querySelectorAll('.sim-panel');
+
+    if (tabs.length === 0 || panels.length === 0) return;
+
+    tabs.forEach(tab => {
+      // Helper function to activate tab
+      const activateTab = function(element: Element) {
+        // 1. Remove active state from all tabs and panels
+        tabs.forEach(t => {
+          t.classList.remove('active', '-translate-y-1', 'lg:-translate-y-0', 'lg:translate-x-2.5', 'border-[#e5e7eb]', 'bg-white', 'shadow-[0_10px_30px_rgba(0,0,0,0.04)]');
+          t.classList.add('border-transparent', 'bg-transparent', 'hover:bg-white/50');
+          
+          const icon = t.querySelector('.tab-icon');
+          if (icon) {
+            icon.classList.remove('bg-[#fff0ed]', 'text-[#ef533f]');
+            icon.classList.add('bg-white', 'text-[#555555]', 'shadow-[0_2px_8px_rgba(0,0,0,0.05)]');
+          }
+
+          const text = t.querySelector('.tab-text');
+          if (text) {
+            text.classList.remove('font-bold', 'text-[#1a1a1a]');
+            text.classList.add('font-semibold', 'text-[#555555]');
+          }
+        });
+
+        panels.forEach(p => {
+          p.classList.remove('active', 'flex');
+          p.classList.add('hidden');
+        });
+
+        // 2. Add active state to current tab
+        element.classList.remove('border-transparent', 'bg-transparent', 'hover:bg-white/50');
+        element.classList.add('active', '-translate-y-1', 'lg:-translate-y-0', 'lg:translate-x-2.5', 'border-[#e5e7eb]', 'bg-white', 'shadow-[0_10px_30px_rgba(0,0,0,0.04)]');
+
+        const icon = element.querySelector('.tab-icon');
+        if (icon) {
+          icon.classList.remove('bg-white', 'text-[#555555]', 'shadow-[0_2px_8px_rgba(0,0,0,0.05)]');
+          icon.classList.add('bg-[#fff0ed]', 'text-[#ef533f]');
+        }
+
+        const text = element.querySelector('.tab-text');
+        if (text) {
+          text.classList.remove('font-semibold', 'text-[#555555]');
+          text.classList.add('font-bold', 'text-[#1a1a1a]');
+        }
+
+        // 3. Show target panel
+        const targetId = element.getAttribute('data-target');
+        if (targetId) {
+          const targetPanel = document.getElementById(targetId);
+          if (targetPanel) {
+            targetPanel.classList.remove('hidden');
+            targetPanel.classList.add('active', 'flex');
+          }
+        }
+      };
+
+      // Desktop: mouseenter (hover)
+      tab.addEventListener('mouseenter', function(this: Element) {
+        if (window.innerWidth > 992) {
+          activateTab(this);
+        }
+      });
+      
+      // Mobile: click
+      tab.addEventListener('click', function(this: Element) {
+        activateTab(this);
+        
+        // Scroll into view on mobile
+        if (window.innerWidth <= 992) {
+          this.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+      });
+    });
+  }
+
+  // Run on initial load and after Astro page transitions
+  document.addEventListener('DOMContentLoaded', initSimulationShowcase);
+  document.addEventListener('astro:page-load', initSimulationShowcase);
+</script>
+
+<style>
+  @keyframes fadeInRight {
+    from { opacity: 0; transform: translateX(15px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .hide-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+</style>

@@ -2,19 +2,30 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { emsHomeDefaults } from '../../content/defaults/ems';
 import { pcbAssemblyDefaults } from '../../content/defaults/pcb-assembly';
+import { pcbDesignDefaults } from '../../content/defaults/pcb-design';
+import { siteFooterDefaults } from '../../content/defaults/site-footer';
+import { siteHeaderDefaults } from '../../content/defaults/site-header';
 import { normalizeEmsHomeContentJson } from '../../content/normalize/ems';
 import { normalizePcbAssemblyContentJson } from '../../content/normalize/pcb-assembly';
+import { normalizePcbDesignContentJson } from '../../content/normalize/pcb-design';
+import { normalizeSiteFooterContentJson } from '../../content/normalize/site-footer';
+import { normalizeSiteHeaderContentJson } from '../../content/normalize/site-header';
 import { emsHomeSchema } from '../../content/schemas/ems';
 import { pcbAssemblySchema } from '../../content/schemas/pcb-assembly';
+import { pcbDesignSchema } from '../../content/schemas/pcb-design';
+import { siteFooterSchema } from '../../content/schemas/site-footer';
+import { siteHeaderSchema } from '../../content/schemas/site-header';
 import { getAssetPath } from '../../lib/assets';
 import { createAdminSupabaseClient } from '../../lib/supabase/adminClient';
-import { getPageBundleBySlugForAdmin, saveAdminBundle } from '../../lib/supabase/adminQueries';
+import { createPageForAdmin, getPageBundleBySlugForAdmin, saveAdminBundle } from '../../lib/supabase/adminQueries';
 import type { TemplateType } from '../../types/page';
 import type { JsonValue } from '../../utils/jsonTree';
 import { deepMerge, isObject } from '../../utils/jsonTree';
 import EmsEditorContentModules from './EmsEditorContentModules';
 import PcbAssemblyEditorContentModules from './PcbAssemblyEditorContentModules';
+import PcbDesignEditorContentModules from './PcbDesignEditorContentModules';
 import EmsEditorSeoCard, { type SeoDraft } from './EmsEditorSeoCard';
+import SchemaForm from './SchemaForm';
 import { EditorTemplate } from './templates/EditorTemplate';
 import { Badge, Button, Card, CardBody, CardFooter, CardHeader, CardTitle, ConfirmDialog, Input, Select, Tabs, ToastProvider, useToast } from './ui';
 
@@ -22,6 +33,10 @@ type LoadState = 'loading' | 'ready' | 'error';
 
 export interface AdminPageEditorProps {
   initialSlug: string;
+  createIfMissing?: {
+    title: string;
+    template_type: TemplateType;
+  };
 }
 
 const normalizeSlug = (input: string) => {
@@ -34,14 +49,14 @@ const normalizeSlug = (input: string) => {
 export default function AdminPageEditor(props: AdminPageEditorProps) {
   return (
     <ToastProvider>
-      <AdminPageEditorInner initialSlug={props.initialSlug} />
+      <AdminPageEditorInner initialSlug={props.initialSlug} createIfMissing={props.createIfMissing} />
     </ToastProvider>
   );
 }
 
 type EditorTab = 'content' | 'seo' | 'settings';
 
-function AdminPageEditorInner({ initialSlug }: AdminPageEditorProps) {
+function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorProps) {
   const supabase = useMemo(() => createAdminSupabaseClient(), []);
   const { push } = useToast();
 
@@ -96,12 +111,31 @@ function AdminPageEditorInner({ initialSlug }: AdminPageEditorProps) {
         return;
       }
 
-      const bundle = await getPageBundleBySlugForAdmin(supabase, normalized);
+      let bundle = await getPageBundleBySlugForAdmin(supabase, normalized);
       if (cancelled) return;
       if (!bundle?.page) {
-        setLoadState('error');
-        setLoadError(`未找到 ${normalized} 对应的 pages 记录`);
-        return;
+        if (createIfMissing) {
+          const created = await createPageForAdmin(supabase, {
+            title: createIfMissing.title,
+            slug: normalized,
+            template_type: createIfMissing.template_type
+          });
+          if (cancelled) return;
+          if (!created.ok) {
+            setLoadState('error');
+            setLoadError(created.message);
+            return;
+          }
+
+          bundle = await getPageBundleBySlugForAdmin(supabase, normalized);
+          if (cancelled) return;
+        }
+
+        if (!bundle?.page) {
+          setLoadState('error');
+          setLoadError(`未找到 ${normalized} 对应的 pages 记录`);
+          return;
+        }
       }
 
       setPageId(bundle.page.id);
@@ -128,6 +162,15 @@ function AdminPageEditorInner({ initialSlug }: AdminPageEditorProps) {
       } else if (template === 'pcb_assembly') {
         const merged = deepMerge(pcbAssemblyDefaults as any, (isObject(raw) ? raw : {}) as any) as JsonValue;
         setContentJson(normalizePcbAssemblyContentJson(merged));
+      } else if (template === 'pcb_design') {
+        const merged = deepMerge(pcbDesignDefaults as any, (isObject(raw) ? raw : {}) as any) as JsonValue;
+        setContentJson(normalizePcbDesignContentJson(merged));
+      } else if (template === 'site_footer') {
+        const merged = deepMerge(siteFooterDefaults as any, (isObject(raw) ? raw : {}) as any) as JsonValue;
+        setContentJson(normalizeSiteFooterContentJson(merged));
+      } else if (template === 'site_header') {
+        const merged = deepMerge(siteHeaderDefaults as any, (isObject(raw) ? raw : {}) as any) as JsonValue;
+        setContentJson(normalizeSiteHeaderContentJson(merged));
       } else {
         const safeObj = isObject(raw) ? raw : {};
         setContentJson(safeObj as any);
@@ -140,7 +183,7 @@ function AdminPageEditorInner({ initialSlug }: AdminPageEditorProps) {
     return () => {
       cancelled = true;
     };
-  }, [supabase, initialSlug]);
+  }, [supabase, initialSlug, createIfMissing]);
 
   useEffect(() => {
     if (!dirty) return;
@@ -170,7 +213,10 @@ function AdminPageEditorInner({ initialSlug }: AdminPageEditorProps) {
 
   const isEmsHome = templateType === 'ems_home';
   const isPcbAssembly = templateType === 'pcb_assembly';
-  const hasSchema = isEmsHome || isPcbAssembly;
+  const isPcbDesign = templateType === 'pcb_design';
+  const isSiteFooter = templateType === 'site_footer';
+  const isSiteHeader = templateType === 'site_header';
+  const hasSchema = isEmsHome || isPcbAssembly || isPcbDesign || isSiteFooter || isSiteHeader;
 
   const onContentKeyChange = (key: string, next: JsonValue) => {
     const obj = (isObject(contentJson) ? (contentJson as any) : {}) as Record<string, JsonValue>;
@@ -183,6 +229,10 @@ function AdminPageEditorInner({ initialSlug }: AdminPageEditorProps) {
   };
 
   const onPcbAssemblyModuleChange = (key: keyof typeof pcbAssemblySchema, next: JsonValue) => {
+    onContentKeyChange(String(key), next);
+  };
+
+  const onPcbDesignModuleChange = (key: keyof typeof pcbDesignSchema, next: JsonValue) => {
     onContentKeyChange(String(key), next);
   };
 
@@ -199,6 +249,12 @@ function AdminPageEditorInner({ initialSlug }: AdminPageEditorProps) {
         ? normalizeEmsHomeContentJson(contentJson)
         : templateType === 'pcb_assembly'
           ? normalizePcbAssemblyContentJson(contentJson)
+          : templateType === 'pcb_design'
+            ? normalizePcbDesignContentJson(contentJson)
+          : templateType === 'site_footer'
+            ? normalizeSiteFooterContentJson(contentJson)
+            : templateType === 'site_header'
+              ? normalizeSiteHeaderContentJson(contentJson)
           : contentJson;
 
     const res = await saveAdminBundle(supabase, {
@@ -363,6 +419,9 @@ function AdminPageEditorInner({ initialSlug }: AdminPageEditorProps) {
               <option value="ems_home">ems_home</option>
               <option value="ems_service">ems_service</option>
               <option value="pcb_assembly">pcb_assembly</option>
+              <option value="pcb_design">pcb_design</option>
+              <option value="site_footer">site_footer</option>
+              <option value="site_header">site_header</option>
             </Select>
           </label>
         </CardBody>
@@ -409,6 +468,47 @@ function AdminPageEditorInner({ initialSlug }: AdminPageEditorProps) {
     // content tab
     if (isEmsHome) return <EmsEditorContentModules contentJson={contentJson} onModuleChange={onEmsHomeModuleChange} />;
     if (isPcbAssembly) return <PcbAssemblyEditorContentModules contentJson={contentJson} onModuleChange={onPcbAssemblyModuleChange} />;
+    if (isPcbDesign) return <PcbDesignEditorContentModules contentJson={contentJson} onModuleChange={onPcbDesignModuleChange} />;
+    if (isSiteFooter) {
+      return (
+        <Card>
+          <CardHeader>
+            <CardTitle>Footer</CardTitle>
+          </CardHeader>
+          <CardBody className="space-y-3 pt-0">
+            <SchemaForm
+              schema={siteFooterSchema as any}
+              value={contentJson}
+              onChange={(next) => {
+                setContentJson(next);
+                setDirty(true);
+              }}
+              pathLabel="Footer"
+            />
+          </CardBody>
+        </Card>
+      );
+    }
+    if (isSiteHeader) {
+      return (
+        <Card>
+          <CardHeader>
+            <CardTitle>Header</CardTitle>
+          </CardHeader>
+          <CardBody className="space-y-3 pt-0">
+            <SchemaForm
+              schema={siteHeaderSchema as any}
+              value={contentJson}
+              onChange={(next) => {
+                setContentJson(next);
+                setDirty(true);
+              }}
+              pathLabel="Header"
+            />
+          </CardBody>
+        </Card>
+      );
+    }
     return (
       <Card>
         <CardHeader>
@@ -428,7 +528,7 @@ function AdminPageEditorInner({ initialSlug }: AdminPageEditorProps) {
           {content}
           <Card>
             <CardBody className="pt-[var(--admin-card-p)] text-sm text-[var(--admin-fg-muted)]">
-              原型阶段：`ems_home` 与 `pcb_assembly` 支持 schema 表单；其他模板仍使用 JSON 编辑占位。
+              原型阶段：`ems_home`、`pcb_assembly`、`pcb_design`、`site_footer`、`site_header` 支持 schema 表单；其他模板仍使用 JSON 编辑占位。
               {!hasSchema ? '（当前模板无 schema）' : null}
             </CardBody>
           </Card>

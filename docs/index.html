@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PCB 项目文档导航</title>
+    <style>
+      :root {
+        --bg: #eef3ff;
+        --panel: rgba(255, 255, 255, 0.92);
+        --ink: #1d2550;
+        --muted: #5e678f;
+        --line: #d8def8;
+        --primary: #3b82f6;
+        --primary-soft: rgba(59, 130, 246, 0.12);
+        --green: #0f9f5f;
+        --green-soft: rgba(15, 159, 95, 0.12);
+        --purple: #6d28d9;
+        --purple-soft: rgba(109, 40, 217, 0.12);
+        --orange: #d97706;
+        --orange-soft: rgba(217, 119, 6, 0.12);
+        --shadow: 0 22px 50px rgba(39, 54, 112, 0.12);
+        --radius-xl: 28px;
+        --radius-lg: 22px;
+        --radius-md: 16px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        font-family: "IBM Plex Sans", "Avenir Next", "PingFang SC", "Noto Sans SC", sans-serif;
+        background:
+          radial-gradient(circle at top left, rgba(59, 130, 246, 0.12), transparent 24%),
+          radial-gradient(circle at top right, rgba(109, 40, 217, 0.11), transparent 22%),
+          linear-gradient(180deg, #f9fbff 0%, #eef3ff 100%);
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .shell {
+        max-width: 1480px;
+        margin: 0 auto;
+        padding: 28px;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid rgba(216, 222, 248, 0.92);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(10px);
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.28fr) 360px;
+        gap: 22px;
+        margin-bottom: 22px;
+      }
+
+      .hero-main {
+        position: relative;
+        overflow: hidden;
+        padding: 34px;
+      }
+
+      .hero-main::before {
+        content: "";
+        position: absolute;
+        left: -60px;
+        bottom: -70px;
+        width: 250px;
+        height: 220px;
+        background: radial-gradient(circle, rgba(59, 130, 246, 0.18), transparent 70%);
+      }
+
+      .hero-main::after {
+        content: "";
+        position: absolute;
+        right: -50px;
+        top: -50px;
+        width: 220px;
+        height: 220px;
+        border-radius: 999px;
+        background: radial-gradient(circle, rgba(109, 40, 217, 0.16), transparent 70%);
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: var(--primary-soft);
+        color: var(--primary);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+        line-height: 1;
+      }
+
+      h1 {
+        margin: 18px 0 12px;
+        font-size: clamp(38px, 5vw, 68px);
+        line-height: 0.98;
+        letter-spacing: -0.05em;
+      }
+
+      .hero-copy {
+        margin: 0;
+        color: var(--muted);
+        max-width: 860px;
+        font-size: 16px;
+        line-height: 1.9;
+      }
+
+      .hero-note {
+        margin-top: 22px;
+        padding: 16px 18px;
+        border-radius: var(--radius-md);
+        border: 1px solid rgba(59, 130, 246, 0.18);
+        background: rgba(59, 130, 246, 0.08);
+        font-size: 14px;
+        line-height: 1.8;
+      }
+
+      .hero-side {
+        padding: 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .card,
+      .side-card,
+      .step-card {
+        border-radius: 18px;
+        border: 1px solid rgba(216, 222, 248, 0.92);
+        background: rgba(255, 255, 255, 0.82);
+        padding: 18px;
+      }
+
+      .label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+        color: var(--muted);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .stat {
+        border-radius: 18px;
+        border: 1px solid rgba(216, 222, 248, 0.92);
+        background: rgba(255, 255, 255, 0.82);
+        padding: 18px;
+      }
+
+      .stat .value {
+        display: block;
+        font-size: 30px;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+      }
+
+      .stat p,
+      .side-card p,
+      .side-card li,
+      .card p,
+      .card li,
+      .step-card p,
+      .step-card li {
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.8;
+      }
+
+      .grid-2,
+      .grid-3 {
+        display: grid;
+        gap: 16px;
+        margin-top: 22px;
+      }
+
+      .grid-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .grid-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .section {
+        padding: 28px;
+        margin-bottom: 22px;
+      }
+
+      .section h2 {
+        margin: 0;
+        font-size: 28px;
+        letter-spacing: -0.03em;
+      }
+
+      .section-intro {
+        margin: 12px 0 0;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.85;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        margin-top: 16px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .pill.blue {
+        background: var(--primary-soft);
+        color: var(--primary);
+      }
+
+      .pill.green {
+        background: var(--green-soft);
+        color: var(--green);
+      }
+
+      .pill.purple {
+        background: var(--purple-soft);
+        color: var(--purple);
+      }
+
+      .pill.orange {
+        background: var(--orange-soft);
+        color: var(--orange);
+      }
+
+      .doc-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+        margin-top: 22px;
+      }
+
+      .doc-card {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        padding: 22px;
+        border-radius: 22px;
+        border: 1px solid rgba(216, 222, 248, 0.94);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(246, 248, 255, 0.9));
+      }
+
+      .doc-top {
+        display: flex;
+        align-items: start;
+        justify-content: space-between;
+        gap: 14px;
+      }
+
+      .doc-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .doc-tag.blue {
+        background: var(--primary-soft);
+        color: var(--primary);
+      }
+
+      .doc-tag.green {
+        background: var(--green-soft);
+        color: var(--green);
+      }
+
+      .doc-tag.purple {
+        background: var(--purple-soft);
+        color: var(--purple);
+      }
+
+      .doc-tag.orange {
+        background: var(--orange-soft);
+        color: var(--orange);
+      }
+
+      .doc-card h3 {
+        margin: 0;
+        font-size: 22px;
+        letter-spacing: -0.03em;
+      }
+
+      .doc-card ul {
+        margin: 0;
+        padding-left: 18px;
+      }
+
+      .doc-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .doc-actions a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 130px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      .doc-actions a.primary {
+        background: var(--primary);
+        color: white;
+      }
+
+      .doc-actions a.secondary {
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(216, 222, 248, 0.96);
+        color: var(--muted);
+      }
+
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 22px;
+      }
+
+      .step-card strong {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 16px;
+      }
+
+      .footer-note {
+        margin-top: 22px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.8;
+      }
+
+      @media (max-width: 1180px) {
+        .hero {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 920px) {
+        .grid-2,
+        .grid-3,
+        .doc-grid,
+        .steps {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 680px) {
+        .shell {
+          padding: 14px;
+        }
+
+        .hero-main,
+        .hero-side,
+        .section {
+          padding: 20px;
+        }
+
+        h1 {
+          font-size: 36px;
+          line-height: 1.02;
+        }
+
+        .hero-copy,
+        .section-intro {
+          font-size: 14px;
+          line-height: 1.8;
+        }
+
+        .hero-note,
+        .stat p,
+        .side-card p,
+        .side-card li,
+        .card p,
+        .card li,
+        .step-card p,
+        .step-card li {
+          font-size: 13px;
+        }
+
+        .card,
+        .side-card,
+        .step-card,
+        .stat,
+        .doc-card {
+          padding: 16px;
+          border-radius: 16px;
+        }
+
+        .doc-actions {
+          flex-direction: column;
+        }
+
+        .doc-actions a {
+          width: 100%;
+          min-width: 0;
+        }
+
+        .pill,
+        .eyebrow {
+          width: 100%;
+          justify-content: center;
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <section class="hero">
+        <div class="panel hero-main">
+          <div class="eyebrow">PCB Docs Hub / Learning + Deploy + Launch</div>
+          <h1>PCB 项目文档总首页</h1>
+          <p class="hero-copy">
+            这里是你现在这几份 HTML 文档的总导航中心。以后你不需要记住“哪份文档叫什么、应该从哪里开始读”，只要先到这里，
+            再按你的当前问题进入对应页面：如果你在想<strong>怎么学习</strong>，看 AI 文档；如果你在想<strong>怎么部署服务器</strong>，看服务器 SOP；
+            如果你在想<strong>EMS 上线顺序和配置</strong>，看上线执行总表。
+          </p>
+          <div class="hero-note">
+            <strong>最推荐的用法：</strong>
+            把这里当成你的文档控制台。以后每次遇到问题，先问自己：我是现在更需要“看方向”，还是“看执行步骤”，还是“看项目架构和上线顺序”。
+          </div>
+        </div>
+
+        <aside class="panel hero-side">
+          <div class="stat">
+            <span class="label">建议阅读顺序</span>
+            <span class="value">先方向，再执行，再上线</span>
+            <p>先让自己心里有地图，再进入技术动作，会明显不慌。</p>
+          </div>
+          <div class="side-card">
+            <span class="label">你现在有的 4 类文档</span>
+            <ul>
+              <li>学习方法</li>
+              <li>服务器部署 SOP</li>
+              <li>EMS 上线执行总表</li>
+              <li>项目代码地图</li>
+            </ul>
+          </div>
+          <div class="side-card">
+            <span class="label">如果你今天状态很乱</span>
+            <p>优先看“AI 时代如何学习与走出舒适区”，先把脑子里的线捋顺，再回到具体执行文档。</p>
+          </div>
+        </aside>
+      </section>
+
+      <section class="panel section">
+        <h2>1. 按你的问题进入对应文档</h2>
+        <p class="section-intro">
+          下面不是按文件名分，而是按“你现在脑子里最真实的问题”来分。你只要找到自己的问题，就能快速进入正确文档。
+        </p>
+        <div class="pill blue">从“我现在最需要什么”出发，而不是从文件名出发</div>
+
+        <div class="doc-grid">
+          <article class="doc-card">
+            <div class="doc-top">
+              <div>
+                <span class="doc-tag purple">Mindset</span>
+                <h3>AI 时代如何学习与走出舒适区</h3>
+              </div>
+            </div>
+            <p>适合你在焦虑、混乱、接触陌生领域时看。核心解决：怎么学、怎么开始、怎么不变成只会问 AI 要答案的人。</p>
+            <ul>
+              <li>判断你的思维方式哪里已经做对了</li>
+              <li>面对陌生领域的上手框架</li>
+              <li>如何避免对 AI 形成依赖</li>
+              <li>AI 时代学习 SOP</li>
+            </ul>
+            <div class="doc-actions">
+              <a class="primary" href="./AI时代如何学习与走出舒适区.html">打开文档</a>
+            </div>
+          </article>
+
+          <article class="doc-card">
+            <div class="doc-top">
+              <div>
+                <span class="doc-tag blue">Deploy</span>
+                <h3>服务器部署学习方案与 SOP</h3>
+              </div>
+            </div>
+            <p>适合你在想“服务器到底是怎么回事、更新网站要进哪个目录、以后 Astro 网站怎么部署”时看。</p>
+            <ul>
+              <li>命令行、SSH、权限、Node、PM2、Nginx 的人话解释</li>
+              <li>你昨天整套部署流程复盘</li>
+              <li>以后可复用的 Astro 网站部署 SOP</li>
+              <li>怎么简化流程、少敲命令</li>
+            </ul>
+            <div class="doc-actions">
+              <a class="primary" href="./服务器部署学习方案与SOP.html">打开文档</a>
+            </div>
+          </article>
+
+          <article class="doc-card">
+            <div class="doc-top">
+              <div>
+                <span class="doc-tag green">Launch</span>
+                <h3>EMS 上线执行顺序总表</h3>
+              </div>
+            </div>
+            <p>适合你在想“这个项目上线到底要配什么、Cloudflare 和服务器怎么分工、为什么走独立服务器”时看。</p>
+            <ul>
+              <li>当前 EMS 架构关系图</li>
+              <li>上线前后的执行顺序</li>
+              <li>环境变量、配置矩阵、上线闸门</li>
+              <li>Cloudflare / Resend / Supabase / Server 分工</li>
+            </ul>
+            <div class="doc-actions">
+              <a class="primary" href="./EMS上线执行顺序总表.html">打开文档</a>
+            </div>
+          </article>
+
+          <article class="doc-card">
+            <div class="doc-top">
+              <div>
+                <span class="doc-tag orange">Codebase</span>
+                <h3>代码地图</h3>
+              </div>
+            </div>
+            <p>适合你在想“这个项目代码放在哪里、哪些目录负责什么、前台后台和 Worker 的关系”时看。</p>
+            <ul>
+              <li>仓库目录结构</li>
+              <li>前端、后台、Worker 所在位置</li>
+              <li>理解项目结构的入口</li>
+            </ul>
+            <div class="doc-actions">
+              <a class="primary" href="./代码地图.html">打开文档</a>
+              <a class="secondary" href="./代码地图.md">查看 Markdown 版本</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel section">
+        <h2>2. 最推荐的阅读路线</h2>
+        <p class="section-intro">
+          如果你不是为了某个即时问题，而是想系统把这几份文档看一遍，我建议按这个顺序读。它和你这次真实成长路径是一致的。
+        </p>
+        <div class="pill green">先稳住认知，再学操作，再看项目级联动</div>
+
+        <div class="steps">
+          <article class="step-card">
+            <strong>Step 1 看学习文档</strong>
+            <p>先把“怎么学、怎么和 AI 协作、怎么不慌”这层理顺。</p>
+          </article>
+          <article class="step-card">
+            <strong>Step 2 看服务器 SOP</strong>
+            <p>再理解服务器、命令行、Node、Nginx、部署和更新动作。</p>
+          </article>
+          <article class="step-card">
+            <strong>Step 3 看 EMS 上线总表</strong>
+            <p>把这次真实项目的架构、上线顺序、配置关系全部串起来。</p>
+          </article>
+          <article class="step-card">
+            <strong>Step 4 看代码地图</strong>
+            <p>最后再回到代码结构层，知道项目文件各自放在哪。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel section">
+        <h2>3. 如果你卡住了，先这样判断自己该去哪份文档</h2>
+        <p class="section-intro">
+          小白最容易卡在“我甚至不知道现在该查哪份文档”。所以你只要先问自己一句：我当前卡的是“心理和方向”，还是“技术动作”，还是“项目架构和上线关系”。
+        </p>
+        <div class="grid-3">
+          <article class="card">
+            <span class="label">去 AI 文档</span>
+            <p>当你觉得焦虑、混乱、怕陌生、怕依赖 AI、怕自己没有思考时。</p>
+          </article>
+          <article class="card">
+            <span class="label">去服务器 SOP</span>
+            <p>当你要登录服务器、拉代码、构建、重启、更新网站，或者想懂命令行时。</p>
+          </article>
+          <article class="card">
+            <span class="label">去 EMS 上线总表</span>
+            <p>当你要梳理 Cloudflare、服务器、Supabase、Resend、反向代理和上线顺序时。</p>
+          </article>
+        </div>
+
+        <p class="footer-note">
+          以后你完全可以把这个首页当成你的“知识控制台”。你不需要一次记住所有内容，只需要记住：
+          <strong>我现在在哪个问题层级，就去对应文档。</strong>
+        </p>
+      </section>
+    </div>
+  </body>
+</html>

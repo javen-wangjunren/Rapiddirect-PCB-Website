@@ -1,12 +1,46 @@
 ---
+export const prerender = false;
+
 import EmsLayout from '../layouts/EmsLayout.astro';
+import HeroBanner from '../components/common/HeroBanner.astro';
+import ServicesSection from '../components/common/ServicesSection.astro';
+import PcbDesignCapabilitySection from '../components/pcb-design/PcbDesignCapabilitySection.astro';
+import PcbDesignWorkflowSection from '../components/pcb-design/PcbDesignWorkflowSection.astro';
+import PcbDesignSimulationSection from '../components/pcb-design/PcbDesignSimulationSection.astro';
+import PcbDesignProcessSection from '../components/pcb-design/PcbDesignProcessSection.astro';
+import PcbDesignDeliverablesSection from '../components/pcb-design/PcbDesignDeliverablesSection.astro';
+import IndustrySection from '../components/common/IndustrySection.astro';
+import WhyChooseUsSection from '../components/common/WhyChooseUsSection.astro';
+import FaqSection from '../components/common/FaqSection.astro';
+import PcbDesignCtaSection from '../components/pcb-design/PcbDesignCtaSection.astro';
+import { pcbDesignDefaults } from '../content/defaults/pcb-design';
+import { normalizePcbDesignContentJson } from '../content/normalize/pcb-design';
+import { createSupabaseClient } from '../lib/supabase/client';
+import { mergeSectionFallback } from '../lib/supabase/mappers';
+import { getPublishedPageBundleBySlug } from '../lib/supabase/queries';
+
+const slug = Astro.url.pathname;
+
+const supabase = createSupabaseClient();
+const bundle = supabase ? await getPublishedPageBundleBySlug(supabase, slug) : null;
+
+const contentJson = bundle?.content?.content_json ?? null;
+const data = normalizePcbDesignContentJson(mergeSectionFallback(pcbDesignDefaults as any, contentJson) as any) as any;
+
+const title = bundle?.seo?.meta_title ?? 'PCB Design Services | RapidDirect';
+const description = bundle?.seo?.meta_description ?? 'Professional PCB design and layout services. From schematic capture to DFM verification.';
 ---
 
-<EmsLayout title="PCB Design | RapidDirect" description="Scaffold page for /ems/pcb-design/.">
-  <section class="mx-auto max-w-7xl px-6 py-20">
-    <h1 class="text-4xl font-semibold tracking-tight text-slate-900">PCB Design</h1>
-    <p class="mt-4 max-w-2xl text-base leading-7 text-slate-600">
-      Route scaffold initialized for the PCB Design service page.
-    </p>
-  </section>
+<EmsLayout title={title} description={description}>
+  <HeroBanner data={data.hero} />
+  <ServicesSection data={data.services} />
+  <PcbDesignCapabilitySection data={data.capability} />
+  <PcbDesignWorkflowSection data={data.workflow} />
+  <PcbDesignSimulationSection data={data.simulation} />
+  <PcbDesignProcessSection data={data.process} />
+  <PcbDesignDeliverablesSection data={data.deliverables} />
+  {data.industry && <IndustrySection data={data.industry} />}
+  {data.why_choose_us && <WhyChooseUsSection data={data.why_choose_us} />}
+  {data.faq && <FaqSection data={data.faq} />}
+  <PcbDesignCtaSection data={data.cta} />
 </EmsLayout>

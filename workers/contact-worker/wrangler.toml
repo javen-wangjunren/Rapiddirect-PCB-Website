@@ -7,6 +7,6 @@ routes = [
 ]
 
 [vars]
-ALLOWED_ORIGIN = "https://rapiddirect.com"
+ALLOWED_ORIGIN = "http://pcb.rapiddirect.com"
 FROM_EMAIL = "quote@rapiddirect.com"
 TO_EMAIL = "pcb@rapiddirect.com"

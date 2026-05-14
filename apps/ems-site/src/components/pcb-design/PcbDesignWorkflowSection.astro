@@ -7,7 +7,7 @@ export interface Props {
 }
 
 const { data } = Astro.props;
-const stages = Array.isArray(data?.stages) ? data.stages : [];
+const stages = (Array.isArray(data?.stages) ? data.stages : []) as Props['data']['stages'];
 ---
 
 <section class="bg-[#F5F5F5] py-20 text-[#1a1a1a]">
@@ -89,7 +89,7 @@ const stages = Array.isArray(data?.stages) ? data.stages : [];
 
               {/* Right Column (Steps) */}
               <div class="flex flex-1 flex-col justify-center gap-10 lg:pl-10">
-                {(stage.steps || []).map((step) => (
+                {(stage.steps ?? []).map(step => (
                   <div class="flex flex-col gap-3">
                     <span class="w-fit rounded-[50px] bg-[#ef533f]/10 px-3 py-1 text-xs font-bold uppercase tracking-[1px] text-[#ef533f]">
                       {step.tag}

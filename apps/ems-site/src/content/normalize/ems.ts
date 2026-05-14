@@ -46,6 +46,7 @@ const normalizeServiceItem = (input: unknown) => {
 
   return {
     name: asString(obj.name),
+    image_url: asString(obj.image_url),
     description: normalizeServiceDescription(obj.description),
     cta: {
       label: asString(cta.label),

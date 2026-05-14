@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1680 1120" width="1680" height="1120">
+  <style>
+    text { font-family: Helvetica, Arial, "PingFang SC", "Microsoft YaHei", sans-serif; fill: #1f2937; }
+    .title { font-size: 46px; font-weight: 700; }
+    .subtitle { font-size: 21px; fill: #667085; }
+    .node-title { font-size: 30px; font-weight: 700; }
+    .body { font-size: 20px; fill: #667085; }
+    .small { font-size: 18px; fill: #667085; }
+    .tag { font-size: 18px; font-weight: 700; }
+  </style>
+
+  <defs>
+    <marker id="arrowBlue2" markerWidth="14" markerHeight="10" refX="12" refY="5" orient="auto">
+      <polygon points="0 0, 14 5, 0 10" fill="#2563eb"/>
+    </marker>
+    <marker id="arrowGreen2" markerWidth="14" markerHeight="10" refX="12" refY="5" orient="auto">
+      <polygon points="0 0, 14 5, 0 10" fill="#0f8a5f"/>
+    </marker>
+  </defs>
+
+  <rect width="1680" height="1120" rx="36" fill="#faf7f2"/>
+  <rect x="24" y="24" width="1632" height="1072" rx="32" fill="#fffdf9" stroke="#e8dfd4" stroke-width="2"/>
+
+  <text x="72" y="104" class="title">最后整套请求会怎么流动</text>
+  <text x="72" y="146" class="subtitle">记住这一张图，你以后看“反向代理、Worker、Resend、Turnstile”就不会再觉得它们都搅在一起。</text>
+
+  <g transform="translate(72,216)">
+    <rect width="320" height="216" rx="28" fill="#fff0e9" stroke="#ffd1c1" stroke-width="2"/>
+    <text x="24" y="72" class="node-title">1. 用户访问主站</text>
+    <text x="24" y="116" class="body">用户访问的是</text>
+    <text x="24" y="152" class="tag">rapiddirect.com/ems/*</text>
+    <text x="24" y="190" class="body">用户看到的入口始终是主站路径。</text>
+  </g>
+
+  <g transform="translate(462,216)">
+    <rect width="380" height="216" rx="28" fill="#eef4ff" stroke="#d8e5ff" stroke-width="2"/>
+    <text x="24" y="72" class="node-title">2. Cloudways 主站反向代理</text>
+    <text x="24" y="116" class="body">主站服务器接住请求后，把</text>
+    <text x="24" y="152" class="tag">/ems/*</text>
+    <text x="105" y="152" class="body">转发给真正负责 EMS 页面内容的源站。</text>
+  </g>
+
+  <g transform="translate(912,216)">
+    <rect width="360" height="216" rx="28" fill="#eaf8f1" stroke="#c8eadb" stroke-width="2"/>
+    <text x="24" y="72" class="node-title">3. EMS 独立站返回内容</text>
+    <text x="24" y="116" class="body">真正返回页面、内容和后台数据的是</text>
+    <text x="24" y="152" class="tag">pcb.rapiddirect.com/ems/*</text>
+    <text x="24" y="190" class="body">这里跑着 Astro / Node 应用。</text>
+  </g>
+
+  <g transform="translate(1342,216)">
+    <rect width="266" height="216" rx="28" fill="#fff6e7" stroke="#f4ddac" stroke-width="2"/>
+    <text x="24" y="72" class="node-title">4. 用户看到页面</text>
+    <text x="24" y="116" class="body">地址栏保持不变，</text>
+    <text x="24" y="150" class="body">用户感觉像一直都在</text>
+    <text x="24" y="184" class="body">同一个网站里。</text>
+  </g>
+
+  <line x1="392" y1="324" x2="454" y2="324" stroke="#2563eb" stroke-width="5" marker-end="url(#arrowBlue2)"/>
+  <line x1="842" y1="324" x2="904" y2="324" stroke="#2563eb" stroke-width="5" marker-end="url(#arrowBlue2)"/>
+  <line x1="1272" y1="324" x2="1334" y2="324" stroke="#2563eb" stroke-width="5" marker-end="url(#arrowBlue2)"/>
+
+  <text x="72" y="534" class="node-title">页面链路和表单链路，其实是两条不同的路</text>
+  <text x="72" y="572" class="subtitle">页面访问的重点是“送到谁”；表单提交的重点是“怎么安全处理”。这也是为什么你会同时碰到反向代理和 Worker。</text>
+
+  <g transform="translate(72,632)">
+    <rect width="744" height="180" rx="28" fill="#eef4ff" stroke="#d8e5ff" stroke-width="2"/>
+    <text x="26" y="62" class="node-title">页面访问链路</text>
+    <text x="26" y="104" class="body">用户请求页面</text>
+    <text x="214" y="104" class="body">→ 主站把请求反向代理到 EMS 源站</text>
+    <text x="26" y="146" class="body">→ EMS 独立站返回页面内容</text>
+    <text x="400" y="146" class="body">→ 用户最终看到页面</text>
+  </g>
+
+  <g transform="translate(864,632)">
+    <rect width="744" height="180" rx="28" fill="#eaf8f1" stroke="#c8eadb" stroke-width="2"/>
+    <text x="26" y="62" class="node-title">表单提交链路</text>
+    <text x="26" y="104" class="body">用户提交表单</text>
+    <text x="222" y="104" class="body">→ 请求交给 Worker</text>
+    <text x="26" y="146" class="body">→ Worker 查 Turnstile、保护 secret</text>
+    <text x="434" y="146" class="body">→ 调 Resend 发邮件</text>
+  </g>
+
+  <line x1="1210" y1="432" x2="1210" y2="622" stroke="#0f8a5f" stroke-width="5" marker-end="url(#arrowGreen2)"/>
+
+  <g transform="translate(72,874)">
+    <rect width="1536" height="170" rx="28" fill="#ffffff" stroke="#e8dfd4" stroke-width="2"/>
+    <text x="28" y="60" class="node-title">一句话背下来</text>
+    <text x="28" y="106" class="body">反向代理负责：</text>
+    <text x="216" y="106" class="body">让用户始终访问统一入口，但后台把页面请求送到正确的站点。</text>
+    <text x="28" y="146" class="body">Worker 负责：</text>
+    <text x="188" y="146" class="body">让表单、机器人校验、邮件发送和密钥保护这条链路独立又安全。</text>
+  </g>
+</svg>

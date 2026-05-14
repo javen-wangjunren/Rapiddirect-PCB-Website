@@ -82,5 +82,129 @@ export const pcbDesignSchema = {
         }
       }
     }
+  },
+  simulation: {
+    title: 'string',
+    description: 'string',
+    tabs: {
+      type: 'array',
+      items: {
+        name: 'string',
+        icon_svg: 'string',
+        panel: {
+          image_url: 'string',
+          title: 'string',
+          description: 'string',
+          benefits: 'array'
+        }
+      }
+    },
+    footer: {
+      description: 'string',
+      cta: {
+        label: 'string',
+        href: 'string'
+      }
+    }
+  },
+  deliverables: {
+    title: 'string',
+    description: 'string',
+    groups: {
+      type: 'array',
+      items: {
+        icon_svg: 'string',
+        title: 'string',
+        items: {
+          type: 'array',
+          items: {
+            icon_svg: 'string',
+            title: 'string',
+            format_tag: 'string',
+            description: 'string'
+          }
+        }
+      }
+    }
+  },
+  industry: {
+    title: 'string',
+    description: 'string',
+    items: {
+      type: 'array',
+      items: {
+        tab: {
+          id: 'string',
+          name: 'string',
+          icon_url: 'string'
+        },
+        card: {
+          title: 'string',
+          description: {
+            paragraph: 'string',
+            list: 'array'
+          },
+          cta: {
+            label: 'string',
+            href: 'string'
+          },
+          image_url: 'string'
+        }
+      }
+    }
+  },
+  why_choose_us: {
+    title: 'string',
+    desc: 'string',
+    advantages: {
+      type: 'array',
+      items: {
+        icon_url: 'string',
+        title: 'string',
+        highlight: 'string',
+        desc: 'string'
+      }
+    },
+    stats_bar: {
+      stats: {
+        type: 'array',
+        items: {
+          number: 'string',
+          label: 'string'
+        }
+      },
+      button: {
+        text: 'string',
+        href: 'string'
+      }
+    }
+  },
+  faq: {
+    title: 'string',
+    items: {
+      type: 'array',
+      items: {
+        question: 'string',
+        answer: 'string'
+      }
+    }
+  },
+  cta: {
+    title: 'string',
+    description: 'string',
+    primary_button: {
+      label: 'string',
+      href: 'string'
+    },
+    secondary_button: {
+      label: 'string',
+      href: 'string'
+    },
+    trust_badges: {
+      type: 'array',
+      items: {
+        label: 'string'
+      }
+    }
   }
 };

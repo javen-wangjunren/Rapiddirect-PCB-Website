@@ -33,7 +33,8 @@ const menus = [
   data?.menus?.about ?? siteFooterDefaults.menus.about
 ];
 const footerBottom = data?.footer_bottom ?? siteFooterDefaults.footer_bottom;
-const logoUrl = data?.logo_url?.trim() ? getAssetPath(data.logo_url) : '';
+const fallbackLogoUrl = getAssetPath('/assets/images/rd-logo.png');
+const logoUrl = data?.logo_url?.trim() ? getAssetPath(data.logo_url) : fallbackLogoUrl;
 ---
 
 <footer class="border-t border-slate-200 bg-white">
@@ -44,9 +45,7 @@ const logoUrl = data?.logo_url?.trim() ? getAssetPath(data.logo_url) : '';
           {logoUrl ? (
             <img src={logoUrl} alt="RapidDirect" class="h-10 w-auto object-contain" loading="lazy" decoding="async" />
           ) : (
-            <div class="flex h-10 w-28 items-center justify-center rounded-md border border-dashed border-slate-300 text-xs font-medium uppercase tracking-[0.18em] text-slate-400">
-              Logo
-            </div>
+            <div class="h-10 w-28 rounded-md border border-dashed border-slate-300" aria-hidden="true" />
           )}
         </a>
 

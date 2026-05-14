@@ -10,7 +10,13 @@ const modules: { key: keyof typeof pcbDesignSchema; label: string }[] = [
   { key: 'hero', label: 'Hero' },
   { key: 'services', label: 'Services' },
   { key: 'capability', label: 'Capability' },
-  { key: 'workflow', label: 'Workflow' }
+  { key: 'workflow', label: 'Workflow' },
+  { key: 'simulation', label: 'Simulation' },
+  { key: 'deliverables', label: 'Deliverables' },
+  { key: 'industry', label: 'Industry' },
+  { key: 'why_choose_us', label: 'Why Choose Us' },
+  { key: 'faq', label: 'FAQ' },
+  { key: 'cta', label: 'CTA' }
 ];
 
 export interface PcbDesignEditorContentModulesProps {
@@ -49,6 +55,18 @@ export default function PcbDesignEditorContentModules({ contentJson, onModuleCha
                   {m.key === 'workflow' ? (
                     <div className="mb-3 text-xs leading-5 text-[var(--admin-fg-muted)]">
                       layout=standard 使用 steps/image_url；layout=special 使用 special_title/special_description/special_cta。
+                    </div>
+                  ) : m.key === 'simulation' ? (
+                    <div className="mb-3 text-xs leading-5 text-[var(--admin-fg-muted)]">
+                      panel.description 支持少量 HTML：span/br/strong/em（其余标签会被清理）。
+                    </div>
+                  ) : m.key === 'deliverables' ? (
+                    <div className="mb-3 text-xs leading-5 text-[var(--admin-fg-muted)]">
+                      description 支持少量 HTML：span/br/strong/em（其余标签会被清理）。
+                    </div>
+                  ) : m.key === 'cta' ? (
+                    <div className="mb-3 text-xs leading-5 text-[var(--admin-fg-muted)]">
+                      title 支持少量 HTML：span/br/strong/em（其余标签会被清理）。按钮与徽章图标固定，无需配置。
                     </div>
                   ) : null}
                   <SchemaForm

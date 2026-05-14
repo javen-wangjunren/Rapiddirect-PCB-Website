@@ -13,7 +13,8 @@ type HeaderData = {
 
 const { data = siteHeaderDefaults } = Astro.props as { data?: HeaderData };
 
-const logoUrl = data?.logo_url?.trim() ? getAssetPath(data.logo_url) : '';
+const fallbackLogoUrl = getAssetPath('/assets/images/rd-logo.png');
+const logoUrl = data?.logo_url?.trim() ? getAssetPath(data.logo_url) : fallbackLogoUrl;
 const ctaText = data?.cta_text?.trim() || siteHeaderDefaults.cta_text;
 const ctaHref = data?.cta_href?.trim() || siteHeaderDefaults.cta_href;
 const navItems = (data?.nav_items?.length ? data.nav_items : siteHeaderDefaults.nav_items) as NavItem[];
@@ -21,17 +22,12 @@ const navItems = (data?.nav_items?.length ? data.nav_items : siteHeaderDefaults.
 
 <header class="site-header sticky top-0 z-[1000] border-b border-slate-100 bg-white px-10">
   <div class="mx-auto flex h-20 max-w-[1440px] items-center justify-between">
-    <a href={getHref('/')} class="flex items-center gap-3 no-underline" aria-label="RapidDirect home">
+    <a href={getHref('/')} class="flex items-center no-underline" aria-label="RapidDirect home">
       {logoUrl ? (
         <img src={logoUrl} alt="RapidDirect" class="h-10 w-auto object-contain" loading="eager" decoding="async" />
       ) : (
-        <div class="flex h-10 w-10 items-center justify-center rounded bg-slate-200 text-[10px] text-slate-400">
-          IMG
-        </div>
+        <div class="h-10 w-10 rounded bg-slate-200" aria-hidden="true" />
       )}
-      <span class="text-[22px] font-extrabold tracking-[-0.5px] text-[#0f172a]">
-        RAPID<span class="text-[#f25537]">PCB</span>
-      </span>
     </a>
 
     <nav class="flex items-center gap-8">

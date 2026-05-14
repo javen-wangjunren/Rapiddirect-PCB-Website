@@ -33,6 +33,7 @@ export const emsHomeDefaults = {
     items: [
       {
         name: 'PCB Design',
+        image_url: '',
         description: {
           kind: 'paragraph',
           text: 'Professional PCB design services tailored to your project needs'
@@ -44,6 +45,7 @@ export const emsHomeDefaults = {
       },
       {
         name: 'PCB Manufacturing',
+        image_url: '',
         description: {
           kind: 'list',
           items: [
@@ -60,6 +62,7 @@ export const emsHomeDefaults = {
       },
       {
         name: 'PCB Assembly',
+        image_url: '',
         description: {
           kind: 'list',
           items: [
@@ -76,6 +79,7 @@ export const emsHomeDefaults = {
       },
       {
         name: 'Component Sourcing',
+        image_url: '',
         description: {
           kind: 'list',
           items: [
@@ -92,6 +96,7 @@ export const emsHomeDefaults = {
       },
       {
         name: 'Mechanical & Enclosure Fabrication',
+        image_url: '',
         description: {
           kind: 'list',
           items: [
@@ -108,6 +113,7 @@ export const emsHomeDefaults = {
       },
       {
         name: 'Box Build & Final Assembly',
+        image_url: '',
         description: {
           kind: 'list',
           items: [
@@ -124,6 +130,7 @@ export const emsHomeDefaults = {
       },
       {
         name: 'Testing & Delivery',
+        image_url: '',
         description: {
           kind: 'list',
           items: [

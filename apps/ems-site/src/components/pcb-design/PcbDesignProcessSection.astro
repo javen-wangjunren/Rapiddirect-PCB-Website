@@ -1,14 +1,15 @@
 ---
 import type { PcbDesignProcessContent } from '../../types/pcb-design';
 import { getAssetPath } from '../../lib/assets';
+import { getPcbDesignProcessBenefitIconSvg, getPcbDesignProcessItemIconSvg } from '../../content/icons/pcb-design-process';
 
 export interface Props {
   data: PcbDesignProcessContent;
 }
 
 const { data } = Astro.props;
-const items = Array.isArray(data?.items) ? data.items : [];
-const benefits = Array.isArray(data?.trust_base?.benefits) ? data.trust_base.benefits : [];
+const items = (Array.isArray(data?.items) ? data.items : []) as Props['data']['items'];
+const benefits = (Array.isArray(data?.trust_base?.benefits) ? data.trust_base.benefits : []) as Props['data']['trust_base']['benefits'];
 ---
 
 <section class="overflow-hidden bg-[#F5F5F5] py-[100px] text-[#1a1a1a]">
@@ -35,6 +36,7 @@ const benefits = Array.isArray(data?.trust_base?.benefits) ? data.trust_base.ben
       {items.map((item, index) => {
         // Determine layout based on index (odd vs even for desktop staggered layout)
         const isOdd = index % 2 !== 0;
+        const hasImage = typeof item?.image_url === 'string' && Boolean(item.image_url.trim());
         
         return (
           <div class={`timeline-item relative z-30 mb-[60px] flex w-full flex-col items-start opacity-0 translate-y-[40px] transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] lg:mb-[80px] lg:flex-row lg:items-center lg:justify-between ${isOdd ? 'lg:flex-row-reverse' : ''}`}>
@@ -43,13 +45,13 @@ const benefits = Array.isArray(data?.trust_base?.benefits) ? data.trust_base.ben
             <div class="timeline-dot absolute left-[20px] top-[30px] z-50 h-[18px] w-[18px] -translate-x-1/2 -translate-y-1/2 rounded-full border-4 border-[#d1d5db] bg-white transition-all duration-400 ease-out lg:left-1/2 lg:top-1/2"></div>
 
             {/* Text Card */}
-            <div class={`timeline-content text-card mb-5 ml-[60px] flex w-[calc(100%-60px)] flex-col rounded-xl border border-[#e5e7eb] bg-white p-[30px] shadow-[0_5px_20px_rgba(0,0,0,0.03)] transition-transform duration-300 ease-out lg:mb-0 lg:ml-0 lg:w-[44%] ${isOdd ? 'order-1 lg:order-none' : 'order-1 lg:order-none'}`}>
-              <div set:html={item.icon_svg}></div>
+            <div class={`timeline-content text-card mb-5 ml-[60px] flex w-[calc(100%-60px)] flex-col rounded-xl border border-[#e5e7eb] bg-white p-[30px] shadow-[0_5px_20px_rgba(0,0,0,0.03)] transition-transform duration-300 ease-out lg:mb-0 lg:ml-0 ${hasImage ? 'lg:w-[44%]' : 'lg:w-full'} ${isOdd ? 'order-1 lg:order-none' : 'order-1 lg:order-none'}`}>
+              <div set:html={getPcbDesignProcessItemIconSvg((item as any)?.icon ?? (item as any)?.icon_svg)}></div>
               <h3 class="mb-2.5 text-[19px] font-bold text-[#1a1a1a]">{item.title}</h3>
               <p class="mb-[18px] flex-grow text-[14px] leading-[1.6] text-[#666666]" set:html={item.description}></p>
               
               <div class="flex flex-wrap gap-2">
-                {(item.tags || []).map(tag => (
+                {(item.tags ?? []).map(tag => (
                   <span class="rounded-[50px] bg-[#F0F0F0] px-3 py-[5px] text-[12px] font-semibold text-[#475569]">
                     {tag}
                   </span>
@@ -58,19 +60,15 @@ const benefits = Array.isArray(data?.trust_base?.benefits) ? data.trust_base.ben
             </div>
 
             {/* Photo Module */}
-            <div class={`timeline-content photo-module group relative ml-[60px] flex aspect-[16/9] w-[calc(100%-60px)] items-center justify-center overflow-hidden rounded-xl border border-[#e5e7eb] bg-[#f0f2f5] transition-transform duration-300 ease-out lg:ml-0 lg:aspect-[4/3] lg:w-[44%] ${isOdd ? 'order-2 lg:order-none' : 'order-2 lg:order-none'}`}>
-              {item.image_url ? (
+            {hasImage && (
+              <div class={`timeline-content photo-module group relative ml-[60px] flex aspect-[16/9] w-[calc(100%-60px)] items-center justify-center overflow-hidden rounded-xl border border-[#e5e7eb] bg-[#f0f2f5] transition-transform duration-300 ease-out lg:ml-0 lg:aspect-[4/3] lg:w-[44%] ${isOdd ? 'order-2 lg:order-none' : 'order-2 lg:order-none'}`}>
                 <img
                   src={getAssetPath(item.image_url)}
-                  alt={item.image_alt || item.title}
+                  alt={item.title}
                   class="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                 />
-              ) : (
-                <span class="absolute text-[14px] font-medium text-[#94a3b8] px-4 text-center">
-                  {item.image_placeholder}
-                </span>
-              )}
-            </div>
+              </div>
+            )}
 
           </div>
         );
@@ -87,7 +85,7 @@ const benefits = Array.isArray(data?.trust_base?.benefits) ? data.trust_base.ben
         {benefits.map(benefit => (
           <div class="rounded-[10px] bg-[#F5F5F5] p-5">
             <h4 class="mb-2 flex items-center gap-2 text-[15px] font-bold text-[#1a1a1a]">
-              <span set:html={benefit.icon_svg}></span>
+              <span set:html={getPcbDesignProcessBenefitIconSvg((benefit as any)?.icon ?? (benefit as any)?.icon_svg)}></span>
               {benefit.title}
             </h4>
             <p class="text-[13px] leading-[1.5] text-[#666666]">

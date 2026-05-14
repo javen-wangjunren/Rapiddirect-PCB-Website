@@ -1,8 +1,10 @@
 name = "pcp-contact"
 main = "src/index.ts"
 compatibility_date = "2026-04-24"
+workers_dev = true
 
 routes = [
+  { pattern = "pcb.rapiddirect.com/api/contact*", zone_name = "rapiddirect.com" },
   { pattern = "rapiddirect.com/api/contact*", zone_name = "rapiddirect.com" }
 ]
 
@@ -10,3 +12,5 @@ routes = [
 ALLOWED_ORIGIN = "http://pcb.rapiddirect.com"
 FROM_EMAIL = "quote@rapiddirect.com"
 TO_EMAIL = "pcb@rapiddirect.com"
+
+

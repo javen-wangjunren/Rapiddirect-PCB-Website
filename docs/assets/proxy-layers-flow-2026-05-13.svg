@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 980" width="1600" height="980">
+  <style>
+    text { font-family: Helvetica, Arial, "PingFang SC", "Microsoft YaHei", sans-serif; fill: #1f2937; }
+    .title { font-size: 44px; font-weight: 700; }
+    .subtitle { font-size: 20px; fill: #667085; }
+    .layer-title { font-size: 30px; font-weight: 700; }
+    .body { font-size: 20px; fill: #667085; }
+    .small { font-size: 18px; fill: #667085; }
+    .label { font-size: 16px; font-weight: 700; letter-spacing: 0.08em; }
+    .tag { font-size: 18px; font-weight: 700; }
+  </style>
+
+  <defs>
+    <marker id="arrowBlue" markerWidth="14" markerHeight="10" refX="12" refY="5" orient="auto">
+      <polygon points="0 0, 14 5, 0 10" fill="#2563eb"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="980" rx="36" fill="#faf7f2"/>
+  <rect x="24" y="24" width="1552" height="932" rx="32" fill="#fffdf9" stroke="#e8dfd4" stroke-width="2"/>
+
+  <text x="72" y="104" class="title">反向代理相关东西分别在哪一层</text>
+  <text x="72" y="146" class="subtitle">把它想成一栋四层楼：用户从最外面走进来，请求会一层层往里送，不同名词只是站在不同楼层做不同决定。</text>
+
+  <g transform="translate(72,210)">
+    <rect width="340" height="320" rx="28" fill="#fff0e9" stroke="#ffd1c1" stroke-width="2"/>
+    <rect x="24" y="22" width="122" height="34" rx="17" fill="rgba(31,41,55,0.08)"/>
+    <text x="45" y="45" class="label">第 1 层</text>
+    <text x="24" y="102" class="layer-title">用户浏览器</text>
+    <text x="24" y="146" class="body">用户只知道自己在访问</text>
+    <text x="24" y="182" class="tag">rapiddirect.com/ems/*</text>
+    <text x="24" y="230" class="body">他并不知道后面实际上</text>
+    <text x="24" y="264" class="body">经过了 Cloudflare、主站服务器</text>
+    <text x="24" y="298" class="body">和 EMS 独立站。</text>
+  </g>
+
+  <g transform="translate(448,210)">
+    <rect width="340" height="320" rx="28" fill="#eef4ff" stroke="#d8e5ff" stroke-width="2"/>
+    <rect x="24" y="22" width="122" height="34" rx="17" fill="rgba(31,41,55,0.08)"/>
+    <text x="45" y="45" class="label">第 2 层</text>
+    <text x="24" y="102" class="layer-title">Cloudflare</text>
+    <text x="24" y="146" class="body">这是站外的大门口保安，负责</text>
+    <text x="24" y="180" class="body">DNS、CDN、SSL、安全和</text>
+    <text x="24" y="214" class="body">Worker route。</text>
+    <text x="24" y="264" class="small">Origin Rule 也在这一层，但你现在的套餐</text>
+    <text x="24" y="294" class="small">不支持关键 origin override 能力。</text>
+  </g>
+
+  <g transform="translate(824,210)">
+    <rect width="340" height="320" rx="28" fill="#eaf8f1" stroke="#c8eadb" stroke-width="2"/>
+    <rect x="24" y="22" width="122" height="34" rx="17" fill="rgba(31,41,55,0.08)"/>
+    <text x="45" y="45" class="label">第 3 层</text>
+    <text x="24" y="102" class="layer-title">Cloudways 主站服务器</text>
+    <text x="24" y="146" class="body">这里是真正接住主域请求的地方。</text>
+    <text x="24" y="180" class="body">这次最关键的动作，是在这里把</text>
+    <text x="24" y="214" class="tag">/ems/*</text>
+    <text x="98" y="214" class="body">转给 EMS 源站。</text>
+    <text x="24" y="264" class="small">.htaccess 和 mod_proxy 都更靠近这一层，</text>
+    <text x="24" y="294" class="small">但最终更适合用 Nginx location 来做。</text>
+  </g>
+
+  <g transform="translate(1200,210)">
+    <rect width="328" height="320" rx="28" fill="#fff6e7" stroke="#f4ddac" stroke-width="2"/>
+    <rect x="24" y="22" width="122" height="34" rx="17" fill="rgba(31,41,55,0.08)"/>
+    <text x="45" y="45" class="label">第 4 层</text>
+    <text x="24" y="102" class="layer-title">EMS 独立站</text>
+    <text x="24" y="146" class="body">真正返回 EMS 页面、内容和</text>
+    <text x="24" y="180" class="body">后台数据的地方，也就是</text>
+    <text x="24" y="218" class="tag">pcb.rapiddirect.com/ems/*</text>
+    <text x="24" y="264" class="small">DigitalOcean 上跑着 Astro / Node</text>
+    <text x="24" y="294" class="small">应用，由 PM2 和 Nginx 承接。</text>
+  </g>
+
+  <line x1="412" y1="370" x2="436" y2="370" stroke="#2563eb" stroke-width="4" marker-end="url(#arrowBlue)"/>
+  <line x1="788" y1="370" x2="812" y2="370" stroke="#2563eb" stroke-width="4" marker-end="url(#arrowBlue)"/>
+  <line x1="1164" y1="370" x2="1188" y2="370" stroke="#2563eb" stroke-width="4" marker-end="url(#arrowBlue)"/>
+
+  <text x="72" y="620" class="layer-title">这些名词到底挂在哪一层</text>
+  <text x="72" y="654" class="subtitle">下面这几张小卡片，就是你这次最容易混淆的词。把它们挂回正确楼层，理解会轻松很多。</text>
+
+  <g transform="translate(72,706)">
+    <rect width="282" height="176" rx="24" fill="#ffffff" stroke="#e8dfd4" stroke-width="2"/>
+    <text x="22" y="42" class="tag">.htaccess</text>
+    <text x="22" y="80" class="body">应用目录里的小规则文件，</text>
+    <text x="22" y="114" class="body">你试过让它代理 EMS 路径，</text>
+    <text x="22" y="148" class="body">但 Cloudways 明确说这条路不支持。</text>
+  </g>
+
+  <g transform="translate(380,706)">
+    <rect width="282" height="176" rx="24" fill="#ffffff" stroke="#e8dfd4" stroke-width="2"/>
+    <text x="22" y="42" class="tag">mod_proxy</text>
+    <text x="22" y="80" class="body">Apache 的代理能力模块，</text>
+    <text x="22" y="114" class="body">像是给门卫加上“带路”的功能。</text>
+    <text x="22" y="148" class="body">它能开，但不代表 .htaccess 方案就可走通。</text>
+  </g>
+
+  <g transform="translate(688,706)">
+    <rect width="282" height="176" rx="24" fill="#ffffff" stroke="#e8dfd4" stroke-width="2"/>
+    <text x="22" y="42" class="tag">Nginx</text>
+    <text x="22" y="80" class="body">主站服务器层的大门卫，</text>
+    <text x="22" y="114" class="body">最适合做 /ems/* 的路径转发。</text>
+    <text x="22" y="148" class="body">这也是 Cloudways 最终建议你走的方案。</text>
+  </g>
+
+  <g transform="translate(996,706)">
+    <rect width="252" height="176" rx="24" fill="#ffffff" stroke="#e8dfd4" stroke-width="2"/>
+    <text x="22" y="42" class="tag">Origin Rule</text>
+    <text x="22" y="80" class="body">Cloudflare 边缘层改源站规则。</text>
+    <text x="22" y="114" class="body">思路是对的，但你这次需要的关键</text>
+    <text x="22" y="148" class="body">override 能力在当前套餐下不可用。</text>
+  </g>
+
+  <g transform="translate(1274,706)">
+    <rect width="254" height="176" rx="24" fill="#ffffff" stroke="#e8dfd4" stroke-width="2"/>
+    <text x="22" y="42" class="tag">Worker</text>
+    <text x="22" y="80" class="body">它不负责整站页面转发，</text>
+    <text x="22" y="114" class="body">而是专门处理表单、Turnstile、</text>
+    <text x="22" y="148" class="body">Resend 和密钥安全这条链路。</text>
+  </g>
+</svg>

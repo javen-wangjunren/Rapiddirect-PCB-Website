@@ -47,6 +47,8 @@ export function IndustrySection({ data }: { data: EmsHomeIndustryContent }) {
                         alt=""
                         className="h-[26px] w-[26px]"
                         style={{ filter: isActive ? whiteIconFilter : orangeIconFilter }}
+                        loading="lazy"
+                        decoding="async"
                       />
                     ) : (
                       <span className="h-[26px] w-[26px]" aria-hidden="true" />
@@ -85,12 +87,20 @@ export function IndustrySection({ data }: { data: EmsHomeIndustryContent }) {
                     alt=""
                     className="h-[21px] w-[21px]"
                     style={{ filter: whiteIconFilter }}
+                    loading="lazy"
+                    decoding="async"
                   />
                 </a>
               </div>
 
               {activeImageSrc ? (
-                <img src={activeImageSrc} alt="" className="h-[450px] w-[450px] rounded-[20px] object-cover" />
+                <img
+                  src={activeImageSrc}
+                  alt=""
+                  className="h-[450px] w-[450px] rounded-[20px] object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
               ) : (
                 <div className="h-[450px] w-[450px] rounded-[20px] bg-white/60" />
               )}

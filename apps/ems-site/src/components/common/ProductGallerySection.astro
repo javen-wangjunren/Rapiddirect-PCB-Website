@@ -1,0 +1,329 @@
+---
+import { getAssetPath } from '../../lib/assets';
+
+export interface ProductGalleryFilter {
+  label: string;
+  value: string;
+}
+
+export interface ProductGallerySpec {
+  label: string;
+  value: string;
+}
+
+export interface ProductGalleryItem {
+  category: string;
+  title: string;
+  subtitle: string;
+  image_url?: string;
+  specs: ProductGallerySpec[];
+}
+
+export interface Props {
+  data: {
+    title: string;
+    description: string;
+    filters: ProductGalleryFilter[];
+    items: ProductGalleryItem[];
+  };
+}
+
+const { data } = Astro.props;
+---
+
+<section class="product-gallery-section">
+  <div class="mx-auto max-w-7xl px-6 py-24 sm:py-28">
+    <div class="product-gallery-header">
+      <h2>{data.title}</h2>
+      <p>{data.description}</p>
+    </div>
+
+    <div class="product-gallery-tabs" role="tablist" aria-label="Product gallery filter">
+      {data.filters.map((filter, idx) => (
+        <button
+          type="button"
+          class:list={['product-gallery-tab', idx === 0 && 'is-active']}
+          data-filter={filter.value}
+          role="tab"
+          aria-selected={idx === 0 ? 'true' : 'false'}
+        >
+          {filter.label}
+        </button>
+      ))}
+    </div>
+
+    <div class="product-gallery-grid" data-gallery-grid>
+      {data.items.map((item) => (
+        <article class="product-gallery-card" data-category={item.category} tabindex="0">
+          <div class="product-gallery-media">
+            {item.image_url ? (
+              <img src={getAssetPath(item.image_url)} alt="" class="product-gallery-img" loading="lazy" />
+            ) : (
+              <div class="product-gallery-img-fallback" aria-hidden="true" />
+            )}
+
+            <div class="product-gallery-overlay" aria-hidden="true">
+              <h4>Technical Specs</h4>
+              <ul class="product-gallery-specs">
+                {item.specs.map((spec) => (
+                  <li>
+                    <span>{spec.label}</span>
+                    <span>{spec.value}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <div class="product-gallery-info">
+            <h3>{item.title}</h3>
+            <p>{item.subtitle}</p>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .product-gallery-section {
+    background-color: #f8f9fa;
+  }
+
+  .product-gallery-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .product-gallery-header h2 {
+    font-size: 36px;
+    color: #1a1a1a;
+    margin-bottom: 16px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+
+  .product-gallery-header p {
+    color: #666666;
+    font-size: 16px;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .product-gallery-tabs {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+
+  .product-gallery-tab {
+    background-color: transparent;
+    border: 1px solid #eaeaea;
+    padding: 10px 24px;
+    border-radius: 999px;
+    color: #666666;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+    appearance: none;
+  }
+
+  .product-gallery-tab:hover {
+    border-color: #ef533f;
+    color: #ef533f;
+  }
+
+  .product-gallery-tab.is-active {
+    background-color: #ef533f;
+    border-color: #ef533f;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(239, 83, 63, 0.3);
+  }
+
+  .product-gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+    transition: all 0.4s ease;
+  }
+
+  .product-gallery-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #eaeaea;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    display: block;
+    outline: none;
+  }
+
+  .product-gallery-card.is-hidden {
+    display: none;
+  }
+
+  .product-gallery-card:hover,
+  .product-gallery-card:focus-visible {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+    border-color: transparent;
+  }
+
+  .product-gallery-media {
+    position: relative;
+    width: 100%;
+    padding-top: 75%;
+    background-color: #f0f2f5;
+    overflow: hidden;
+  }
+
+  .product-gallery-img,
+  .product-gallery-img-fallback {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .product-gallery-img {
+    object-fit: cover;
+  }
+
+  .product-gallery-img-fallback {
+    background:
+      radial-gradient(circle at 20% 30%, rgba(239, 83, 63, 0.18), transparent 45%),
+      radial-gradient(circle at 80% 60%, rgba(15, 23, 43, 0.12), transparent 50%),
+      linear-gradient(135deg, rgba(148, 163, 184, 0.18), rgba(148, 163, 184, 0.06));
+  }
+
+  .product-gallery-overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(239, 83, 63, 0.95);
+    color: #ffffff;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+  }
+
+  .product-gallery-card:hover .product-gallery-overlay,
+  .product-gallery-card:focus-visible .product-gallery-overlay {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .product-gallery-overlay h4 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    font-weight: 700;
+  }
+
+  .product-gallery-specs {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .product-gallery-specs li {
+    font-size: 13px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+  }
+
+  .product-gallery-specs li span:first-child {
+    opacity: 0.85;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .product-gallery-specs li span:last-child {
+    font-weight: 700;
+    flex: none;
+    white-space: nowrap;
+  }
+
+  .product-gallery-info {
+    padding: 20px;
+    text-align: center;
+  }
+
+  .product-gallery-info h3 {
+    font-size: 16px;
+    color: #1a1a1a;
+    margin-bottom: 4px;
+    font-weight: 700;
+  }
+
+  .product-gallery-info p {
+    font-size: 13px;
+    color: #666666;
+  }
+
+  @media (max-width: 768px) {
+    .product-gallery-tabs {
+      justify-content: flex-start;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding-bottom: 10px;
+      scrollbar-width: none;
+    }
+
+    .product-gallery-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .product-gallery-tab {
+      flex-shrink: 0;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const root = document.querySelector('.product-gallery-section');
+    if (!root) return;
+
+    const tabs = Array.from(root.querySelectorAll('.product-gallery-tab'));
+    const cards = Array.from(root.querySelectorAll('.product-gallery-card'));
+    if (!tabs.length || !cards.length) return;
+
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const value = tab.getAttribute('data-filter') || 'all';
+        tabs.forEach((tabItem) => {
+          const isActive = tabItem === tab;
+          tabItem.classList.toggle('is-active', isActive);
+          tabItem.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+
+        cards.forEach((card) => {
+          const category = card.getAttribute('data-category') || '';
+          const shouldShow = value === 'all' || category === value;
+          card.classList.toggle('is-hidden', !shouldShow);
+        });
+      });
+    });
+
+    const initial = tabs.find((tab) => tab.classList.contains('is-active')) || tabs[0];
+    if (initial) {
+      const value = initial.getAttribute('data-filter') || 'all';
+      cards.forEach((card) => {
+        const category = card.getAttribute('data-category') || '';
+        const shouldShow = value === 'all' || category === value;
+        card.classList.toggle('is-hidden', !shouldShow);
+      });
+    }
+  });
+</script>

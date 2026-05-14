@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI 时代如何学习与走出舒适区</title>
+    <title>AI 时代如何进入任何陌生领域</title>
     <style>
       :root {
         --bg: #f4f7ff;
@@ -133,6 +133,27 @@
         line-height: 1.85;
       }
 
+      .hero-subtitle {
+        margin: 0 0 18px;
+        max-width: 760px;
+        color: var(--ink);
+        font-size: 18px;
+        line-height: 1.75;
+        font-weight: 600;
+      }
+
+      .author-line {
+        margin: -2px 0 16px;
+        color: var(--muted);
+        font-size: 14px;
+        letter-spacing: 0.04em;
+      }
+
+      .author-line strong {
+        color: var(--ink);
+        font-weight: 700;
+      }
+
       .hero-note {
         margin-top: 22px;
         padding: 16px 18px;
@@ -141,6 +162,42 @@
         background: rgba(59, 130, 246, 0.08);
         font-size: 14px;
         line-height: 1.8;
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 20px;
+      }
+
+      .hero-actions a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 180px;
+        padding: 12px 16px;
+        border-radius: 14px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 700;
+        transition: 160ms ease;
+      }
+
+      .hero-actions a.primary-action {
+        color: #ffffff;
+        background: linear-gradient(135deg, #2563eb, #4f46e5);
+        box-shadow: 0 16px 34px rgba(37, 99, 235, 0.22);
+      }
+
+      .hero-actions a.secondary-action {
+        color: var(--ink);
+        background: rgba(255, 255, 255, 0.82);
+        border: 1px solid rgba(188, 200, 242, 0.88);
+      }
+
+      .hero-actions a:hover {
+        transform: translateY(-1px);
       }
 
       .hero-grid {
@@ -218,7 +275,7 @@
 
       .layout {
         display: grid;
-        grid-template-columns: 290px minmax(0, 1fr);
+        grid-template-columns: 260px minmax(0, 1fr);
         gap: 22px;
       }
 
@@ -257,6 +314,10 @@
 
       .section {
         padding: 28px;
+      }
+
+      .section.lead {
+        padding: 30px;
       }
 
       .section h2 {
@@ -306,6 +367,70 @@
       .pill.purple {
         background: var(--purple-soft);
         color: var(--purple);
+      }
+
+      .lead-grid {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 18px;
+        margin-top: 22px;
+      }
+
+      .lead-stack {
+        display: grid;
+        gap: 16px;
+      }
+
+      .lead-card {
+        border-radius: 20px;
+        border: 1px solid rgba(188, 200, 242, 0.86);
+        background: rgba(255, 255, 255, 0.84);
+        padding: 20px;
+      }
+
+      .lead-card h3 {
+        margin: 0 0 10px;
+        font-size: 20px;
+      }
+
+      .lead-card p,
+      .lead-card li {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.8;
+      }
+
+      .lead-card ul,
+      .lead-card ol {
+        margin: 0;
+        padding-left: 18px;
+      }
+
+      .lead-steps {
+        display: grid;
+        gap: 12px;
+        margin-top: 16px;
+      }
+
+      .lead-step {
+        padding: 14px 16px;
+        border-radius: 16px;
+        border: 1px solid rgba(188, 200, 242, 0.82);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(244, 247, 255, 0.88));
+      }
+
+      .lead-step strong {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 15px;
+      }
+
+      .lead-step span {
+        display: block;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.7;
       }
 
       .grid-2,
@@ -548,27 +673,6 @@
         line-height: 1.8;
       }
 
-      .doc-links {
-        display: grid;
-        gap: 8px;
-        margin-top: 10px;
-      }
-
-      .doc-links a {
-        display: block;
-        padding: 10px 12px;
-        border-radius: 12px;
-        text-decoration: none;
-        color: var(--muted);
-        background: rgba(255, 255, 255, 0.72);
-        border: 1px solid rgba(188, 200, 242, 0.82);
-      }
-
-      .doc-links a:hover {
-        color: var(--primary);
-        background: var(--primary-soft);
-      }
-
       .mindmap-shell {
         margin-top: 22px;
         padding: 22px;
@@ -717,6 +821,7 @@
         .hero-grid,
         .grid-3,
         .grid-4,
+        .lead-grid,
         .flow,
         .mindmap-line {
           grid-template-columns: 1fr;
@@ -771,6 +876,8 @@
         }
 
         .hero-copy,
+        .hero-subtitle,
+        .author-line,
         .section-intro,
         .quote p {
           font-size: 14px;
@@ -792,6 +899,8 @@
         .hero-card,
         .card,
         .side-card,
+        .lead-card,
+        .lead-step,
         .mind-branch,
         .mind-node,
         .prompt,
@@ -806,6 +915,15 @@
           justify-content: center;
           text-align: center;
         }
+
+        .hero-actions {
+          flex-direction: column;
+        }
+
+        .hero-actions a {
+          width: 100%;
+          min-width: 0;
+        }
       }
     </style>
   </head>
@@ -814,19 +932,28 @@
       <section class="hero">
         <div class="panel hero-main">
           <div class="eyebrow">AI x Learning x Action</div>
-          <h1>AI 时代如何学习、如何走出舒适区、如何不被 AI 反过来带着走</h1>
+          <h1>AI 时代如何进入任何陌生领域、快速建立判断力</h1>
+          <p class="author-line">作者：<strong>俊人Javen</strong></p>
+          <p class="hero-subtitle">
+            这不是一篇“把理论讲全”的文章，而是一套面向真实世界的上手方法：当你走进一个完全陌生的领域时，怎样借助 AI 快速建立地图、推进动作、保住判断力。
+          </p>
           <p class="hero-copy">
-            这份文档不是写给“已经很懂的人”，而是写给<strong>正在面对陌生领域、心里有点怕、又真的想把事做成的人</strong>。
-            重点不是背多少概念，而是建立一套<strong>你能长期复用的思维方式</strong>：先看地图，再做 MVP，边做边问，做完复盘，把一次次陌生体验沉淀成自己的 SOP、Skill 和判断力。
+            这份文档不是写给“已经很懂的人”，而是写给<strong>正在进入陌生领域、心里有点怕、又真的想把事做成的人</strong>。
+            不管你面对的是 网站搭建、外贸业务销售、SEO、广告投放还是一个全新的行业，重点都不是先背完所有概念，
+            而是建立一套<strong>你能长期复用的学习操作系统</strong>：先定义结果，再拿全局地图，做最小项目，边做边问，做完复盘，把一次陌生体验沉淀成自己的 SOP、术语表、案例库和判断力。
           </p>
           <div class="hero-note">
-            你这次做 Astro 网站、写大量思考文档、先让 AI 帮你看方向、再列 checklist、一步步推进、遇到问题及时问、做完后再复盘沉淀，
-            这套方法整体上<strong>是对的，而且其实已经比很多人更成熟</strong>。需要优化的，不是“要不要用 AI”，而是“怎样用 AI 才不会慢慢失去自己的判断”。
+            你这次做网站时，先让 AI 帮你看方向，再列 checklist，一步步推进，遇到问题及时问，做完后再复盘沉淀，
+            这套方法整体上<strong>是对的，而且可以迁移到几乎任何陌生领域</strong>。需要升级的，不是“要不要用 AI”，而是“怎样把 AI 用成领域教练、项目副驾和复盘伙伴，而不是把自己的判断权交出去”。
+          </div>
+          <div class="hero-actions">
+            <a class="primary-action" href="#mindmap">先看 3 分钟速读版</a>
+            <a class="secondary-action" href="#sop">直接看 AI 学习 SOP</a>
           </div>
           <div class="hero-grid">
             <div class="hero-card">
               <strong>你已经做对的</strong>
-              <span>先定方向，再行动，不一上来就陷进细节，这是很好的项目思维。</span>
+              <span>先定结果，再行动，不一上来就陷进术语和教程，这是很好的项目型学习思维。</span>
             </div>
             <div class="hero-card">
               <strong>你最需要防的</strong>
@@ -834,7 +961,7 @@
             </div>
             <div class="hero-card">
               <strong>你真正的目标</strong>
-              <span>不是不用 AI，而是把 AI 变成你思考的放大器、练习器、合作者。</span>
+              <span>不是成为每个领域的专家，而是快速具备上手、判断、验证和复用的能力。</span>
             </div>
           </div>
         </div>
@@ -846,7 +973,7 @@
           </div>
           <div class="side-card">
             <span class="label">你现在最像什么</span>
-            <p>不是“等老师讲答案的学生”，而是一个带着真实项目在学习的操盘者。</p>
+            <p>不是“等老师讲答案的学生”，而是一个带着真实项目进入新领域的操盘者。</p>
             <ul>
               <li>有问题</li>
               <li>有目标</li>
@@ -855,54 +982,100 @@
             </ul>
           </div>
           <div class="side-card">
-            <span class="label">这份文档会回答</span>
+            <span class="label">这份文档适合谁</span>
             <ul>
-              <li>你现在的思路哪里是强项</li>
-              <li>哪里可能悄悄滑向依赖</li>
-              <li>遇到陌生领域时怎么起步</li>
-              <li>如何在 AI 时代保住自己的思考力</li>
+              <li>刚进入陌生领域，脑子里一团乱的人</li>
+              <li>会行动，但容易被术语和教程吓住的人</li>
+              <li>已经在用 AI，但担心形成依赖的人</li>
+              <li>想把一次经验沉淀成方法的人</li>
             </ul>
           </div>
           <div class="side-card">
-            <span class="label">相关文档入口</span>
-            <div class="doc-links">
-              <a href="./index.html">返回文档总首页</a>
-              <a href="./服务器部署学习方案与SOP.html">继续读服务器部署学习方案</a>
-              <a href="./EMS上线执行顺序总表.html">查看 EMS 上线执行总表</a>
-            </div>
+            <span class="label">读完你会拿走</span>
+            <ul>
+              <li>一套进入陌生领域的固定框架</li>
+              <li>一套和 AI 协作而不失去判断的方法</li>
+              <li>一份能直接套用的提问模板与 SOP</li>
+              <li>一种把经历转成能力的复盘方式</li>
+            </ul>
           </div>
         </aside>
       </section>
 
+      <section class="panel section lead" id="quickstart">
+        <h2>先看这里</h2>
+        <p class="section-intro">
+          如果你现在没空通读整篇文章，可以先抓住这一页最重要的三层：<strong>一句话主线、3 分钟速读、可直接执行的 SOP。</strong>
+        </p>
+        <div class="pill blue">把长文先读成地图，再决定往哪一块深入</div>
+
+        <div class="lead-grid">
+          <div class="lead-stack">
+            <div class="lead-card">
+              <h3>一句话主线</h3>
+              <p>
+                进入陌生领域时，不要先追求“学完”，而要先定义结果、拿到地图、跑通最小闭环、在卡点补知识、最后把经历沉淀成自己的方法。
+              </p>
+            </div>
+            <div class="lead-card">
+              <h3>这篇文章最值得先读哪三块</h3>
+              <ol>
+                <li>先看<a href="#mindmap">思维导图版总览</a>，建立整篇文章的脑内地图。</li>
+                <li>再看<a href="#unknown-field">陌生领域上手框架</a>，把抽象焦虑变成可执行动作。</li>
+                <li>最后看<a href="#sop">AI 学习 SOP</a>，直接拿去用在你的当前任务上。</li>
+              </ol>
+            </div>
+          </div>
+          <div class="lead-card">
+            <h3>3 分钟阅读路径</h3>
+            <div class="lead-steps">
+              <div class="lead-step">
+                <strong>Step 1 看地图</strong>
+                <span>先用 1 分钟读懂这篇文章的主线，不急着逐段消化。</span>
+              </div>
+              <div class="lead-step">
+                <strong>Step 2 找自己</strong>
+                <span>判断你现在卡在“方向、执行、判断、复盘”哪一层。</span>
+              </div>
+              <div class="lead-step">
+                <strong>Step 3 拿动作</strong>
+                <span>只带走今天能立刻执行的一步，不要一口气背完全部内容。</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <div class="layout">
         <nav class="panel nav">
-          <h2>目录</h2>
-          <a href="./index.html">← 返回文档总首页</a>
+          <h2>快速导航</h2>
+          <a href="#quickstart">先看这里</a>
           <a href="#mindmap">0. 思维导图版总览</a>
           <a href="#judgement">1. 先判断：你的思维方式怎么样</a>
           <a href="#why-it-works">2. 为什么这套方法有效</a>
           <a href="#unknown-field">3. 面对陌生领域的上手框架</a>
-          <a href="#comfort-zone">4. 如何真正走出舒适区</a>
-          <a href="#anti-dependence">5. 如何避免对 AI 上瘾式依赖</a>
-          <a href="#prompts">6. 更好的提问与协作方式</a>
-          <a href="#sop">7. AI 时代学习 SOP</a>
-          <a href="#plan">8. 给你的学习升级路线</a>
+          <a href="#field-examples">4. 不同领域怎么套用</a>
+          <a href="#comfort-zone">5. 如何真正走出舒适区</a>
+          <a href="#anti-dependence">6. 如何避免对 AI 上瘾式依赖</a>
+          <a href="#prompts">7. 更好的提问与协作方式</a>
+          <a href="#sop">8. AI 时代学习 SOP</a>
+          <a href="#plan">9. 给你的学习升级路线</a>
         </nav>
 
         <main class="content">
           <section class="panel section" id="mindmap">
             <h2>0. 思维导图版总览</h2>
             <p class="section-intro">
-              如果把整份文档压缩成一张“脑内地图”，核心其实就一句：<strong>先看地图，再跑 MVP；先给自己版本，再让 AI 校准；做完以后，把经历沉淀成自己的方法。</strong>
+              如果把整份文档压缩成一张“脑内地图”，核心其实就一句：<strong>先定义业务结果，再跑最小闭环；先给自己版本，再让 AI 校准；做完以后，把经历沉淀成自己的方法。</strong>
             </p>
             <div class="pill blue">这块是整份文档的速读版，适合你以后快速回看</div>
 
             <div class="mindmap-shell">
               <div class="mindmap-core">
-                <h3>AI 时代学习陌生领域的主线</h3>
+                <h3>AI 时代进入陌生领域的主线</h3>
                 <p>
-                  不是“我先学懂全部，再开始做”，而是：<strong>我先把结果定义清楚，拿到地图，拆成步骤，跑最小版本，卡点再补知识，最后复盘沉淀。</strong>
-                  AI 在这里最好的角色，不是代替你，而是帮你看地图、补盲点、校准方向、整理经验。
+                  不是“我先学懂全部，再开始做”，而是：<strong>我先把结果定义清楚，拿到地图，拆成步骤，跑最小闭环，卡点再补知识，最后复盘沉淀。</strong>
+                  AI 在这里最好的角色，不是代替你，而是帮你看地图、补盲点、模拟高手、校准方向、整理经验。
                 </p>
               </div>
 
@@ -911,9 +1084,9 @@
                   <span class="branch-tag blue">Branch 1</span>
                   <h4>进入陌生领域</h4>
                   <ul>
-                    <li>先定义结果，不先定义“我要学完”</li>
+                    <li>先定义业务结果，不先定义“我要学完”</li>
                     <li>先看大地图，不急着深挖所有细节</li>
-                    <li>先拆 checklist，降低恐惧感</li>
+                    <li>先拆角色、流程、指标、工具和常见坑</li>
                   </ul>
                 </article>
 
@@ -932,7 +1105,7 @@
                   <h4>推动执行</h4>
                   <ul>
                     <li>一次只推进一个阻塞点</li>
-                    <li>先跑 MVP，不追求首轮完美</li>
+                    <li>先跑最小业务闭环，不追求首轮完美</li>
                     <li>问题在哪出现，就在哪补知识</li>
                   </ul>
                 </article>
@@ -942,8 +1115,8 @@
                   <h4>保住思考力</h4>
                   <ul>
                     <li>不把判断权交给 AI</li>
-                    <li>做完后自己复述一遍</li>
-                    <li>把经历固化成 SOP / Skill / 框架</li>
+                    <li>做完后自己复述“为什么这样做”</li>
+                    <li>把经历固化成 SOP / 术语表 / 案例库</li>
                   </ul>
                 </article>
               </div>
@@ -958,8 +1131,8 @@
                   <span>让 AI 帮你看方向和模块</span>
                 </div>
                 <div class="mind-node">
-                  <strong>跑 MVP</strong>
-                  <span>先做最小版本，先动起来</span>
+                  <strong>跑闭环</strong>
+                  <span>先做最小闭环，先动起来</span>
                 </div>
                 <div class="mind-node">
                   <strong>补知识</strong>
@@ -967,7 +1140,7 @@
                 </div>
                 <div class="mind-node">
                   <strong>做沉淀</strong>
-                  <span>把一次经历变成以后可复用的方法</span>
+                  <span>把一次经历变成可迁移方法</span>
                 </div>
               </div>
             </div>
@@ -977,7 +1150,7 @@
             <h2>1. 先判断：你的思维方式怎么样</h2>
             <p class="section-intro">
               先直接回答你最关心的：<strong>你的思维方式整体上是健康的，而且很适合 AI 时代</strong>。因为你不是把 AI 当“替你做事的黑箱”，而是在做三件很关键的事：
-              自己先想、把自己的思考显性化、再让 AI 帮你扩展和校准。
+              自己先想、把自己的思考显性化、再让 AI 帮你扩展和校准。这种方式不只适合写网站，也适合进入任何需要快速上手的业务领域。
             </p>
             <div class="pill green">总体评价：方向是对的，接下来重点是防止“信息过饱和”和“答案依赖”</div>
 
@@ -986,10 +1159,10 @@
                 <h3>你现在做得很好的地方</h3>
                 <ul>
                   <li><span class="emphasis">先求方向正确</span>：你不是一上来钻细节，而是先确认整件事的大地图。</li>
-                  <li><span class="emphasis">先做 MVP</span>：先把最小版本跑通，再扩展，而不是想一次做完美。</li>
+                  <li><span class="emphasis">先做最小闭环</span>：先把最小版本跑通，再扩展，而不是想一次做完美。</li>
                   <li><span class="emphasis">边做边问</span>：问题在真实场景里出现，学习效率最高。</li>
                   <li><span class="emphasis">做完会复盘</span>：这是把“经历”变成“能力”的关键一步。</li>
-                  <li><span class="emphasis">会记录</span>：你写大量 md 反思和规划，这说明你不只是执行，还在建立自己的知识系统。</li>
+                  <li><span class="emphasis">会记录</span>：你写大量反思和规划，这说明你不只是执行，还在建立自己的知识系统。</li>
                 </ul>
               </div>
               <div class="box-risk">
@@ -997,7 +1170,7 @@
                 <ul>
                   <li><span class="emphasis">过度外包判断</span>：每一步都等 AI 说“下一步干嘛”，久了会削弱自己的路线感。</li>
                   <li><span class="emphasis">记录太多、行动太少</span>：如果文档增长速度超过结果增长速度，会慢慢掉进“看起来很努力”的陷阱。</li>
-                  <li><span class="emphasis">知道很多词，但没形成手感</span>：真正会，不是听懂，而是做过、踩过、改过。</li>
+                  <li><span class="emphasis">知道很多词，但没形成手感</span>：真正会，不是听懂“询盘、关键词、转化率、交付流程”这些词，而是做过、踩过、改过。</li>
                   <li><span class="emphasis">把 AI 的流畅表达当成可靠性</span>：AI 讲得像那么回事，不等于它真的对。</li>
                 </ul>
               </div>
@@ -1008,22 +1181,22 @@
             <h2>2. 为什么这套方法有效</h2>
             <p class="section-intro">
               你现在这套方法，本质上是一种很典型的<strong>项目驱动学习</strong>。它和“先学完再开始”最大的区别，是它把学习和产出绑在一起。
-              不是先等自己全懂，而是先让事情动起来，在行动里逼出问题、在问题里补知识。
+              不是先等自己全懂，而是先让事情动起来，在行动里逼出问题、在问题里补知识。对陌生领域来说，真实任务就是最好的老师，AI 则是陪你拆任务、补背景、模拟高手反馈的副驾。
             </p>
             <div class="pill blue">核心心法：不是“我学会了所以能做”，而是“我做着做着才学会”</div>
 
             <div class="flow">
               <div class="flow-step">
                 <strong>先看地图</strong>
-                <span>先问 AI：这件事整体有哪些模块、方向对不对、有哪些坑。</span>
+                <span>先问 AI：这个领域有哪些模块、角色、流程、指标和常见坑。</span>
               </div>
               <div class="flow-step">
                 <strong>拆 checklist</strong>
                 <span>把抽象问题变成可执行步骤，避免整件事压在脑子里。</span>
               </div>
               <div class="flow-step">
-                <strong>跑 MVP</strong>
-                <span>先把最小结果做出来，不追求一步到位。</span>
+                <strong>跑闭环</strong>
+                <span>先把最小业务闭环做出来，不追求一步到位。</span>
               </div>
               <div class="flow-step">
                 <strong>遇阻就问</strong>
@@ -1031,14 +1204,14 @@
               </div>
               <div class="flow-step">
                 <strong>复盘固化</strong>
-                <span>把经历变成 SOP、Skill、术语表，下次不再从零开始。</span>
+                <span>把经历变成 SOP、术语表和案例库，下次不再从零开始。</span>
               </div>
             </div>
 
             <div class="quote">
               <p>
-                你现在最强的一点，不是“会不会服务器”，而是你已经开始用<strong>地图思维 + 执行思维 + 复盘思维</strong>去碰一个完全陌生的领域。
-                这比单纯搜答案更高级，因为你在搭自己的方法论。
+                你现在最强的一点，不是“会不会某个具体技术或行业术语”，而是你已经开始用<strong>地图思维 + 执行思维 + 复盘思维</strong>去碰一个完全陌生的领域。
+                这比单纯搜答案更高级，因为你在搭自己的方法论。以后换成外贸销售、SEO 或任何新业务，这套动作仍然能用。
               </p>
             </div>
           </section>
@@ -1047,6 +1220,7 @@
             <h2>3. 面对完全陌生的领域，怎么上手最稳</h2>
             <p class="section-intro">
               很多人一遇到陌生领域就有两个极端：要么完全不敢做，要么一头扎进教程海里。更稳的做法不是这两个，而是先给自己一个<strong>进入陌生领域的固定框架</strong>。
+              这个框架的目的不是让你第一天就变专家，而是让你第一天就知道“我该看什么、问什么、做什么、怎么判断进展”。
             </p>
             <div class="pill purple">陌生领域不是靠勇气硬冲，而是靠结构化进入</div>
 
@@ -1054,43 +1228,122 @@
               <div class="timeline-item">
                 <h3>第一步：先定义“结果”，不要先定义“我要学完”</h3>
                 <p>
-                  比如你这次不是说“我要先学会 Linux、Nginx、Cloudflare 再部署”，而是说
-                  <span class="emphasis">“我要把这个 Astro 网站跑起来并挂到主站路径下”</span>。这就对了。因为结果明确，学习才有边界。
+                  不要一上来写“我要学会外贸”“我要学会 SEO”。这种目标太大，会让你不知道从哪开始。
+                  更好的写法是：<span class="emphasis">“我要在 7 天内整理出 30 个潜在海外客户并写出第一版开发信”</span>，
+                  或者<span class="emphasis">“我要为一个产品页做关键词研究，并发布 3 篇能带来搜索流量的文章”</span>。因为结果明确，学习才有边界。
                 </p>
               </div>
               <div class="timeline-item">
                 <h3>第二步：先拿全局地图，不急着啃所有细节</h3>
                 <p>
                   面对陌生领域，第一反应不是深挖，而是先问：这件事分几块？哪些是主线？哪些先不碰也没关系？
-                  你这次先确认“服务器、Node、Nginx、反向代理、Cloudflare、GitHub”这条主线，就是在拿地图。
+                  可以让 AI 先帮你画出五张地图：<span class="emphasis">角色地图、流程地图、术语地图、指标地图、风险地图</span>。
+                  比如外贸销售要先知道客户是谁、询盘从哪来、报价怎么走、成交卡在哪；SEO 要先知道关键词、内容、技术站点、外链和转化之间的关系。
                 </p>
               </div>
               <div class="timeline-item">
                 <h3>第三步：一次只推进一个阻塞点</h3>
                 <p>
                   小白最怕的是脑子里同时装十个问题。你要做的是：<span class="emphasis">当前只解决一个卡点</span>。
-                  例如先把服务器跑起来，再处理 Nginx，再处理主站代理，而不是同时研究全部概念。
+                  做外贸时，不要同时研究海关、付款、物流、开发信、报价和谈判；先解决“我怎么找到第一批潜在客户”。
+                  做 SEO 时，不要同时研究技术 SEO、内容集群、外链、Schema 和 GA4；先解决“我这个产品页到底该打哪些关键词”。
                 </p>
               </div>
               <div class="timeline-item">
                 <h3>第四步：用真实任务学，而不是只看资料</h3>
                 <p>
                   真正能记住的，不是“看过”，而是“亲手做过一次”。陌生领域最好的老师，是一个真实项目。
-                  你这次做网站，就是最好的学习容器。
+                  外贸销售可以用“找 10 个客户并写 3 封不同角度的开发信”作为学习容器；SEO 可以用“选一个产品词，做一页内容并观察搜索表现”作为学习容器；
+                  PCB 网站可以用“上线一个能承接询盘的页面”作为学习容器。
                 </p>
               </div>
               <div class="timeline-item">
                 <h3>第五步：做完以后才补“抽象理解”</h3>
                 <p>
-                  很多概念在没做过前很虚，比如端口、反向代理、PM2。做过一轮后再回头整理，就会突然“懂了”。
-                  所以先不求甚解，本身没有问题，关键是后面要补复盘。
+                  很多概念在没做过前很虚，比如询盘质量、搜索意图、转化漏斗、客户分层、交付节点。做过一轮后再回头整理，就会突然“懂了”。
+                  所以先不求甚解，本身没有问题，关键是后面要补复盘：这次我做了什么？哪里有效？哪里只是看起来专业？下次怎么复用？
+                </p>
+              </div>
+              <div class="timeline-item">
+                <h3>第六步：建立自己的“领域最小知识库”</h3>
+                <p>
+                  每进入一个陌生领域，都建议沉淀四个小文件：<span class="emphasis">术语表、流程图、案例库、SOP</span>。
+                  术语表让你听得懂，流程图让你知道事怎么转，案例库让你有判断样本，SOP 让你下次不从零开始。
                 </p>
               </div>
             </div>
           </section>
 
+          <section class="panel section" id="field-examples">
+            <h2>4. 不同领域怎么套用：外贸销售、SEO、网站项目</h2>
+            <p class="section-intro">
+              真正通用的方法，一定要能落到不同场景里。下面不是让你一次学完这些领域，而是示范同一套框架怎么迁移：
+              <strong>先定结果，拿地图，做最小闭环，卡点补知识，复盘成自己的方法。</strong>
+            </p>
+            <div class="pill green">把“学习一个领域”改成“完成一个最小业务闭环”</div>
+
+            <div class="grid-3">
+              <div class="card">
+                <h3>外贸业务销售</h3>
+                <p>
+                  不要先问“外贸怎么学”，先问“我怎样拿到第一批有效客户线索并发出第一轮开发信”。让 AI 帮你拆：
+                  目标客户画像、找客户渠道、采购角色、开发信结构、报价逻辑、常见拒绝理由、跟进节奏。
+                </p>
+              </div>
+              <div class="card">
+                <h3>SEO</h3>
+                <p>
+                  不要先问“SEO 全套教程”，先问“我这个产品页要服务哪个搜索意图”。让 AI 帮你拆：
+                  关键词分层、搜索意图、内容结构、竞争页面差距、站内链接、转化入口、排名后的询盘路径。
+                </p>
+              </div>
+              <div class="card">
+                <h3>网站项目</h3>
+                <p>
+                  不要先问“我要学完网站搭建和上线”，先问“这个页面能不能清楚承接客户需求并稳定上线”。让 AI 帮你拆：
+                  信息架构、页面模块、技术栈、上线流程、表单转化、速度和可维护性。
+                </p>
+              </div>
+            </div>
+
+            <div class="compare">
+              <div class="box-good">
+                <h3>每个领域都要先看这 5 件事</h3>
+                <ul>
+                  <li><span class="emphasis">对象</span>：谁在这个领域里做决策？客户、平台、搜索引擎、采购、老板分别在意什么？</li>
+                  <li><span class="emphasis">流程</span>：从开始到结果，中间有哪些关键节点？哪一步最容易卡住？</li>
+                  <li><span class="emphasis">指标</span>：什么叫做“有效”？询盘数、转化率、排名、交付速度、利润率分别怎么衡量？</li>
+                  <li><span class="emphasis">样本</span>：找 5 个好案例和 5 个差案例，让 AI 帮你比较差异。</li>
+                  <li><span class="emphasis">风险</span>：新手最容易被骗、误判、做无用功的地方在哪里？</li>
+                </ul>
+              </div>
+              <div class="box-risk">
+                <h3>不要一开始就陷进去的东西</h3>
+                <ul>
+                  <li>不要一开始追求“全套理论”，先追求一个小结果。</li>
+                  <li>不要一开始被术语吓住，术语只是压缩后的经验。</li>
+                  <li>不要一开始买课、买工具、买系统，先确认自己真正缺哪一层。</li>
+                  <li>不要只问 AI “答案是什么”，要让它解释判断依据和边界条件。</li>
+                  <li>不要只收藏资料，要把资料变成一次真实动作。</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="protocol">
+              <h3>通用领域启动模板</h3>
+              <ol>
+                <li>我想进入的领域是：外贸销售 / SEO / 广告投放 / 供应链 / 其他。</li>
+                <li>我这次要完成的最小结果是：例如找到 30 个客户、写 3 篇 SEO 文章、跑通一个询盘页面。</li>
+                <li>请 AI 先给我这个领域的角色地图、流程地图、术语地图、指标地图和风险地图。</li>
+                <li>请 AI 帮我设计一个 3 天或 7 天的最小闭环任务，不要给百科式学习计划。</li>
+                <li>我先自己执行一小步，再把结果、疑问和卡点交给 AI 校准。</li>
+                <li>完成后沉淀：术语表、SOP、好案例、坏案例、下次 checklist。</li>
+              </ol>
+            </div>
+          </section>
+
           <section class="panel section" id="comfort-zone">
-            <h2>4. 如何真正走出舒适区，而不是只在门口打转</h2>
+            <h2>5. 如何真正走出舒适区，而不是只在门口打转</h2>
             <p class="section-intro">
               走出舒适区不是靠一句“我要勇敢”，而是靠降低未知感。你之所以会怕，通常不是因为能力不行，而是因为事情太大、太陌生、没有抓手。
             </p>
@@ -1099,7 +1352,7 @@
             <div class="grid-3">
               <div class="card">
                 <h3>把大事变小</h3>
-                <p>不要想“我要搞懂部署”，而是想“我先把服务器买好”“我先把网站跑起来”“我先把一个子路径代理通”。</p>
+                <p>不要想“我要搞懂外贸 / SEO / 网站上线”，而是想“我先找 10 个客户”“我先做 1 页关键词分析”“我先跑通一个页面”。</p>
               </div>
               <div class="card">
                 <h3>先求可控，不求完美</h3>
@@ -1119,13 +1372,13 @@
                 <li>把主线拆成 checklist，每次只看当前一步。</li>
                 <li>先做，再在卡点处补概念。</li>
                 <li>每完成一个小阶段，就停下来问自己：我现在真正懂了哪一层？</li>
-                <li>最后把这次经历沉淀成 SOP，下次直接复用。</li>
+                <li>最后把这次经历沉淀成 SOP、术语表和案例库，下次直接复用。</li>
               </ol>
             </div>
           </section>
 
           <section class="panel section" id="anti-dependence">
-            <h2>5. 如何避免对 AI 上瘾式依赖</h2>
+            <h2>6. 如何避免对 AI 上瘾式依赖</h2>
             <p class="section-intro">
               你这个担忧非常重要，而且说明你已经有自我警觉了。真正可怕的不是用 AI，而是慢慢形成一种心理：
               <span class="emphasis">“没有 AI，我就不敢开始；没有 AI，我就不相信自己的判断。”</span>
@@ -1168,7 +1421,7 @@
           </section>
 
           <section class="panel section" id="prompts">
-            <h2>6. 更好的提问与协作方式：让 AI 变成伙伴，不是答案机</h2>
+            <h2>7. 更好的提问与协作方式：让 AI 变成伙伴，不是答案机</h2>
             <p class="section-intro">
               你现在已经在用一个很好的方式：<strong>先自己思考，再把自己的思考交给 AI</strong>。这比“直接要答案”好太多。
               下面这些提问模板，能进一步保护你的思考力。
@@ -1184,17 +1437,31 @@
 请你不要直接替我做结论，先判断我的理解哪里对、哪里偏、哪里漏了。</code>
               </div>
               <div class="prompt">
-                <strong>模板 2：让 AI 当项目教练，不是代做者</strong>
-                <code>请先给我这件事的全局地图，再拆一个最小可执行 checklist。
-我只想先推进到 MVP，不要一开始给我过度复杂的最佳实践。</code>
+                <strong>模板 2：让 AI 给领域地图，不要直接灌教程</strong>
+                <code>我想进入的领域是：……
+我的目标不是先学完理论，而是在 …… 天内完成一个最小结果：……
+请先给我这个领域的角色地图、流程地图、术语地图、指标地图和风险地图。
+每张地图只保留新手最该知道的 20%。</code>
               </div>
               <div class="prompt">
-                <strong>模板 3：让 AI 反驳你</strong>
+                <strong>模板 3：让 AI 当项目教练，不是代做者</strong>
+                <code>请把这件事拆成一个最小可执行 checklist。
+我只想先跑通最小闭环，不要一开始给我过度复杂的最佳实践。
+每一步请告诉我：目标、输入、动作、输出、判断是否完成的标准。</code>
+              </div>
+              <div class="prompt">
+                <strong>模板 4：让 AI 反驳你</strong>
                 <code>这是我当前打算采用的方案：……
 请从风险、长期维护、隐性成本三个角度反驳我，看看我有没有想当然。</code>
               </div>
               <div class="prompt">
-                <strong>模板 4：让 AI 帮你复盘，而不是替你总结</strong>
+                <strong>模板 5：让 AI 用案例训练你的判断力</strong>
+                <code>请给我 5 个这个领域里的好案例和 5 个差案例。
+不要只列名字，请比较它们在目标、策略、执行、结果上的差异。
+最后提炼出新手可以马上用的判断标准。</code>
+              </div>
+              <div class="prompt">
+                <strong>模板 6：让 AI 帮你复盘，而不是替你总结</strong>
                 <code>这是我今天做过的步骤：……
 这是我遇到的坑：……
 请帮我把这些经历整理成 SOP / 术语表 / 学习框架，但先基于我的真实过程，不要空泛讲理论。</code>
@@ -1203,7 +1470,7 @@
           </section>
 
           <section class="panel section" id="sop">
-            <h2>7. AI 时代学习 SOP：从陌生，到能做，到能复用</h2>
+            <h2>8. AI 时代学习 SOP：从陌生，到能做，到能复用</h2>
             <p class="section-intro">
               如果你以后遇到任何陌生领域，都可以先按这套 SOP 走。它不是“最快的理论学习法”，但对真实项目非常实用。
             </p>
@@ -1212,19 +1479,19 @@
             <div class="grid-4">
               <div class="card">
                 <h3>Step 1 先定结果</h3>
-                <p>一句话写清楚：我最终想做成什么。不要写“我要学会 X”，而要写“我要完成 Y”。</p>
+                <p>一句话写清楚：我最终想做成什么。不要写“我要学会 X”，而要写“我要完成 Y，并用 Z 判断是否有效”。</p>
               </div>
               <div class="card">
                 <h3>Step 2 先看地图</h3>
-                <p>让 AI 先给你大方向、模块、顺序、坑点，但不急着深挖全部细节。</p>
+                <p>让 AI 先给你角色、流程、术语、指标、风险，但不急着深挖全部细节。</p>
               </div>
               <div class="card">
                 <h3>Step 3 拆 checklist</h3>
-                <p>把抽象目标变成可以一条条打勾的动作，不然脑子会被复杂度淹没。</p>
+                <p>把抽象目标变成可以一条条打勾的动作，每一步都要有输入、动作、输出和完成标准。</p>
               </div>
               <div class="card">
-                <h3>Step 4 跑 MVP</h3>
-                <p>只做最小版本，先让事情动起来。很多概念在项目跑起来前都只是空词。</p>
+                <h3>Step 4 跑最小闭环</h3>
+                <p>只做最小版本，先让事情动起来。很多概念在真实任务跑起来前都只是空词。</p>
               </div>
               <div class="card">
                 <h3>Step 5 卡点补知识</h3>
@@ -1236,7 +1503,7 @@
               </div>
               <div class="card">
                 <h3>Step 7 固化成 SOP</h3>
-                <p>把命令、顺序、术语、踩坑点写成你自己的版本，这样能力才会留下来。</p>
+                <p>把步骤、顺序、术语、判断标准、踩坑点写成你自己的版本，这样能力才会留下来。</p>
               </div>
               <div class="card">
                 <h3>Step 8 再扩展</h3>
@@ -1246,48 +1513,48 @@
           </section>
 
           <section class="panel section" id="plan">
-            <h2>8. 给你的学习升级路线：学到什么程度就够</h2>
+            <h2>9. 给你的学习升级路线：学到什么程度就够</h2>
             <p class="section-intro">
-              你不是要转职当全职运维、全职程序员，所以学习的目标不是“全懂”，而是“够用、敢做、能复用、能交接”。
+              你不需要在每个陌生领域都变成专家。对大多数新领域来说，学习目标不是“全懂”，而是“够用、敢做、能判断、能复用、能交接”。
             </p>
             <div class="pill purple">最适合你的，不是追求百科式学习，而是项目型、任务型、复盘型学习</div>
 
             <div class="grid-2">
               <div class="card">
-                <h3>第一阶段：会更新</h3>
+                <h3>第一阶段：听得懂</h3>
                 <ul>
-                  <li>会登录服务器</li>
-                  <li>会进入正确目录</li>
-                  <li>会 <code>git pull</code></li>
-                  <li>会 <code>build + restart</code></li>
-                  <li>知道基本报错在哪一层</li>
+                  <li>知道这个领域的核心角色是谁</li>
+                  <li>知道最常见的 30 个术语是什么意思</li>
+                  <li>知道一件事从开始到结果的大流程</li>
+                  <li>知道哪些问题是新手最容易误判的</li>
+                  <li>能把别人的专业表达翻译成自己的话</li>
                 </ul>
               </div>
               <div class="card">
-                <h3>第二阶段：会部署</h3>
+                <h3>第二阶段：做得出</h3>
                 <ul>
-                  <li>知道域名、服务器、Nginx、Node 的关系</li>
-                  <li>能从 0 跑起一个 Astro 网站</li>
-                  <li>能看懂最常见的部署命令和配置</li>
-                  <li>能复用 SOP 做第二个站</li>
+                  <li>能完成一个最小闭环任务</li>
+                  <li>能独立拆出 checklist</li>
+                  <li>能识别当前卡点属于流程、知识、资源还是判断问题</li>
+                  <li>能把 AI 的建议变成真实动作，而不是只收藏</li>
                 </ul>
               </div>
               <div class="card">
-                <h3>第三阶段：会简化</h3>
+                <h3>第三阶段：判得准</h3>
                 <ul>
-                  <li>把高频命令做成脚本</li>
-                  <li>把流程文档化</li>
-                  <li>逐步引入自动部署</li>
-                  <li>让别人也能照着你的流程做</li>
+                  <li>知道哪些指标是真有效，哪些只是好看</li>
+                  <li>能比较 3 个方案的成本、收益和风险</li>
+                  <li>能判断 AI 的建议哪里过度理想化</li>
+                  <li>能用案例训练自己的眼光</li>
                 </ul>
               </div>
               <div class="card">
-                <h3>第四阶段：会判断</h3>
+                <h3>第四阶段：可复用</h3>
                 <ul>
-                  <li>知道什么时候该上托管平台</li>
-                  <li>知道什么时候该用服务器</li>
-                  <li>知道什么时候要反向代理</li>
-                  <li>知道什么时候值得继续学深</li>
+                  <li>把流程写成 SOP</li>
+                  <li>把术语整理成自己的小词典</li>
+                  <li>把好坏案例做成判断样本</li>
+                  <li>下次进入相邻领域时，不再从零开始</li>
                 </ul>
               </div>
             </div>
@@ -1295,7 +1562,7 @@
             <div class="quote">
               <p>
                 AI 时代最值得培养的能力，不是“记住所有答案”，而是：
-                <strong>敢开始、会拆解、能验证、肯复盘、会把一次次经验沉淀成自己的方法</strong>。
+                <strong>敢开始、会拆解、能验证、肯复盘、会把一次次陌生经验沉淀成自己的方法</strong>。
                 当你这样用 AI，它就不会把你变懒，反而会把你推得更远。
               </p>
             </div>
@@ -1303,6 +1570,8 @@
             <p class="footer-note">
               给你的最终建议只有一句：<strong>继续保持“先想一下，再问 AI；先做一下，再补概念；做完以后，写成自己的 SOP”</strong>。
               这条路会慢慢把你从“害怕陌生”带到“看到陌生也知道怎么上手”。
+              <br />这篇文章是写给每一个正在进入陌生领域、但不想把判断权交出去的人。
+              <br />作者：<strong>俊人Javen</strong>
             </p>
           </section>
         </main>

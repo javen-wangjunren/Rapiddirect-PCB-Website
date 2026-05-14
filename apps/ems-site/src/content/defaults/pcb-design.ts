@@ -303,61 +303,66 @@ export const pcbDesignDefaults = {
     description: 'Your Single Partner for PCB Prototyping, Manufacturing, Assembly & Full-Scale Production',
     items: [
       {
-        icon_svg: '<svg class="h-6 w-6 text-[#ef533f] mb-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>',
+        icon: 'prototyping',
         title: 'Rapid PCB Prototyping',
         description: 'Fast-turn PCB prototyping with <span class="text-[#0066FF] font-semibold">24–72 hour</span> lead times, supporting multi-layer boards and HDI. Perfect for quick iteration before production.',
         tags: ['Fast Turnaround', 'Low MOQ Support'],
-        image_placeholder: '[ Image: Engineer inspecting prototype ]'
+        image_url:
+          'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=Photorealistic%20close-up%20of%20an%20electronics%20engineer%20inspecting%20a%20printed%20circuit%20board%20prototype%20under%20magnifier%2C%20modern%20clean%20lab%2C%20soft%20daylight%2C%20high%20detail%2C%20realistic%20colors&image_size=landscape_4_3',
       },
       {
-        icon_svg: '<svg class="h-6 w-6 text-[#ef533f] mb-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>',
+        icon: 'fabrication',
         title: 'Precision PCB Fabrication',
         description: 'High-quality manufacturing for advanced technologies including <span class="text-[#0066FF] font-semibold">Rigid-Flex</span> and specialized substrates. Strict IPC-A-600 standard compliance.',
         tags: ['IPC Standards', 'Precision Etching'],
-        image_placeholder: '[ Image: Automated PCB Fabrication Line ]'
+        image_url:
+          'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=Photorealistic%20wide%20shot%20of%20automated%20PCB%20fabrication%20production%20line%20with%20conveyor%20and%20machines%2C%20clean%20factory%2C%20industrial%20lighting%2C%20high%20detail&image_size=landscape_4_3',
       },
       {
-        icon_svg: '<svg class="h-6 w-6 text-[#ef533f] mb-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>',
+        icon: 'assembly',
         title: 'Full SMT & THT Assembly',
         description: 'Turnkey assembly for complex <span class="text-[#0066FF] font-semibold">fine-pitch</span> and mixed technology. Automated Optical Inspection (AOI) ensuring consistent quality.',
         tags: ['AOI Inspection', 'Mixed Technology'],
-        image_placeholder: '[ Image: Full SMT Pick and Place Line ]'
+        image_url:
+          'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=Photorealistic%20SMT%20pick%20and%20place%20machine%20placing%20components%20on%20a%20PCB%2C%20macro%20view%2C%20clean%20manufacturing%20floor%2C%20high%20detail%2C%20sharp%20focus&image_size=landscape_4_3',
       },
       {
-        icon_svg: '<svg class="h-6 w-6 text-[#ef533f] mb-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>',
+        icon: 'sourcing',
         title: 'Component Sourcing',
         description: 'End-to-end procurement with traced sourcing and <span class="text-[#0066FF] font-semibold">BOM validation</span>. Supply chain risk mitigation with genuine components.',
         tags: ['Bom Validation', 'Genuine Traceability'],
-        image_placeholder: '[ Image: Warehouse Component Reels ]'
+        image_url:
+          'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=Photorealistic%20warehouse%20shelves%20with%20labeled%20electronics%20component%20reels%20and%20trays%2C%20organized%20supply%20chain%2C%20clean%20lighting%2C%20high%20detail&image_size=landscape_4_3',
       },
       {
-        icon_svg: '<svg class="h-6 w-6 text-[#ef533f] mb-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',
+        icon: 'production',
         title: 'Flexible Production Runs',
         description: 'Scalable capacity from prototypes up to <span class="text-[#0066FF] font-semibold">100,000+ units</span>. Flexible MOQs with consistent quality across all volumes.',
         tags: ['Scalable Volume', 'Flexible Capacity'],
-        image_placeholder: '[ Image: Final PCBA Batch Quality Control ]'
+        image_url:
+          'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=Photorealistic%20quality%20control%20technician%20examining%20finished%20PCBA%20batch%20with%20inspection%20equipment%2C%20clean%20factory%2C%20high%20detail%2C%20realistic%20colors&image_size=landscape_4_3',
       }
     ],
     trust_base: {
       title: 'Why Choose Our One-Stop Production Service?',
       benefits: [
         {
-          icon_svg: '<svg class="h-[18px] w-[18px] text-[#ef533f]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>',
+          icon: 'workflow',
           title: 'Seamless Workflow',
           description: 'Design handled by the same team until delivery, eliminating miscommunication.'
         },
         {
-          icon_svg: '<svg class="h-[18px] w-[18px] text-[#ef533f]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>',
+          icon: 'timing',
           title: 'Controlled Lead Times',
           description: 'No supplier handovers. We optimize steps to stay on schedule.'
         },
         {
-          icon_svg: '<svg class="h-[18px] w-[18px] text-[#ef533f]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>',
+          icon: 'cost',
           title: 'Cost Efficiency',
           description: 'Unified production reduces overhead and eliminates hidden third-party fees.'
         },
         {
-          icon_svg: '<svg class="h-[18px] w-[18px] text-[#ef533f]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>',
+          icon: 'quality',
           title: 'Quality Consistency',
           description: 'Unified standards across all stages with full material traceability.'
         }

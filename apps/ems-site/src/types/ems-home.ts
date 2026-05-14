@@ -34,6 +34,7 @@ export type ServiceDescription =
 
 export interface ServiceItem {
   name: string;
+  image_url?: string;
   description: ServiceDescription;
   cta: ServiceCta;
 }

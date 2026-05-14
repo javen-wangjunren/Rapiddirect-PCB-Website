@@ -23,6 +23,7 @@ export const emsHomeSchema = {
       type: 'array',
       items: {
         name: 'string',
+        image_url: 'string',
         description: {
           kind: 'string',
           text: 'string',

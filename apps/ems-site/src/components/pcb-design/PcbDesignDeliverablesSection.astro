@@ -6,7 +6,7 @@ export interface Props {
 }
 
 const { data } = Astro.props;
-const groups = Array.isArray(data?.groups) ? data.groups : [];
+const groups = (Array.isArray(data?.groups) ? data.groups : []) as Props['data']['groups'];
 ---
 
 <section class="bg-[#F5F5F5] py-[100px] text-[#1a1a1a]">
@@ -23,40 +23,43 @@ const groups = Array.isArray(data?.groups) ? data.groups : [];
     </div>
 
     {/* Deliverables Groups */}
-    {groups.map(group => (
-      <div class="mb-10 overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white shadow-[0_5px_20px_rgba(0,0,0,0.02)]">
-        {/* Group Header */}
-        <div class="flex items-center gap-3 border-b border-[#e5e7eb] bg-[#f8fafc] px-[30px] py-5">
-          <div class="h-6 w-6 text-[#ef533f]" set:html={group.icon_svg}></div>
-          <h3 class="text-[18px] font-bold text-[#1a1a1a]">{group.title}</h3>
-        </div>
-        
-        {/* Group Items */}
-        <div class="flex flex-col">
-          {(group.items || []).map((item, index) => (
-            <div class={`group flex flex-col items-start gap-4 p-6 transition-colors duration-300 hover:bg-[#fdfdfd] md:flex-row md:items-center md:px-[30px] ${index !== group.items.length - 1 ? 'border-b border-[#e5e7eb]' : ''}`}>
-              
-              {/* Left Side: Icon + Title + Tag */}
-              <div class="flex w-full flex-none items-start gap-4 md:w-[40%]">
-                <div set:html={item.icon_svg}></div>
-                <div class="flex flex-col items-start">
-                  <h4 class="mb-1.5 text-[16px] font-bold text-[#1a1a1a]">{item.title}</h4>
-                  <span class="rounded bg-[#f1f5f9] px-2 py-[3px] text-[12px] text-[#64748b]">
-                    {item.format_tag}
-                  </span>
+    {groups.map(group => {
+      const items = group.items ?? [];
+      return (
+        <div class="mb-10 overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white shadow-[0_5px_20px_rgba(0,0,0,0.02)]">
+          {/* Group Header */}
+          <div class="flex items-center gap-3 border-b border-[#e5e7eb] bg-[#f8fafc] px-[30px] py-5">
+            <div class="h-6 w-6 text-[#ef533f]" set:html={group.icon_svg}></div>
+            <h3 class="text-[18px] font-bold text-[#1a1a1a]">{group.title}</h3>
+          </div>
+          
+          {/* Group Items */}
+          <div class="flex flex-col">
+            {items.map((item, index) => (
+              <div class={`group flex flex-col items-start gap-4 p-6 transition-colors duration-300 hover:bg-[#fdfdfd] md:flex-row md:items-center md:px-[30px] ${index !== items.length - 1 ? 'border-b border-[#e5e7eb]' : ''}`}>
+                
+                {/* Left Side: Icon + Title + Tag */}
+                <div class="flex w-full flex-none items-start gap-4 md:w-[40%]">
+                  <div set:html={item.icon_svg}></div>
+                  <div class="flex flex-col items-start">
+                    <h4 class="mb-1.5 text-[16px] font-bold text-[#1a1a1a]">{item.title}</h4>
+                    <span class="rounded bg-[#f1f5f9] px-2 py-[3px] text-[12px] text-[#64748b]">
+                      {item.format_tag}
+                    </span>
+                  </div>
                 </div>
-              </div>
 
-              {/* Right Side: Description */}
-              <div class="w-full border-t border-dashed border-[#e5e7eb] pt-4 md:flex-1 md:border-l md:border-t-0 md:pl-[30px] md:pt-0">
-                <p class="text-[15px] leading-[1.6] text-[#555555]" set:html={item.description}></p>
-              </div>
+                {/* Right Side: Description */}
+                <div class="w-full border-t border-dashed border-[#e5e7eb] pt-4 md:flex-1 md:border-l md:border-t-0 md:pl-[30px] md:pt-0">
+                  <p class="text-[15px] leading-[1.6] text-[#555555]" set:html={item.description}></p>
+                </div>
 
-            </div>
-          ))}
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
-    ))}
+      );
+    })}
 
   </div>
 </section>

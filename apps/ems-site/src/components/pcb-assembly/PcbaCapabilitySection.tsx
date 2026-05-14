@@ -116,7 +116,7 @@ export function PcbaCapabilitySection(props: Props) {
                 >
                   <div className="flex h-[180px] w-full items-center justify-center bg-[#f0f2f5]">
                     {src && isImageUrl(src) ? (
-                      <img src={src} alt="" className="h-full w-full object-cover" />
+                      <img src={src} alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" />
                     ) : (
                       <div className="px-6 text-center text-sm font-medium text-[#94a3b8]">[ Image ]</div>
                     )}

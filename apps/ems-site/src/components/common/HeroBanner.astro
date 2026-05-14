@@ -19,20 +19,23 @@ const backgroundImageUrl = data.background_image_url
 ---
 
 <section class="relative overflow-hidden">
-  <div
-    class="absolute inset-0 bg-slate-100"
-    style={
-      backgroundImageUrl
-        ? { backgroundImage: `url(${backgroundImageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }
-        : undefined
-    }
-  />
+  <div class="absolute inset-0 bg-slate-100" />
+  {backgroundImageUrl && (
+    <img
+      src={backgroundImageUrl}
+      alt=""
+      class="absolute inset-0 h-full w-full object-cover"
+      loading="eager"
+      decoding="async"
+      fetchpriority="high"
+    />
+  )}
   {!data.background_image_url && (
     <div class="absolute inset-0 bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200" />
   )}
 
   <div class="relative mx-auto max-w-7xl px-6 py-16 sm:py-20">
-    <div class="max-w-xl rounded-3xl border border-white/50 bg-white/30 p-8 shadow-[0_20px_60px_-30px_rgba(0,0,0,0.45)] sm:p-10">
+    <div class="max-w-xl rounded-3xl border border-white/50 bg-white/95 p-8 shadow-[0_20px_60px_-30px_rgba(0,0,0,0.45)] sm:p-10">
       <h1 class="text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
         {data.title}
       </h1>

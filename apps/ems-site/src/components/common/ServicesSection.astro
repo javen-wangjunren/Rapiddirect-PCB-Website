@@ -1,6 +1,6 @@
 ---
 import type { EmsHomeServicesContent } from '../../types/ems-home';
-import { getHref } from '../../lib/assets';
+import { getAssetPath, getHref } from '../../lib/assets';
 
 export interface Props {
   data: EmsHomeServicesContent;
@@ -24,7 +24,11 @@ const items = Array.isArray((data as any)?.items) ? ((data as any).items as any[
     <div class="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
       {items.map((item) => (
         <article class="flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-[0_18px_50px_-30px_rgba(0,0,0,0.7)] ring-1 ring-black/5">
-          <div class="h-36 bg-gradient-to-br from-slate-200 to-slate-100" />
+          {item.image_url ? (
+            <img src={getAssetPath(item.image_url)} alt="" class="h-36 w-full object-cover" loading="lazy" decoding="async" />
+          ) : (
+            <div class="h-36 bg-gradient-to-br from-slate-200 to-slate-100" />
+          )}
           <div class="flex flex-1 flex-col p-6">
             <h3 class="text-base font-semibold leading-6 text-slate-900">{item.name}</h3>
             {item?.description?.kind === 'paragraph' ? (

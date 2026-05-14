@@ -87,9 +87,15 @@ const sendResendEmail = async (apiKey: string, payload: unknown) => {
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    const origin = request.headers.get('origin');
-    const allowedOrigin = env.ALLOWED_ORIGIN ?? '';
-    const corsOrigin = origin && origin === allowedOrigin ? origin : null;
+const origin = request.headers.get('origin');
+const allowedOrigins = new Set(
+  String(env.ALLOWED_ORIGIN ?? '')
+    .split(',')
+    .map((v) => v.trim())
+    .filter(Boolean)
+);
+const corsOrigin = origin && allowedOrigins.has(origin) ? origin : null;
+
 
     if (request.method === 'OPTIONS') {
       return withCors(new Response(null, { status: 204 }), corsOrigin);

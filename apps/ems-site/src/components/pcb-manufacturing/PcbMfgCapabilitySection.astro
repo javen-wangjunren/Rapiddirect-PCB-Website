@@ -1,0 +1,331 @@
+---
+import { getAssetPath, getHref } from '../../lib/assets';
+
+export interface PcbMfgCapabilityItem {
+  title: string;
+  heading?: string;
+  description: string;
+  image_url?: string;
+  cta?: { label: string; href: string };
+}
+
+export interface Props {
+  data: {
+    title: string;
+    description: string;
+    items: PcbMfgCapabilityItem[];
+  };
+}
+
+const { data } = Astro.props;
+---
+
+<section class="pcb-mfg-capability-section bg-white">
+  <div class="mx-auto max-w-7xl px-6 py-24 sm:py-28">
+    <div class="text-center">
+      <h2 class="pcb-mfg-capability-heading text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
+        {data.title}
+      </h2>
+      <p class="mx-auto mt-4 max-w-3xl text-base leading-7 text-slate-600 sm:text-lg">
+        {data.description}
+      </p>
+    </div>
+
+    <div class="pcb-mfg-capability-showcase mt-14 lg:mt-16">
+      <div class="pcb-mfg-capability-list">
+        {data.items.map((item, index) => (
+          <div class:list={['pcb-mfg-capability-item', index === 0 && 'is-active']}>
+            <button type="button" class="pcb-mfg-capability-title">
+              {item.title}
+            </button>
+
+            <div class="pcb-mfg-capability-content">
+              <div class="pcb-mfg-capability-image">
+                {item.image_url ? (
+                  <img src={getAssetPath(item.image_url)} alt="" class="pcb-mfg-capability-image-el" loading="lazy" />
+                ) : (
+                  <div class="pcb-mfg-capability-image-fallback" aria-hidden="true" />
+                )}
+              </div>
+
+              <div class="pcb-mfg-capability-text">
+                <h3 class="pcb-mfg-capability-card-title text-2xl font-semibold leading-8 text-slate-900">
+                  {item.heading ?? item.title}
+                </h3>
+                <p class="mt-3 text-base leading-7 text-slate-600">
+                  {item.description}
+                </p>
+                {item.cta && (
+                  <a href={getHref(item.cta.href)} class="pcb-mfg-capability-link mt-5 inline-flex items-center gap-1.5 text-sm font-semibold">
+                    {item.cta.label}
+                    <span aria-hidden="true">→</span>
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .pcb-mfg-capability-showcase {
+    position: relative;
+  }
+
+  @media (min-width: 1024px) {
+    .pcb-mfg-capability-showcase {
+      display: flex;
+      min-height: 600px;
+    }
+  }
+
+  .pcb-mfg-capability-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  @media (min-width: 1024px) {
+    .pcb-mfg-capability-list {
+      width: 32%;
+      justify-content: center;
+      z-index: 2;
+    }
+  }
+
+  .pcb-mfg-capability-title {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    padding: 16px 0;
+    cursor: pointer;
+    transition: color 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    text-align: left;
+    font-weight: 600;
+    color: #c0c0c0;
+    font-size: 22px;
+    line-height: 1.15;
+  }
+
+  @media (min-width: 1024px) {
+    .pcb-mfg-capability-title {
+      display: inline-block;
+      width: auto;
+      font-size: 32px;
+      padding: 16px 0;
+    }
+  }
+
+  .pcb-mfg-capability-item {
+    border-bottom: 1px solid #eeeeee;
+  }
+
+  .pcb-mfg-capability-item:last-child {
+    border-bottom: none;
+  }
+
+  @media (min-width: 1024px) {
+    .pcb-mfg-capability-item {
+      border-bottom: none;
+    }
+  }
+
+  .pcb-mfg-capability-title:hover {
+    color: #777777;
+  }
+
+  .pcb-mfg-capability-item.is-active .pcb-mfg-capability-title {
+    color: #111111;
+  }
+
+  @media (min-width: 1024px) {
+    .pcb-mfg-capability-item.is-active .pcb-mfg-capability-title {
+      transform: translateX(20px);
+    }
+
+    .pcb-mfg-capability-item.is-active .pcb-mfg-capability-title::before {
+      content: '';
+      position: absolute;
+      left: -20px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 12px;
+      height: 3px;
+      background-color: #ef533f;
+      border-radius: 2px;
+    }
+  }
+
+  @media (max-width: 1023px) {
+    .pcb-mfg-capability-title {
+      color: #111111;
+      padding: 24px 0;
+    }
+
+    .pcb-mfg-capability-title:hover {
+      color: #ef533f;
+    }
+
+    .pcb-mfg-capability-title::after {
+      content: '+';
+      font-size: 28px;
+      font-weight: 400;
+      color: #c0c0c0;
+      transition: transform 0.3s ease;
+    }
+
+    .pcb-mfg-capability-item.is-active .pcb-mfg-capability-title {
+      color: #ef533f;
+    }
+
+    .pcb-mfg-capability-item.is-active .pcb-mfg-capability-title::after {
+      content: '−';
+      color: #ef533f;
+    }
+  }
+
+  .pcb-mfg-capability-content {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.45s ease, transform 0.45s ease;
+  }
+
+  .pcb-mfg-capability-item.is-active .pcb-mfg-capability-content {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  @media (min-width: 1024px) {
+    .pcb-mfg-capability-content {
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 62%;
+    }
+  }
+
+  @media (max-width: 1023px) {
+    .pcb-mfg-capability-content {
+      position: static;
+      width: 100%;
+      transform: none;
+      max-height: 0;
+      overflow: hidden;
+      visibility: visible;
+      pointer-events: auto;
+      transition: max-height 0.4s ease, opacity 0.4s ease;
+    }
+
+    .pcb-mfg-capability-item.is-active .pcb-mfg-capability-content {
+      max-height: 900px;
+      padding-bottom: 30px;
+    }
+  }
+
+  .pcb-mfg-capability-image {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    border-radius: 16px;
+    overflow: hidden;
+    background-color: #f5f5f5;
+    filter: drop-shadow(0px 20px 50px rgba(0, 0, 0, 0.06));
+    position: relative;
+  }
+
+  .pcb-mfg-capability-image-fallback {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 20% 30%, rgba(239, 83, 63, 0.12), transparent 40%),
+      radial-gradient(circle at 80% 40%, rgba(15, 23, 43, 0.08), transparent 45%),
+      linear-gradient(135deg, rgba(148, 163, 184, 0.18), rgba(148, 163, 184, 0.06));
+  }
+
+  .pcb-mfg-capability-image-el {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.05);
+    transition: transform 0.9s cubic-bezier(0.25, 0.8, 0.25, 1);
+    display: block;
+  }
+
+  .pcb-mfg-capability-item.is-active .pcb-mfg-capability-image-el {
+    transform: scale(1);
+  }
+
+  .pcb-mfg-capability-text {
+    margin-top: 30px;
+    padding-right: 40px;
+  }
+
+  @media (max-width: 1023px) {
+    .pcb-mfg-capability-text {
+      margin-top: 20px;
+      padding-right: 0;
+    }
+
+    .pcb-mfg-capability-card-title {
+      display: none;
+    }
+  }
+
+  .pcb-mfg-capability-link {
+    color: #ef533f;
+    transition: color 0.25s ease;
+    text-decoration: none;
+  }
+
+  .pcb-mfg-capability-link:hover {
+    color: #d64734;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const root = document.querySelector<HTMLElement>('.pcb-mfg-capability-section');
+    if (!root) return;
+
+    const items = Array.from(root.querySelectorAll<HTMLElement>('.pcb-mfg-capability-item'));
+    if (!items.length) return;
+
+    const isDesktop = () => window.matchMedia('(min-width: 1024px)').matches;
+
+    const setActive = (next: HTMLElement) => {
+      items.forEach((item) => item.classList.remove('is-active'));
+      next.classList.add('is-active');
+    };
+
+    items.forEach((item) => {
+      item.addEventListener('mouseenter', () => {
+        if (isDesktop()) setActive(item);
+      });
+
+      const title = item.querySelector<HTMLButtonElement>('.pcb-mfg-capability-title');
+      if (!title) return;
+
+      title.addEventListener('click', () => {
+        if (isDesktop()) return;
+        const wasActive = item.classList.contains('is-active');
+        items.forEach((x) => x.classList.remove('is-active'));
+        if (!wasActive) item.classList.add('is-active');
+      });
+    });
+
+    window.addEventListener('resize', () => {
+      if (!isDesktop()) return;
+      const active = root.querySelector<HTMLElement>('.pcb-mfg-capability-item.is-active') ?? items[0];
+      if (active) setActive(active);
+    });
+  });
+</script>

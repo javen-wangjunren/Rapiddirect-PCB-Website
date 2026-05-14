@@ -33,6 +33,8 @@ const { data } = Astro.props;
               src={getAssetPath(item.image_url)}
               alt=""
               class="h-full w-full object-cover"
+              loading="lazy"
+              decoding="async"
             />
           </div>
           <div class="p-6">

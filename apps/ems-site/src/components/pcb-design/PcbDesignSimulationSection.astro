@@ -7,7 +7,7 @@ export interface Props {
 }
 
 const { data } = Astro.props;
-const tabs = Array.isArray(data?.tabs) ? data.tabs : [];
+const tabs = (Array.isArray(data?.tabs) ? data.tabs : []) as Props['data']['tabs'];
 ---
 
 <section class="overflow-hidden bg-[#F5F5F5] py-[100px] text-[#1a1a1a]">
@@ -82,7 +82,7 @@ const tabs = Array.isArray(data?.tabs) ? data.tabs : [];
               <p class="mb-6 text-[15px] leading-[1.6] text-[#555555]" set:html={tab.panel.description}></p>
               
               <div class="flex flex-wrap gap-3">
-                {(tab.panel.benefits || []).map((benefit) => (
+                {(tab.panel.benefits ?? []).map(benefit => (
                   <div class="flex items-center gap-2 rounded-[50px] bg-[#f1f5f9] px-4 py-2 text-[13px] font-semibold text-[#475569]">
                     <span class="text-base text-[#10b981]">✓</span> {benefit}
                   </div>

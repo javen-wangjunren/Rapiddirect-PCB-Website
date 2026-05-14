@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EMS 环境变量与询盘表单排障总结 - 2026-05-13</title>
+    <style>
+      :root {
+        --bg: #f6f3ee;
+        --panel: #fffdf8;
+        --text: #1f2937;
+        --muted: #5b6472;
+        --line: #e7dfd3;
+        --accent: #e85b3b;
+        --accent-soft: #fff0ea;
+        --good: #0f8a5f;
+        --good-soft: #e9f8f1;
+        --warn: #9a6700;
+        --warn-soft: #fff6dd;
+        --shadow: 0 18px 45px rgba(30, 41, 59, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+        background: linear-gradient(180deg, #f8f5ef 0%, #f1ede6 100%);
+        color: var(--text);
+        line-height: 1.7;
+      }
+
+      .wrap {
+        width: min(1100px, calc(100% - 40px));
+        margin: 0 auto;
+        padding: 40px 0 80px;
+      }
+
+      .hero,
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        box-shadow: var(--shadow);
+      }
+
+      .hero {
+        padding: 36px;
+        margin-bottom: 24px;
+      }
+
+      .card {
+        padding: 28px;
+        margin-bottom: 20px;
+      }
+
+      h1,
+      h2,
+      h3 {
+        margin: 0 0 14px;
+        line-height: 1.25;
+      }
+
+      h1 {
+        font-size: 38px;
+      }
+
+      h2 {
+        font-size: 26px;
+      }
+
+      h3 {
+        font-size: 18px;
+      }
+
+      p {
+        margin: 0 0 14px;
+      }
+
+      ul,
+      ol {
+        margin: 10px 0 0 22px;
+        padding: 0;
+      }
+
+      li + li {
+        margin-top: 8px;
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 12px;
+        border-radius: 999px;
+        font-size: 14px;
+        background: var(--accent-soft);
+        color: var(--accent);
+        border: 1px solid #ffd3c5;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .note,
+      .good,
+      .warn {
+        border-radius: 18px;
+        padding: 16px 18px;
+        margin-top: 16px;
+      }
+
+      .good {
+        background: var(--good-soft);
+        border: 1px solid #c9ebda;
+      }
+
+      .warn {
+        background: var(--warn-soft);
+        border: 1px solid #f0df9a;
+      }
+
+      .note {
+        background: #f5f7fb;
+        border: 1px solid #dbe2f0;
+      }
+
+      .step {
+        border-top: 1px dashed var(--line);
+        padding-top: 16px;
+        margin-top: 16px;
+      }
+
+      .mono {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 0.95em;
+        background: rgba(15, 23, 42, 0.05);
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        padding: 2px 6px;
+        border-radius: 7px;
+        word-break: break-word;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 14px;
+      }
+
+      th,
+      td {
+        text-align: left;
+        vertical-align: top;
+        padding: 12px 10px;
+        border-top: 1px solid var(--line);
+      }
+
+      th {
+        color: var(--muted);
+        font-weight: 600;
+        background: #fcfaf6;
+      }
+
+      .footer {
+        text-align: center;
+        color: var(--muted);
+        margin-top: 28px;
+        font-size: 14px;
+      }
+
+      @media (max-width: 860px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        .hero,
+        .card {
+          padding: 22px;
+          border-radius: 20px;
+        }
+
+        h1 {
+          font-size: 30px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <section class="hero">
+        <h1>EMS 环境变量与询盘表单排障总结</h1>
+        <p class="muted">
+          日期：2026-05-13。这个文档是今天上线排障的完整记录，目标是以后你自己回看时，
+          能快速想起来：当时到底哪里错了、改了什么、以后正式上线主域时要怎么切。
+        </p>
+        <div class="chips">
+          <span class="chip">Supabase 环境变量</span>
+          <span class="chip">Cloudflare Worker</span>
+          <span class="chip">Turnstile</span>
+          <span class="chip">Resend</span>
+          <span class="chip">询盘表单 404</span>
+          <span class="chip">CORS</span>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>一眼看懂：今天到底解决了什么</h2>
+        <div class="grid">
+          <div>
+            <h3>问题 1：网站上线后没有连上 Supabase</h3>
+            <p>根因是服务器里没有正确让前端读到环境变量，导致前端拿不到 Supabase 地址和 anon key。</p>
+          </div>
+          <div>
+            <h3>问题 2：询盘表单一直 404，无法提交</h3>
+            <p>根因不是组件坏了，而是请求没有命中 Cloudflare Worker，或者后面又卡在 CORS / Turnstile。</p>
+          </div>
+        </div>
+        <div class="good">
+          <strong>最终结果：</strong>
+          现在 <span class="mono">pcb.rapiddirect.com/ems/</span> 已经可以正常提交询盘，
+          Turnstile 正常、Worker 正常、Resend 正常，邮箱也能收到邮件。
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>项目里这几块分别是谁负责的</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>模块</th>
+              <th>作用</th>
+              <th>今天排查时最关键的点</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>前端站点 <span class="mono">apps/ems-site</span></td>
+              <td>页面展示、表单 UI、Turnstile 组件、提交请求</td>
+              <td>要确认 <span class="mono">PUBLIC_*</span> 环境变量是否真的进了 build</td>
+            </tr>
+            <tr>
+              <td>Cloudflare Worker <span class="mono">workers/contact-worker</span></td>
+              <td>接收表单、校验 Turnstile、调用 Resend 发信</td>
+              <td>要确认 route、生效配置、CORS、ALLOWED_ORIGIN</td>
+            </tr>
+            <tr>
+              <td>Supabase</td>
+              <td>页面数据、后台、媒体库</td>
+              <td>前端必须读到 <span class="mono">PUBLIC_SUPABASE_URL</span> 和 <span class="mono">PUBLIC_SUPABASE_ANON_KEY</span></td>
+            </tr>
+            <tr>
+              <td>Turnstile</td>
+              <td>防机器人的验证码</td>
+              <td>hostname 必须包含当前访问页面的域名</td>
+            </tr>
+            <tr>
+              <td>Resend</td>
+              <td>发询盘邮件</td>
+              <td>域名验证、DKIM、SPF、Worker secret 都要对</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="card">
+        <h2>问题 1：网站上线后没有连上 Supabase</h2>
+        <p><strong>现象：</strong> 网站虽然能打开，但后台或数据读取不正常，说明前端没有真正连到生产 Supabase。</p>
+        <div class="step">
+          <h3>为什么会这样</h3>
+          <p>
+            代码仓库里的前端会读取环境变量，但服务器本机如果没有正确的
+            <span class="mono">.env</span>，或者改完后没有重新构建，前端 build 里就不会带上这些值。
+          </p>
+        </div>
+        <div class="step">
+          <h3>最终确认的前端环境变量</h3>
+          <ul>
+            <li><span class="mono">PUBLIC_SUPABASE_URL</span></li>
+            <li><span class="mono">PUBLIC_SUPABASE_ANON_KEY</span></li>
+            <li><span class="mono">PUBLIC_CONTACT_ENDPOINT</span></li>
+            <li><span class="mono">PUBLIC_TURNSTILE_SITE_KEY</span></li>
+            <li><span class="mono">PUBLIC_MEDIA_FOLDER_ID_ENABLED=false</span></li>
+          </ul>
+        </div>
+        <div class="step">
+          <h3>做了什么</h3>
+          <ol>
+            <li>确认服务器上的 <span class="mono">apps/ems-site/.env</span> 真实存在。</li>
+            <li>把正确的 Supabase、Turnstile、Contact endpoint 配进去。</li>
+            <li>重新执行 build。</li>
+            <li>重启网站进程。</li>
+          </ol>
+        </div>
+        <div class="good">
+          <strong>结论：</strong> 前端环境变量已经生效，网站现在能连到 Supabase。
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>问题 2：询盘表单一直 404</h2>
+        <p><strong>最开始的现象：</strong> 点击提交后返回的是一整页 Astro 404 HTML，而不是表单接口响应。</p>
+        <div class="note">
+          这个点很重要：当时不是表单组件本身坏了，而是请求没有走到正确的接口。
+        </div>
+
+        <div class="step">
+          <h3>第一层排查：是不是前端请求地址不对</h3>
+          <p>代码里表单提交依赖 <span class="mono">PUBLIC_CONTACT_ENDPOINT</span>。</p>
+          <p>开始时它是 <span class="mono">/api/contact</span>，这在最终主域同源场景下是对的，但在当前临时子站测试场景下会引出更多问题。</p>
+        </div>
+
+        <div class="step">
+          <h3>第二层排查：是不是没有命中 Worker</h3>
+          <p>后来确认当时访问的页面是：</p>
+          <p><span class="mono">http://pcb.rapiddirect.com/ems/</span></p>
+          <p>而 Worker 一开始只绑了：</p>
+          <p><span class="mono">rapiddirect.com/api/contact*</span></p>
+          <p>所以子域名测试时，请求根本没有走到那个 route。</p>
+        </div>
+
+        <div class="step">
+          <h3>第三层排查：Cloudflare route 为什么还是不工作</h3>
+          <p>后来又发现 <span class="mono">pcb</span> 这条 DNS 记录没有持续走 <span class="mono">Proxied</span>，而是为了避开 521 临时用了直连源站。</p>
+          <p>只要不是 <span class="mono">Proxied</span>，Cloudflare Worker route 就不会生效。</p>
+        </div>
+
+        <div class="step">
+          <h3>最终为了先测试跑通，采用了过渡方案</h3>
+          <p>前端不再临时提交到 <span class="mono">/api/contact</span>，而是直接提交到：</p>
+          <p><span class="mono">https://pcp-contact.leon-a02.workers.dev</span></p>
+          <p>这样就先绕开了当前子站未完全稳定的反向代理链路。</p>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>我们到底改了哪些内容</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>位置</th>
+              <th>修改内容</th>
+              <th>作用</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>服务器前端 <span class="mono">apps/ems-site/.env</span></td>
+              <td>补上 Supabase、Turnstile、Contact endpoint 等变量</td>
+              <td>让网站 build 时真正吃到生产配置</td>
+            </tr>
+            <tr>
+              <td>前端 <span class="mono">PUBLIC_CONTACT_ENDPOINT</span></td>
+              <td>临时改成 <span class="mono">https://pcp-contact.leon-a02.workers.dev</span></td>
+              <td>先绕开当前子站未完全稳定的同源 route</td>
+            </tr>
+            <tr>
+              <td>Cloudflare Worker route</td>
+              <td>新增 <span class="mono">pcb.rapiddirect.com/api/contact*</span>，保留 <span class="mono">rapiddirect.com/api/contact*</span></td>
+              <td>保证主域和子域将来都能接 Worker</td>
+            </tr>
+            <tr>
+              <td>Worker 变量 <span class="mono">ALLOWED_ORIGIN</span></td>
+              <td>从单值改成支持多个 origin</td>
+              <td>让主域和子域都能通过 CORS</td>
+            </tr>
+            <tr>
+              <td><span class="mono">workers/contact-worker/src/index.ts</span></td>
+              <td>改成支持多个 origin 的匹配逻辑</td>
+              <td>避免只允许一个域名，后续切主域时又报错</td>
+            </tr>
+            <tr>
+              <td>Turnstile widget hostnames</td>
+              <td>增加 <span class="mono">pcb.rapiddirect.com</span> 和 <span class="mono">rapiddirect.com</span></td>
+              <td>让测试页和正式页都能生成可验证 token</td>
+            </tr>
+            <tr>
+              <td>Cloudflare Worker 后台</td>
+              <td>同步更新 variables 和 routes</td>
+              <td>让线上真实运行配置跟本地部署配置一致</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="card">
+        <h2>为什么后来又遇到 CORS / Failed to fetch</h2>
+        <p>
+          这是因为前端已经开始直打 <span class="mono">workers.dev</span>，从浏览器角度看，这已经不是同源请求，
+          所以 Worker 必须明确返回 <span class="mono">Access-Control-Allow-Origin</span>。
+        </p>
+        <div class="step">
+          <h3>当时的根因</h3>
+          <p><span class="mono">ALLOWED_ORIGIN</span> 一开始没有和当前页面来源完全匹配。</p>
+        </div>
+        <div class="step">
+          <h3>最后的修正</h3>
+          <p>把 Worker 调整成允许多个 origin，例如：</p>
+          <ul>
+            <li><span class="mono">http://pcb.rapiddirect.com</span></li>
+            <li><span class="mono">https://pcb.rapiddirect.com</span></li>
+            <li><span class="mono">https://rapiddirect.com</span></li>
+          </ul>
+        </div>
+        <div class="good">
+          之后通过 <span class="mono">curl</span> 验证，已经能看到
+          <span class="mono">access-control-allow-origin: http://pcb.rapiddirect.com</span>，
+          说明 CORS 已经打通。
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>为什么 Turnstile 后来又报 invalid-input-response</h2>
+        <p>
+          这一步不代表 Worker 坏了。相反，它说明请求已经到 Worker 了，只是验证码 token 校验失败。
+        </p>
+        <div class="step">
+          <h3>根因</h3>
+          <p>Turnstile widget 的 hostname 必须包含当前访问页面的域名。</p>
+        </div>
+        <div class="step">
+          <h3>最后的处理</h3>
+          <ul>
+            <li>给 widget 增加 <span class="mono">pcb.rapiddirect.com</span></li>
+            <li>保留 <span class="mono">rapiddirect.com</span></li>
+            <li>刷新页面，重新生成 token 后再提交</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>最后邮件已经能收到，但为什么显示“代发”</h2>
+        <p>这个现象目前看是正常的，不代表发信失败。</p>
+        <div class="step">
+          <h3>原因是什么</h3>
+          <p>
+            Resend 默认会用 <span class="mono">send.rapiddirect.com</span> 这类 return-path / bounce 地址。
+            某些收件邮箱会把这种显示成“由某某代发”。
+          </p>
+        </div>
+        <div class="step">
+          <h3>这是不是因为 <span class="mono">quote@rapiddirect.com</span> 没注册</h3>
+          <p>不是主要原因。Resend 验证域名后，本来就允许从该域名下任意地址发送。</p>
+        </div>
+        <div class="step">
+          <h3>现在是否需要继续处理</h3>
+          <p>如果邮件已经正常进收件箱、不是垃圾箱，可以先不处理，后面再做投递体验优化。</p>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>后续正式上线主域时，建议怎么调整</h2>
+        <ol>
+          <li>确认反向代理已经稳定，让正式用户访问的是 <span class="mono">https://rapiddirect.com/ems/</span>。</li>
+          <li>前端把 <span class="mono">PUBLIC_CONTACT_ENDPOINT</span> 从 <span class="mono">workers.dev</span> 改回 <span class="mono">/api/contact</span>。</li>
+          <li>重新 build 并重启前端站点。</li>
+          <li>保留两个 Worker route：
+            <span class="mono">rapiddirect.com/api/contact*</span> 和
+            <span class="mono">pcb.rapiddirect.com/api/contact*</span>。
+          </li>
+          <li>保留多 origin 配置，主域和子域以后都能继续用。</li>
+          <li>正式上线后分别在主域和子域再各做一次真实提单测试。</li>
+        </ol>
+        <div class="warn">
+          <strong>建议：</strong> 最终生产形态更推荐走同源
+          <span class="mono">/api/contact</span>，而不是一直直打
+          <span class="mono">workers.dev</span>。这样会更干净，也少一层 CORS。
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>以后如果再遇到类似问题，优先按这个顺序检查</h2>
+        <ol>
+          <li>页面是否真的吃到了正确的前端环境变量。</li>
+          <li>表单提交地址到底是 <span class="mono">/api/contact</span> 还是 <span class="mono">workers.dev</span>。</li>
+          <li>请求到底有没有命中 Worker，而不是落回 Nginx / Astro。</li>
+          <li>Cloudflare route 是否存在。</li>
+          <li>DNS 是否真的在走 <span class="mono">Proxied</span>。</li>
+          <li><span class="mono">ALLOWED_ORIGIN</span> 是否和当前页面 origin 一致。</li>
+          <li>Turnstile widget hostname 是否包含当前测试域名。</li>
+          <li>Worker secrets 和 Resend / Turnstile key 是否正确。</li>
+        </ol>
+      </section>
+
+      <section class="card">
+        <h2>今天最后的状态</h2>
+        <div class="good">
+          <ul>
+            <li>Supabase 已连通。</li>
+            <li>EMS 页面已能读取生产环境数据。</li>
+            <li>Turnstile 已正常显示并可校验。</li>
+            <li>Cloudflare Worker 已正常接收请求。</li>
+            <li>Resend 已能正常发出询盘邮件。</li>
+            <li><span class="mono">pcb.rapiddirect.com/ems/</span> 已能成功提交询盘。</li>
+          </ul>
+        </div>
+        <p class="muted">
+          这次排障确实很辛苦，但也把整条链路真正跑通了。以后再看这个文档，你就会比今天轻松很多。
+        </p>
+      </section>
+
+      <p class="footer">生成于 2026-05-13 · EMS 排障记录</p>
+    </div>
+  </body>
+</html>

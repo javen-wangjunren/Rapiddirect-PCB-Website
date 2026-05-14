@@ -1,0 +1,1410 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>反向代理与 Worker 小白解释</title>
+    <style>
+      :root {
+        --bg: #f6f3ee;
+        --panel: rgba(255, 253, 249, 0.94);
+        --ink: #1f2937;
+        --muted: #667085;
+        --line: #e8dfd4;
+        --line-strong: #dccfbe;
+        --accent: #d95b36;
+        --accent-soft: #fff0e9;
+        --blue: #2563eb;
+        --blue-soft: #eef4ff;
+        --green: #0f8a5f;
+        --green-soft: #eaf8f1;
+        --gold: #b06a00;
+        --gold-soft: #fff6e7;
+        --shadow: 0 20px 46px rgba(31, 41, 55, 0.08);
+        --radius-xl: 28px;
+        --radius-lg: 22px;
+        --radius-md: 16px;
+        --radius-sm: 12px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        font-family: "IBM Plex Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top left, rgba(217, 91, 54, 0.1), transparent 26%),
+          radial-gradient(circle at top right, rgba(37, 99, 235, 0.1), transparent 24%),
+          linear-gradient(180deg, #faf7f2 0%, #f3eee7 100%);
+        line-height: 1.8;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      code,
+      pre {
+        font-family: "JetBrains Mono", "SFMono-Regular", monospace;
+      }
+
+      .shell {
+        max-width: 1480px;
+        margin: 0 auto;
+        padding: 28px;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid rgba(220, 207, 190, 0.86);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(10px);
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.28fr) 340px;
+        gap: 22px;
+        margin-bottom: 22px;
+      }
+
+      .hero-main {
+        position: relative;
+        overflow: hidden;
+        padding: 34px;
+      }
+
+      .hero-main::before {
+        content: "";
+        position: absolute;
+        left: -56px;
+        bottom: -68px;
+        width: 250px;
+        height: 200px;
+        background: radial-gradient(circle, rgba(217, 91, 54, 0.16), transparent 70%);
+      }
+
+      .hero-main::after {
+        content: "";
+        position: absolute;
+        right: -44px;
+        top: -46px;
+        width: 210px;
+        height: 210px;
+        border-radius: 999px;
+        background: radial-gradient(circle, rgba(37, 99, 235, 0.14), transparent 72%);
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: var(--accent);
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+        line-height: 1;
+      }
+
+      h1 {
+        margin: 18px 0 12px;
+        font-size: clamp(38px, 5vw, 66px);
+        line-height: 0.98;
+        letter-spacing: -0.05em;
+      }
+
+      h2 {
+        margin: 0;
+        font-size: 28px;
+        letter-spacing: -0.03em;
+      }
+
+      h3 {
+        margin: 0 0 10px;
+        font-size: 18px;
+      }
+
+      h4 {
+        margin: 0 0 8px;
+        font-size: 16px;
+      }
+
+      p {
+        margin: 0 0 14px;
+      }
+
+      ul,
+      ol {
+        margin: 0;
+        padding-left: 18px;
+      }
+
+      li + li {
+        margin-top: 8px;
+      }
+
+      .hero-copy {
+        margin: 0;
+        max-width: 860px;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.9;
+      }
+
+      .hero-note {
+        margin-top: 22px;
+        padding: 16px 18px;
+        border-radius: var(--radius-md);
+        border: 1px solid rgba(217, 91, 54, 0.18);
+        background: rgba(217, 91, 54, 0.08);
+        font-size: 14px;
+        line-height: 1.8;
+      }
+
+      .hero-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 24px;
+      }
+
+      .hero-card {
+        border-radius: 18px;
+        border: 1px solid rgba(220, 207, 190, 0.88);
+        background: rgba(255, 255, 255, 0.82);
+        padding: 16px;
+      }
+
+      .hero-card strong {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 14px;
+      }
+
+      .hero-card span {
+        display: block;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      .hero-side {
+        padding: 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .badge-card,
+      .mini-card {
+        border-radius: 18px;
+        border: 1px solid rgba(220, 207, 190, 0.88);
+        background: rgba(255, 255, 255, 0.8);
+        padding: 16px 18px;
+      }
+
+      .label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+        color: var(--muted);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .badge-card .value {
+        display: block;
+        font-size: 30px;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+      }
+
+      .badge-card p,
+      .mini-card p,
+      .mini-card li {
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.75;
+      }
+
+      .mini-card ul {
+        margin-top: 8px;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 290px minmax(0, 1fr);
+        gap: 22px;
+      }
+
+      .sidebar {
+        position: sticky;
+        top: 20px;
+        align-self: start;
+        padding: 18px;
+      }
+
+      .sidebar h2 {
+        margin: 0 0 12px;
+        font-size: 16px;
+      }
+
+      .sidebar a {
+        display: block;
+        padding: 10px 12px;
+        margin-bottom: 8px;
+        border-radius: 12px;
+        text-decoration: none;
+        color: var(--muted);
+        transition: 160ms ease;
+      }
+
+      .sidebar a:hover {
+        background: var(--accent-soft);
+        color: var(--accent);
+      }
+
+      .content {
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+      }
+
+      .section {
+        padding: 28px;
+      }
+
+      .section-intro {
+        margin: 12px 0 0;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.85;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        margin-top: 16px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .pill.orange {
+        background: var(--accent-soft);
+        color: var(--accent);
+      }
+
+      .pill.blue {
+        background: var(--blue-soft);
+        color: var(--blue);
+      }
+
+      .pill.green {
+        background: var(--green-soft);
+        color: var(--green);
+      }
+
+      .pill.gold {
+        background: var(--gold-soft);
+        color: var(--gold);
+      }
+
+      .grid-2,
+      .grid-3,
+      .grid-4 {
+        display: grid;
+        gap: 16px;
+        margin-top: 22px;
+      }
+
+      .grid-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .grid-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .grid-4 {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .card {
+        border-radius: 18px;
+        border: 1px solid rgba(220, 207, 190, 0.88);
+        background: rgba(255, 255, 255, 0.82);
+        padding: 18px;
+      }
+
+      .card p,
+      .card li {
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.8;
+      }
+
+      .callout {
+        margin-top: 18px;
+        padding: 18px;
+        border-radius: 18px;
+        border: 1px solid rgba(220, 207, 190, 0.92);
+      }
+
+      .callout.orange {
+        background: var(--accent-soft);
+        border-color: #ffd5c8;
+      }
+
+      .callout.blue {
+        background: var(--blue-soft);
+        border-color: #d9e6ff;
+      }
+
+      .callout.green {
+        background: var(--green-soft);
+        border-color: #caebdc;
+      }
+
+      .callout strong {
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      .flow {
+        display: grid;
+        gap: 12px;
+        margin-top: 22px;
+      }
+
+      .flow-item {
+        border-radius: 16px;
+        border: 1px solid rgba(220, 207, 190, 0.88);
+        background: rgba(255, 255, 255, 0.82);
+        padding: 15px 16px;
+      }
+
+      .flow-item p {
+        margin: 6px 0 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .diagram {
+        margin-top: 22px;
+        display: grid;
+        gap: 14px;
+      }
+
+      .storyboard {
+        margin-top: 22px;
+        padding: 20px;
+        border-radius: 22px;
+        border: 1px solid rgba(220, 207, 190, 0.92);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(250, 247, 243, 0.88));
+      }
+
+      .storyboard-title {
+        margin: 0 0 8px;
+        font-size: 18px;
+      }
+
+      .storyboard-intro {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.8;
+      }
+
+      .storyboard-track {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 18px;
+      }
+
+      .storyboard-step {
+        position: relative;
+        border-radius: 18px;
+        padding: 18px;
+        min-height: 156px;
+        border: 1px solid rgba(220, 207, 190, 0.9);
+        background: #fff;
+      }
+
+      .storyboard-step.orange {
+        background: var(--accent-soft);
+        border-color: #ffd1c1;
+      }
+
+      .storyboard-step.blue {
+        background: var(--blue-soft);
+        border-color: #d8e5ff;
+      }
+
+      .storyboard-step.green {
+        background: var(--green-soft);
+        border-color: #c8eadb;
+      }
+
+      .storyboard-step.gold {
+        background: var(--gold-soft);
+        border-color: #f4ddac;
+      }
+
+      .step-num {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 999px;
+        background: rgba(31, 41, 55, 0.08);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .storyboard-step h4 {
+        margin: 12px 0 8px;
+        font-size: 18px;
+      }
+
+      .storyboard-step p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.8;
+      }
+
+      .track-arrows {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin: 14px 0 2px;
+        color: var(--muted);
+        text-align: center;
+        font-size: 26px;
+      }
+
+      .layer-mapping {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 18px;
+      }
+
+      .mini-node {
+        border-radius: 16px;
+        border: 1px dashed rgba(220, 207, 190, 0.96);
+        background: rgba(255, 255, 255, 0.76);
+        padding: 14px;
+      }
+
+      .mini-node strong {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 14px;
+      }
+
+      .mini-node p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.75;
+      }
+
+      .journey {
+        margin-top: 22px;
+        padding: 22px;
+        border-radius: 22px;
+        border: 1px solid rgba(220, 207, 190, 0.92);
+        background:
+          radial-gradient(circle at top right, rgba(37, 99, 235, 0.08), transparent 25%),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 245, 240, 0.94));
+      }
+
+      .journey-line {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) 44px minmax(0, 1.2fr) 44px minmax(0, 1fr) 44px minmax(0, 1fr);
+        align-items: stretch;
+        gap: 0;
+        margin-top: 18px;
+      }
+
+      .journey-node {
+        border-radius: 18px;
+        border: 1px solid rgba(220, 207, 190, 0.9);
+        padding: 18px;
+        background: rgba(255, 255, 255, 0.9);
+      }
+
+      .journey-node.orange {
+        background: var(--accent-soft);
+        border-color: #ffd1c1;
+      }
+
+      .journey-node.blue {
+        background: var(--blue-soft);
+        border-color: #d8e5ff;
+      }
+
+      .journey-node.green {
+        background: var(--green-soft);
+        border-color: #c8eadb;
+      }
+
+      .journey-node.gold {
+        background: var(--gold-soft);
+        border-color: #f4ddac;
+      }
+
+      .journey-node h4 {
+        margin: 0 0 8px;
+        font-size: 18px;
+      }
+
+      .journey-node p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.8;
+      }
+
+      .journey-arrow {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--muted);
+        font-size: 28px;
+      }
+
+      .journey-branch {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 18px;
+      }
+
+      .journey-caption {
+        margin-top: 16px;
+        padding: 14px 16px;
+        border-radius: 16px;
+        background: rgba(15, 138, 95, 0.08);
+        border: 1px solid rgba(15, 138, 95, 0.14);
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.8;
+      }
+
+      .diagram-row {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .diagram-row.three {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .node {
+        border-radius: 18px;
+        padding: 16px;
+        min-height: 112px;
+        border: 1px solid rgba(220, 207, 190, 0.88);
+        background: #fff;
+      }
+
+      .node.orange {
+        background: var(--accent-soft);
+        border-color: #ffd1c1;
+      }
+
+      .node.blue {
+        background: var(--blue-soft);
+        border-color: #d8e5ff;
+      }
+
+      .node.green {
+        background: var(--green-soft);
+        border-color: #c8eadb;
+      }
+
+      .node p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.75;
+      }
+
+      .arrow-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 22px;
+      }
+
+      .compare {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 22px;
+      }
+
+      .attempt {
+        position: relative;
+        padding: 20px;
+        border-radius: 22px;
+        border: 1px solid rgba(220, 207, 190, 0.92);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(250, 247, 243, 0.9));
+      }
+
+      .attempt .tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .attempt .tag.orange {
+        background: var(--accent-soft);
+        color: var(--accent);
+      }
+
+      .attempt .tag.blue {
+        background: var(--blue-soft);
+        color: var(--blue);
+      }
+
+      .attempt .tag.gold {
+        background: var(--gold-soft);
+        color: var(--gold);
+      }
+
+      .attempt h3 {
+        margin-top: 12px;
+      }
+
+      .attempt pre {
+        margin: 12px 0 0;
+        padding: 14px;
+        border-radius: 14px;
+        background: #fff;
+        border: 1px solid rgba(220, 207, 190, 0.92);
+        overflow-x: auto;
+        font-size: 12px;
+        line-height: 1.8;
+      }
+
+      .attempt ul {
+        margin-top: 12px;
+      }
+
+      .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 12px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .status-badge.pending {
+        background: var(--blue-soft);
+        color: var(--blue);
+      }
+
+      .status-badge.stop {
+        background: var(--gold-soft);
+        color: var(--gold);
+      }
+
+      .status-badge.fail {
+        background: var(--accent-soft);
+        color: var(--accent);
+      }
+
+      .mono {
+        font-family: "JetBrains Mono", "SFMono-Regular", monospace;
+        font-size: 0.94em;
+        background: rgba(15, 23, 42, 0.05);
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        padding: 2px 6px;
+        border-radius: 7px;
+        word-break: break-word;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+        margin-top: 18px;
+      }
+
+      table {
+        width: 100%;
+        min-width: 880px;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        text-align: left;
+        vertical-align: top;
+        padding: 12px 10px;
+        border-top: 1px solid var(--line);
+        font-size: 14px;
+        line-height: 1.75;
+      }
+
+      th {
+        color: var(--muted);
+        background: #fcfaf7;
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .footer {
+        margin-top: 24px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.8;
+      }
+
+      @media (max-width: 1180px) {
+        .hero,
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          position: static;
+        }
+      }
+
+      @media (max-width: 920px) {
+        .hero-grid,
+        .grid-3,
+        .grid-4,
+        .diagram-row,
+        .diagram-row.three,
+        .compare,
+        .storyboard-track,
+        .layer-mapping,
+        .journey-branch {
+          grid-template-columns: 1fr;
+        }
+
+        .grid-2 {
+          grid-template-columns: 1fr;
+        }
+
+        .arrow-row {
+          grid-template-columns: 1fr;
+          font-size: 18px;
+        }
+
+        .track-arrows {
+          grid-template-columns: 1fr;
+          font-size: 18px;
+        }
+
+        .journey-line {
+          grid-template-columns: 1fr;
+          gap: 12px;
+        }
+
+        .journey-arrow {
+          min-height: 24px;
+          transform: rotate(90deg);
+        }
+      }
+
+      @media (max-width: 680px) {
+        .shell {
+          padding: 14px;
+        }
+
+        .hero-main,
+        .hero-side,
+        .section {
+          padding: 20px;
+        }
+
+        h1 {
+          font-size: 36px;
+          line-height: 1.03;
+        }
+
+        .hero-copy,
+        .section-intro {
+          font-size: 14px;
+          line-height: 1.85;
+        }
+
+        .hero-note,
+        .card p,
+        .card li,
+        .mini-card p,
+        .mini-card li,
+        .badge-card p,
+        .flow-item p,
+        .node p,
+        .callout,
+        th,
+        td {
+          font-size: 13px;
+        }
+
+        .hero-card,
+        .card,
+        .mini-card,
+        .badge-card,
+        .flow-item,
+        .node,
+        .attempt,
+        .storyboard-step,
+        .mini-node,
+        .journey-node {
+          padding: 16px;
+          border-radius: 16px;
+        }
+
+        .pill,
+        .eyebrow {
+          width: 100%;
+          justify-content: center;
+          text-align: center;
+        }
+
+        table {
+          min-width: 760px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <section class="hero">
+        <div class="panel hero-main">
+          <div class="eyebrow">Reverse Proxy + Worker / Beginner Handbook</div>
+          <h1>反向代理与 Worker：小白也能理解的版本</h1>
+          <p class="hero-copy">
+            这份文档专门解释两件事：<strong>什么叫反向代理</strong>，以及
+            <strong>为什么你这个 EMS 网站的表单提交要单独用 Worker</strong>。我会尽量不用太硬的技术词，而是把它们讲成“前台、总台、秘书、仓库”这种更好理解的角色关系。
+          </p>
+          <div class="hero-note">
+            这次你不是只遇到了一个技术词，而是同时碰到了 <strong>.htaccess、mod_proxy、Nginx、Cloudflare Origin Rule、Worker</strong> 这些不同层的东西。
+            真正让人晕的，往往不是某个名词本身，而是<strong>它们都在负责“转发”，但发生的位置完全不同</strong>。
+          </div>
+          <div class="hero-grid">
+            <div class="hero-card">
+              <strong>反向代理解决什么</strong>
+              <span>解决的是“用户这个请求，后台到底该送到哪里去处理”。</span>
+            </div>
+            <div class="hero-card">
+              <strong>Worker 解决什么</strong>
+              <span>解决的是“请求到了以后，要怎么安全地校验、发邮件、保护密钥”。</span>
+            </div>
+            <div class="hero-card">
+              <strong>你这次为什么会晕</strong>
+              <span>因为你同时在处理主站、子站、Cloudflare、Cloudways、邮件和表单安全，层次太多了。</span>
+            </div>
+          </div>
+        </div>
+
+        <aside class="panel hero-side">
+          <div class="badge-card">
+            <span class="label">一句话总纲</span>
+            <span class="value">先决定“送到哪”，再决定“怎么处理”</span>
+            <p>前者是反向代理的问题，后者是 Worker / 后端逻辑的问题。</p>
+          </div>
+          <div class="mini-card">
+            <span class="label">这份文档会回答</span>
+            <ul>
+              <li>反向代理到底是什么</li>
+              <li>为什么表单要单独用 Worker</li>
+              <li>你这次试过的 3 条代理路线分别是什么</li>
+              <li>为什么有的放弃了，有的还在推进</li>
+            </ul>
+          </div>
+          <div class="mini-card">
+            <span class="label">相关文档</span>
+            <ul>
+              <li><a href="./index.html">返回文档总首页</a></li>
+              <li><a href="./EMS上线执行顺序总表.html">看 EMS 上线执行总表</a></li>
+              <li><a href="./服务器部署学习方案与SOP.html">看服务器部署 SOP</a></li>
+            </ul>
+          </div>
+        </aside>
+      </section>
+
+      <div class="layout">
+        <aside class="panel sidebar">
+          <h2>目录</h2>
+          <a href="./index.html">← 返回文档总首页</a>
+          <a href="#plain">1. 最白话的一版</a>
+          <a href="#proxy-basic">2. 什么叫反向代理</a>
+          <a href="#why">3. 为什么要这样做</a>
+          <a href="#worker">4. Worker 在你这里是什么</a>
+          <a href="#attempts">5. 你这次试过的 3 种代理方式</a>
+          <a href="#layers">6. 这些东西分别在哪一层</a>
+          <a href="#final-shape">7. 最后目标形态</a>
+        </aside>
+
+        <main class="content">
+          <section class="panel section" id="plain">
+            <h2>1. 先讲最白话的版本</h2>
+            <p class="section-intro">
+              如果你现在完全不想看技术词，只想先有一个“脑补画面”，那你可以直接记下面两句话。
+            </p>
+            <div class="pill orange">先把画面感建立起来，再回头看术语会轻松很多</div>
+
+            <div class="grid-2">
+              <div class="callout orange">
+                <strong>反向代理是什么</strong>
+                你可以把它想成：<strong>用户只看到前台门店</strong>，但门店后面真正发货的仓库，不一定就在门店里。
+                用户以为自己一直在找 <span class="mono">rapiddirect.com</span>，但后台总台会把请求悄悄送去真正干活的地方。
+              </div>
+              <div class="callout blue">
+                <strong>Worker 是什么</strong>
+                你可以把它想成门口的一个<strong>小秘书 / 小保安</strong>。它不负责整个网站页面，但专门负责表单提交、机器人校验、邮件发送这种小而关键的任务。
+              </div>
+            </div>
+
+            <div class="callout green">
+              <strong>最核心的一句话：</strong>
+              反向代理解决的是 <strong>“请求送到哪里去处理”</strong>；
+              Worker 解决的是 <strong>“这个请求到了以后，要怎么安全地处理”</strong>。
+            </div>
+          </section>
+
+          <section class="panel section" id="proxy-basic">
+            <h2>2. 什么叫“反向代理”</h2>
+            <p class="section-intro">
+              “代理”这个词听起来很技术，但换成生活里的场景，其实很简单：
+              <strong>你表面上找的是一个窗口，真正处理你事情的人可能在后面另一个房间。</strong>
+            </p>
+            <div class="pill blue">用户看到的是主入口，后台可以自由安排真正处理请求的地方</div>
+
+            <div class="flow">
+              <div class="flow-item">
+                <strong>用户看到的是：</strong>
+                <p><span class="mono">rapiddirect.com/ems/</span></p>
+              </div>
+              <div class="flow-item">
+                <strong>反向代理做的事：</strong>
+                <p>收到这个请求后，悄悄把它往后转给真正负责 EMS 页面的网站。</p>
+              </div>
+              <div class="flow-item">
+                <strong>真正干活的地方可能是：</strong>
+                <p><span class="mono">pcb.rapiddirect.com/ems/</span>，或者另一台独立服务器上的应用。</p>
+              </div>
+            </div>
+
+            <div class="callout green">
+              <strong>小白记忆法：</strong>
+              反向代理不是“把页面改掉”，也不是“让用户跳去另一个网站”。它更像是
+              <strong>总台把来访的人带到正确的办公室</strong>，而来访的人自己未必知道后台换房间了。
+            </div>
+          </section>
+
+          <section class="panel section" id="why">
+            <h2>3. 为什么要这样做</h2>
+            <p class="section-intro">
+              你这次不是为了炫技才做反向代理，而是因为它对现在这个项目结构非常实用。
+            </p>
+            <div class="grid-4">
+              <div class="card">
+                <h3>统一入口</h3>
+                <p>用户继续访问主站路径，体验更统一，不会觉得跳来跳去。</p>
+              </div>
+              <div class="card">
+                <h3>新项目可独立部署</h3>
+                <p>EMS 应用可以先单独放在自己的服务器上，不用一开始就硬塞进老站。</p>
+              </div>
+              <div class="card">
+                <h3>后续迁移更灵活</h3>
+                <p>以后换服务器时，不一定要改前台路径，只是后台接法变了。</p>
+              </div>
+              <div class="card">
+                <h3>排障更清晰</h3>
+                <p>出问题时可以分层判断：主站、子站、Cloudflare、Worker，到底哪一层有问题。</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel section" id="worker">
+            <h2>4. 那为什么表单这里又要单独用 Worker</h2>
+            <p class="section-intro">
+              因为“页面展示”和“安全地发邮件”，其实是两种不同的工作。
+              页面像前台，发邮件像后台秘书。前台可以展示表单，但不适合直接拿着保险箱钥匙去给你发邮件。
+            </p>
+            <div class="pill gold">浏览器能展示页面，但不适合安全保存私密密钥</div>
+
+            <div class="grid-2">
+              <div class="card">
+                <h3>页面负责什么</h3>
+                <ul>
+                  <li>显示表单长什么样</li>
+                  <li>让用户输入姓名、公司、邮箱、附件</li>
+                  <li>展示提交成功或失败提示</li>
+                </ul>
+              </div>
+              <div class="card">
+                <h3>发邮件真正需要做什么</h3>
+                <ul>
+                  <li>验证是不是机器人</li>
+                  <li>保护 <span class="mono">RESEND_API_KEY</span></li>
+                  <li>检查字段、附件和来源域名</li>
+                  <li>真正调用 Resend 发邮件</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="callout orange">
+              <strong>重点：</strong>
+              浏览器里的前端页面，不能安全地保存
+              <span class="mono">RESEND_API_KEY</span>、
+              <span class="mono">TURNSTILE_SECRET_KEY</span> 这种私密信息。
+              所以中间必须有一个后端角色，而你这次让 <strong>Worker</strong> 来当这个角色，正好很顺手。
+            </div>
+
+            <div class="flow">
+              <div class="flow-item">
+                <strong>第 1 步：用户填写表单</strong>
+                <p>前端页面只是负责把数据收集好。</p>
+              </div>
+              <div class="flow-item">
+                <strong>第 2 步：请求交给 Worker</strong>
+                <p>不是直接去找 Resend，而是先交给 Worker。</p>
+              </div>
+              <div class="flow-item">
+                <strong>第 3 步：Worker 做安全检查</strong>
+                <p>查 Turnstile、查字段、查附件、查来源域名。</p>
+              </div>
+              <div class="flow-item">
+                <strong>第 4 步：Worker 调 Resend</strong>
+                <p>发信密钥保存在 Worker 的 secrets 里，不暴露给浏览器。</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel section" id="attempts">
+            <h2>5. 你这次试过的 3 种反向代理方式</h2>
+            <p class="section-intro">
+              这块是你今天最容易混乱的地方，因为你试的 3 条路，看起来都在“转发请求”，但它们分别发生在
+              <strong>Apache 规则层、Cloudways 主站服务器层、Cloudflare 边缘层</strong>。
+            </p>
+            <div class="pill orange">同样都是“转发”，但位置不同、能力不同、限制也不同</div>
+
+            <div class="compare">
+              <article class="attempt">
+                <span class="tag orange">Attempt 1</span>
+                <h3>.htaccess 方案</h3>
+                <p>你先试的是在 Cloudways 主站应用的 <span class="mono">.htaccess</span> 里，用 Apache 的重写规则去代理 <span class="mono">/ems/*</span>。</p>
+                <pre>RewriteRule ^ems/?$ https://pcb.rapiddirect.com/ems/ [P,L]
+RewriteRule ^ems/(.*)$ https://pcb.rapiddirect.com/ems/$1 [P,L]</pre>
+                <ul>
+                  <li><strong>白话理解：</strong>想让主站的“门卫”在收到 <span class="mono">/ems/*</span> 时，把客人送去 <span class="mono">pcb.rapiddirect.com/ems/*</span>。</li>
+                  <li><strong>为什么看起来合理：</strong>路径关系很直接，语义也简单。</li>
+                  <li><strong>为什么放弃：</strong>Cloudways 明确说 <span class="mono">reverse proxy via .htaccess is not supported</span>，也就是这条路在它当前环境里不成立。</li>
+                </ul>
+                <div class="status-badge fail">结果：放弃</div>
+              </article>
+
+              <article class="attempt">
+                <span class="tag blue">Attempt 2</span>
+                <h3>Cloudways 服务器层 Nginx 方案</h3>
+                <p>后来 Cloudways 客服明确告诉你：如果要代理，应该在服务器层的 Nginx 里加 <span class="mono">location block</span>，而不是走 <span class="mono">.htaccess</span>。</p>
+                <pre>location = /ems {
+    return 301 /ems/;
+}
+
+location /ems/ {
+    proxy_pass https://pcb.rapiddirect.com;
+    proxy_http_version 1.1;
+
+    proxy_set_header Host pcb.rapiddirect.com;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+
+    proxy_ssl_server_name on;
+    proxy_redirect off;
+}</pre>
+                <ul>
+                  <li><strong>白话理解：</strong>不是让应用目录里的“小规则文件”处理，而是让主站服务器自己的“大门卫”直接接手这件事。</li>
+                  <li><strong>为什么更靠谱：</strong>Nginx 本来就非常适合做路径转发和反向代理。</li>
+                  <li><strong>现在状态：</strong>Cloudways 已经帮你开启 <span class="mono">mod_proxy</span>，并且正在帮你调整服务器层 Nginx。</li>
+                </ul>
+                <div class="status-badge pending">结果：等待 Cloudways 调整</div>
+              </article>
+
+              <article class="attempt">
+                <span class="tag gold">Attempt 3</span>
+                <h3>Cloudflare Origin Rule 方案</h3>
+                <p>你也试过让 Cloudflare 在边缘层直接改源站，也就是让用户访问 <span class="mono">rapiddirect.com/ems/*</span> 时，Cloudflare 内部改送去别的 origin。</p>
+                <pre>(http.host eq "rapiddirect.com" and starts_with(http.request.uri.path, "/ems"))</pre>
+                <ul>
+                  <li><strong>白话理解：</strong>想让“站外的大门口保安”直接决定把 EMS 请求送去哪台源站。</li>
+                  <li><strong>为什么很诱人：</strong>如果能在 Cloudflare 层搞定，主站服务器就少改一层。</li>
+                  <li><strong>为什么放弃：</strong>你需要的那种 <span class="mono">origin override</span> 能力，在当前套餐下受限，需要 Enterprise 级别。</li>
+                </ul>
+                <div class="status-badge stop">结果：放弃</div>
+              </article>
+            </div>
+
+            <div class="callout green">
+              <strong>你现在这 3 条路的最终结论：</strong>
+              <span class="mono">.htaccess</span> 这条路在 Cloudways 环境里不支持；Cloudflare Origin Rule 这条路在当前套餐下不现实；所以现在最可行的路，就是
+              <strong>让 Cloudways 在服务器层的 Nginx 去处理 <span class="mono">/ems/* -> pcb.rapiddirect.com/ems/*</span></strong>。
+            </div>
+          </section>
+
+          <section class="panel section" id="layers">
+            <h2>6. 这些东西分别在哪一层</h2>
+            <p class="section-intro">
+              小白最容易把这些词混成一锅，是因为它们都在“参与转发”，但其实站在的楼层不一样。你可以把它们想成从外到内的 4 层。
+            </p>
+            <div class="storyboard">
+              <h3 class="storyboard-title">看图先理解：一次请求从外到内会经过哪 4 层</h3>
+              <p class="storyboard-intro">
+                你可以把这套结构想成“用户从街道走进大楼，再被前台带到真正办公室”。用户只看见入口，但后台会一层层把请求送到正确位置。
+              </p>
+              <div class="storyboard-track">
+                <article class="storyboard-step orange">
+                  <span class="step-num">1</span>
+                  <h4>用户浏览器</h4>
+                  <p>用户只知道自己访问的是 <span class="mono">rapiddirect.com/ems/*</span>，他并不知道后面到底是哪台服务器在干活。</p>
+                </article>
+                <article class="storyboard-step blue">
+                  <span class="step-num">2</span>
+                  <h4>Cloudflare</h4>
+                  <p>这是站外的总入口，负责 DNS、CDN、SSL、安全和 Worker route。它更像门口总闸，但这次没直接接管 <span class="mono">/ems/*</span> 的改源站工作。</p>
+                </article>
+                <article class="storyboard-step green">
+                  <span class="step-num">3</span>
+                  <h4>Cloudways 主站服务器</h4>
+                  <p>这里是真正接住主域请求的地方。你现在要在这一层，把 <span class="mono">/ems/*</span> 转给真正负责 EMS 内容的源站。</p>
+                </article>
+                <article class="storyboard-step orange">
+                  <span class="step-num">4</span>
+                  <h4>EMS 独立站</h4>
+                  <p>也就是 <span class="mono">pcb.rapiddirect.com/ems/*</span>。这里才是真正返回 EMS 页面内容、后台数据和应用逻辑的地方。</p>
+                </article>
+              </div>
+              <div class="track-arrows" aria-hidden="true">
+                <div>→</div>
+                <div>→</div>
+                <div>→</div>
+              </div>
+              <div class="layer-mapping">
+                <div class="mini-node">
+                  <strong>.htaccess</strong>
+                  <p>属于主站应用层的小规则文件。你试过让它代理，但 Cloudways 这条路不支持。</p>
+                </div>
+                <div class="mini-node">
+                  <strong>mod_proxy</strong>
+                  <p>是 Apache 的“具备代理能力”的模块，像是给门卫增加带路能力。</p>
+                </div>
+                <div class="mini-node">
+                  <strong>Nginx</strong>
+                  <p>是主站服务器层更强的前台总调度。现在最有希望在这一层完成 <span class="mono">/ems/*</span> 转发。</p>
+                </div>
+                <div class="mini-node">
+                  <strong>Origin Rule</strong>
+                  <p>属于 Cloudflare 边缘层的改源站规则。思路对，但当前套餐下关键能力不可用。</p>
+                </div>
+                <div class="mini-node">
+                  <strong>Worker</strong>
+                  <p>不负责整站页面转发，它更像是表单秘书，专管安全校验、密钥保护和发信。</p>
+                </div>
+              </div>
+            </div>
+            <div class="diagram">
+              <div class="diagram-row">
+                <div class="node orange">
+                  <h4>第 1 层：用户浏览器</h4>
+                  <p>用户只知道自己访问的是 <span class="mono">rapiddirect.com/ems/</span>。</p>
+                </div>
+                <div class="node blue">
+                  <h4>第 2 层：Cloudflare</h4>
+                  <p>这是站外的大门口保安，负责 CDN、SSL、安全、Worker route 等。</p>
+                </div>
+                <div class="node green">
+                  <h4>第 3 层：Cloudways 主站服务器</h4>
+                  <p>这里是主站真正接请求的地方，你现在要在这层做 <span class="mono">/ems/*</span> 的代理。</p>
+                </div>
+                <div class="node orange">
+                  <h4>第 4 层：EMS 独立站</h4>
+                  <p>也就是 <span class="mono">pcb.rapiddirect.com/ems/*</span> 这套应用真正返回内容的地方。</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>东西</th>
+                    <th>它是什么</th>
+                    <th>你可以把它想成</th>
+                    <th>它这次负责什么</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="mono">.htaccess</span></td>
+                    <td>Apache 应用层规则文件</td>
+                    <td>应用目录里的小告示牌</td>
+                    <td>你试过让它代理 <span class="mono">/ems/*</span>，但 Cloudways 不支持这条路</td>
+                  </tr>
+                  <tr>
+                    <td><span class="mono">mod_proxy</span></td>
+                    <td>Apache 的代理能力模块</td>
+                    <td>让门卫具备“带路”的能力</td>
+                    <td>客服帮你开了，但最终仍建议走 Nginx 层，而不是 .htaccess 层</td>
+                  </tr>
+                  <tr>
+                    <td><span class="mono">Nginx</span></td>
+                    <td>Web Server / 反向代理层</td>
+                    <td>真正的大门卫</td>
+                    <td>现在最有希望承接主站 <span class="mono">/ems/*</span> 转发</td>
+                  </tr>
+                  <tr>
+                    <td><span class="mono">Origin Rule</span></td>
+                    <td>Cloudflare 边缘层改源站规则</td>
+                    <td>站外入口保安的调度规则</td>
+                    <td>思路成立，但当前套餐不现实</td>
+                  </tr>
+                  <tr>
+                    <td><span class="mono">Worker</span></td>
+                    <td>Cloudflare 的轻量后端逻辑</td>
+                    <td>专管表单的小秘书</td>
+                    <td>验证 Turnstile、保护 secret、调用 Resend 发邮件</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="panel section" id="final-shape">
+            <h2>7. 最后你应该怎么理解整套结构</h2>
+            <p class="section-intro">
+              你现在可以把整套东西压缩成一条非常清楚的链路。只要记住这条链路，很多零散名词就不会再那么吓人。
+            </p>
+
+            <div class="journey">
+              <h3 class="storyboard-title">一张图看懂：现在整套请求最终会怎么流动</h3>
+              <p class="storyboard-intro">
+                这张图最适合你以后拿来复盘。只要记住“页面请求走主站反代，表单请求走 Worker”，整个架构就不会再乱。
+              </p>
+              <div class="journey-line">
+                <article class="journey-node orange">
+                  <h4>用户访问</h4>
+                  <p><span class="mono">rapiddirect.com/ems/*</span></p>
+                </article>
+                <div class="journey-arrow" aria-hidden="true">→</div>
+                <article class="journey-node blue">
+                  <h4>Cloudways 主站反向代理</h4>
+                  <p>主站接住请求后，把它送去真正负责 EMS 页面内容的源站。</p>
+                </article>
+                <div class="journey-arrow" aria-hidden="true">→</div>
+                <article class="journey-node green">
+                  <h4>EMS 独立站</h4>
+                  <p><span class="mono">pcb.rapiddirect.com/ems/*</span> 返回页面、内容和后台数据。</p>
+                </article>
+                <div class="journey-arrow" aria-hidden="true">→</div>
+                <article class="journey-node gold">
+                  <h4>用户看到页面</h4>
+                  <p>地址栏始终还是主站路径，看起来像同一个网站。</p>
+                </article>
+              </div>
+              <div class="journey-branch">
+                <article class="journey-node blue">
+                  <h4>页面链路</h4>
+                  <p>主站反向代理主要负责“把页面请求送到正确的站点”，也就是解决“送到哪”。</p>
+                </article>
+                <article class="journey-node green">
+                  <h4>表单链路</h4>
+                  <p>用户提交表单后，请求不直接找 Resend，而是单独去 Worker，由 Worker 校验 Turnstile、保护 secret，再调用 Resend 发邮件。</p>
+                </article>
+              </div>
+              <div class="journey-caption">
+                <strong>你可以把它记成一句话：</strong>
+                页面访问这件事，走的是 <strong>主站反向代理</strong>；
+                表单发信这件事，走的是 <strong>Worker + Resend</strong>。
+                前者负责“找对办公室”，后者负责“安全地办事”。
+              </div>
+            </div>
+
+            <div class="flow">
+              <div class="flow-item">
+                <strong>用户看到：</strong>
+                <p><span class="mono">rapiddirect.com/ems/*</span></p>
+              </div>
+              <div class="flow-item">
+                <strong>主站反向代理负责：</strong>
+                <p>把这些页面请求转交给真正负责 EMS 页面内容的 <span class="mono">pcb.rapiddirect.com/ems/*</span></p>
+              </div>
+              <div class="flow-item">
+                <strong>EMS 站点负责：</strong>
+                <p>显示页面、内容、后台数据</p>
+              </div>
+              <div class="flow-item">
+                <strong>Worker 负责：</strong>
+                <p>接表单、查 Turnstile、保护密钥、调用 Resend</p>
+              </div>
+              <div class="flow-item">
+                <strong>Resend 负责：</strong>
+                <p>真正把邮件发出去</p>
+              </div>
+            </div>
+
+            <div class="callout blue">
+              <strong>最后一句最重要的话：</strong>
+              <p>
+                <strong>反向代理</strong>让用户始终看到统一入口；<strong>Worker</strong>让表单发信逻辑既安全又独立。
+                前者解决“送到哪”，后者解决“怎么处理”。
+              </p>
+            </div>
+
+            <div class="callout green">
+              <strong>你现在真正处于哪个阶段：</strong>
+              EMS 独立站本身已经跑起来了，Worker 也承担了表单链路。现在真正还差的一步，就是
+              <strong>Cloudways 在主站服务器层把 <span class="mono">/ems/*</span> 的反向代理配置补好</strong>。
+              这一步一旦完成，整套链路就会更像正式生产形态。
+            </div>
+          </section>
+        </main>
+      </div>
+
+      <p class="footer">生成于 2026-05-13 · 反向代理与 Worker 小白解释</p>
+    </div>
+  </body>
+</html>

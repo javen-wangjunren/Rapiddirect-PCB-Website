@@ -79,17 +79,15 @@ export interface PcbDesignSimulationContent {
 }
 
 export interface PcbDesignProcessItem {
-  icon_svg: string;
+  icon: string;
   title: string;
   description: string;
   tags: ReadonlyArray<string>;
-  image_placeholder: string;
   image_url?: string;
-  image_alt?: string;
 }
 
 export interface PcbDesignProcessBenefit {
-  icon_svg: string;
+  icon: string;
   title: string;
   description: string;
 }
@@ -101,7 +99,7 @@ export interface PcbDesignProcessContent {
   trust_base: {
     title: string;
     benefits: ReadonlyArray<PcbDesignProcessBenefit>;
-    cta: {
+    cta?: {
       label: string;
       href: string;
     };

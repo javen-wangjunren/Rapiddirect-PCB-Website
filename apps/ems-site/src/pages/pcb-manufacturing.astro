@@ -1,9 +1,223 @@
 ---
 import EmsLayout from '../layouts/EmsLayout.astro';
+import HeroBanner from '../components/common/HeroBanner.astro';
+import PcbMfgCapabilitySection from '../components/pcb-manufacturing/PcbMfgCapabilitySection.astro';
+import PcbMfgTechTableSection from '../components/pcb-manufacturing/PcbMfgTechTableSection.astro';
 import PcbProcessSection from '../components/common/PcbProcessSection.astro';
+import QualityControlSection from '../components/common/QualityControlSection.astro';
+import IndustrySection from '../components/common/IndustrySection.astro';
 import WhyChooseUsSection from '../components/common/WhyChooseUsSection.astro';
+import ProductGallerySection from '../components/common/ProductGallerySection.astro';
+import FaqSection from '../components/common/FaqSection.astro';
 import type { PcbProcessContent } from '../types/pcb-process';
 import type { WhyChooseUsContent } from '../types/why-choose-us';
+import { emsHomeDefaults } from '../content/defaults/ems';
+
+const hero = {
+  title: 'PCB Manufacturing Services',
+  benefits: [
+    {
+      title: 'IPC Class 2/3 Quality',
+      description: 'Strict process control with AOI, X-Ray, and electrical testing for every batch.'
+    },
+    {
+      title: 'Fast Prototypes',
+      description: 'Accelerated builds with stable lead times for prototypes and production.'
+    },
+    {
+      title: 'One-Stop Support',
+      description: 'Engineering review, fabrication, and delivery with transparent communication.'
+    }
+  ],
+  benefit_conclusion: 'Need manufacturing guidance? Share your files and we’ll recommend the best stack-up and process.',
+  cta: { href: '#quote', label: 'Get a Quote' }
+};
+
+const capability = {
+  title: 'Our Capabilities',
+  description:
+    'From standard designs to complex high-density architectures, we offer a complete spectrum of PCB manufacturing technologies.',
+  items: [
+    {
+      title: 'Standard PCB',
+      heading: 'Standard PCB',
+      description:
+        'Conventional PCB solutions including single-layer, double-layer, and multi-layer boards (up to 32 layers) tailored for general electronic applications and consumer devices.',
+      image_url: '/images/pcb-manufacturing/mp3q9g13-qkb0a40.png',
+      cta: { label: 'Explore capabilities', href: '#' }
+    },
+    {
+      title: 'Flexible PCB',
+      heading: 'Flexible PCB',
+      description:
+        'Bendable and space-saving Polyimide (PI) solutions. Ideal for compact devices, wearables, and dynamic applications requiring continuous flexing.',
+      image_url: '/images/pcb-manufacturing/mp3q9g13-qkb0a40.png',
+      cta: { label: 'Explore capabilities', href: '#' }
+    },
+    {
+      title: 'Rigid-Flex PCB',
+      heading: 'Rigid-Flex PCB',
+      description:
+        'A hybrid combination of rigid and flex board technologies. It eliminates the need for connectors, significantly improving reliability for complex 3D electronic packaging.',
+      image_url: '/images/pcb-manufacturing/mp3q9g13-qkb0a40.png',
+      cta: { label: 'Explore capabilities', href: '#' }
+    },
+    {
+      title: 'Advanced PCB',
+      heading: 'Advanced PCB',
+      description:
+        'High-end PCB solutions leveraging cutting-edge technologies, including thick copper, ultra-large backplanes, and embedded components for specialized industrial use.',
+      image_url: '/images/pcb-manufacturing/mp3q9g13-qkb0a40.png',
+      cta: { label: 'Explore capabilities', href: '#' }
+    },
+    {
+      title: 'HDI PCB',
+      heading: 'HDI PCB',
+      description:
+        'High-Density Interconnect boards featuring microvias, blind, and buried vias. Perfect for miniaturized, high-performance electronics like smartphones and IoT devices.',
+      image_url: '/images/pcb-manufacturing/mp3q9g13-qkb0a40.png',
+      cta: { label: 'Explore capabilities', href: '#' }
+    },
+    {
+      title: 'RF PCB',
+      heading: 'Radio Frequency (RF) PCB',
+      description:
+        'Engineered with specialized low-loss materials (e.g., Rogers, Taconic) and strict impedance control to minimize signal loss in high-frequency communications and radar systems.',
+      image_url: '/images/pcb-manufacturing/mp3q9g13-qkb0a40.png',
+      cta: { label: 'Explore capabilities', href: '#' }
+    },
+    {
+      title: 'Metal Core PCB',
+      heading: 'Metal Core PCB (MCPCB)',
+      description:
+        'Featuring an aluminum or copper base for superior thermal management. Widely used in high-power LED lighting, automotive headlights, and power converters.',
+      image_url: '/images/pcb-manufacturing/mp3q9g13-qkb0a40.png',
+      cta: { label: 'Explore capabilities', href: '#' }
+    },
+    {
+      title: 'Ceramic PCB',
+      heading: 'Ceramic PCB',
+      description:
+        'Offers exceptional thermal conductivity and electrical insulation. Built to withstand extreme temperatures and environments, ideal for aerospace and high-power modules.',
+      image_url: '/images/pcb-manufacturing/mp3q9g13-qkb0a40.png',
+      cta: { label: 'Explore capabilities', href: '#' }
+    }
+  ]
+};
+
+const techTable = {
+  title: 'Process Capabilities',
+  description:
+    'From rapid prototyping to volume production, our facilities are equipped to handle the most demanding specifications.',
+  rows: [
+    { item: 'Layers', mass_production: '4-16 Layers', sample_prototype: '4-24 Layers' },
+    { item: 'Board Thickness Range', mass_production: '0.6-3.2mm', sample_prototype: '0.4-6.0mm' },
+    { item: 'Stack-up (Max)', mass_production: '4+N+4', sample_prototype: 'Any layer interconnected' },
+    { item: 'Laser Hole (Min)', mass_production: '4mil (0.1mm)', sample_prototype: '3mil (0.075mm)' },
+    { item: 'Laser Technology', mass_production: 'CO2 Laser Machine', sample_prototype: 'CO2 Laser Machine' },
+    { item: 'TG Value', mass_production: '170°C', sample_prototype: '170°C' },
+    { item: 'Hole Copper', mass_production: '12-18µm', sample_prototype: '12-18µm' },
+    { item: 'Impedance Tolerance', mass_production: '+/-10%', sample_prototype: '+/-7%' },
+    { item: 'Layer Alignment', mass_production: '+/-3mil', sample_prototype: '+/-2mil' },
+    { item: 'Solder Mask Alignment', mass_production: '+/-2mil', sample_prototype: '+/-1mil' },
+    { item: 'Track Width/Spacing (Min)', mass_production: '2.5/2.5mil', sample_prototype: '2.5/2.5mil' },
+    { item: 'Annular Ring (Min)', mass_production: '2.5mil', sample_prototype: '2.5mil' },
+    { item: 'Through Hole Diameter (Min)', mass_production: '8mil (0.2mm)', sample_prototype: '6mil (0.15mm)' },
+    { item: 'Blind Via Diameter (Min)', mass_production: '4.0mil', sample_prototype: '3.0mil' },
+    { item: 'Dielectric Thickness (Min)', mass_production: '3.0mil', sample_prototype: '2.0mil' },
+    { item: 'Pad Size (Min)', mass_production: '12mil', sample_prototype: '10mil' },
+    { item: 'Blind Via Aspect Ratio', mass_production: '1:1', sample_prototype: '1.2:1' }
+  ]
+};
+
+const quality = emsHomeDefaults.quality;
+const industry = emsHomeDefaults.industry;
+const faq = emsHomeDefaults.faq;
+
+const productGallery = {
+  title: 'Our Capabilities Showcase',
+  description:
+    'From simple rigid boards to complex multi-layer HDI and rigid-flex circuits. Explore our diverse manufacturing experience across industries.',
+  filters: [
+    { label: 'All Boards', value: 'all' },
+    { label: 'HDI PCB', value: 'hdi' },
+    { label: 'High Frequency', value: 'high-freq' },
+    { label: 'Heavy Copper', value: 'heavy-copper' },
+    { label: 'Rigid-Flex', value: 'rigid-flex' }
+  ],
+  items: [
+    {
+      category: 'hdi',
+      title: '10-Layer HDI Board',
+      subtitle: 'Industrial Control Systems',
+      specs: [
+        { label: 'Layer Count', value: '10 Layers' },
+        { label: 'Material', value: 'FR-4 TG170' },
+        { label: 'HDI Structure', value: '2+N+2 (Blind/Buried)' },
+        { label: 'Min Trace/Space', value: '3mil / 3mil' },
+        { label: 'Surface Finish', value: 'ENIG' }
+      ]
+    },
+    {
+      category: 'high-freq',
+      title: 'Rogers High Frequency Board',
+      subtitle: 'Telecommunications',
+      specs: [
+        { label: 'Layer Count', value: '4 Layers' },
+        { label: 'Material', value: 'Rogers 4350B + FR4' },
+        { label: 'Board Thickness', value: '1.6mm' },
+        { label: 'Impedance Control', value: '±5%' },
+        { label: 'Application', value: 'Telecom Base Station' }
+      ]
+    },
+    {
+      category: 'heavy-copper',
+      title: '4oz Heavy Copper PCB',
+      subtitle: 'Power Supply / Automotive',
+      specs: [
+        { label: 'Layer Count', value: '6 Layers' },
+        { label: 'Copper Thickness', value: '4 oz (Outer/Inner)' },
+        { label: 'Min Hole Size', value: '0.3mm' },
+        { label: 'Solder Mask', value: 'Matte Black' },
+        { label: 'Application', value: 'Automotive EV Charger' }
+      ]
+    },
+    {
+      category: 'rigid-flex',
+      title: '8-Layer Rigid-Flex Circuit',
+      subtitle: 'Medical Devices',
+      specs: [
+        { label: 'Layer Count', value: '8 Layers (6 Rigid + 2 Flex)' },
+        { label: 'Material', value: 'PI + FR-4' },
+        { label: 'Stiffener', value: 'Stainless Steel / PI' },
+        { label: 'Surface Finish', value: 'Hard Gold Plating' },
+        { label: 'Application', value: 'Medical Endoscope' }
+      ]
+    },
+    {
+      category: 'hdi',
+      title: 'Consumer Electronics PCBA',
+      subtitle: 'Smart Home Devices',
+      specs: [
+        { label: 'Layer Count', value: '6 Layers' },
+        { label: 'HDI Structure', value: '1+N+1' },
+        { label: 'BGA Pitch', value: '0.4mm' },
+        { label: 'Surface Finish', value: 'OSP' }
+      ]
+    },
+    {
+      category: 'high-freq',
+      title: 'Radar Antenna PCB',
+      subtitle: 'Aerospace & Defense',
+      specs: [
+        { label: 'Layer Count', value: '2 Layers' },
+        { label: 'Material', value: 'Taconic RF-35' },
+        { label: 'Min Trace/Space', value: '4mil / 4mil' },
+        { label: 'Surface Finish', value: 'Immersion Silver' }
+      ]
+    }
+  ]
+};
 
 const process: PcbProcessContent = {
   title: 'Precision PCB Manufacturing Process',
@@ -120,12 +334,13 @@ const whyChooseUs: WhyChooseUsContent = {
   title="PCB Manufacturing | RapidDirect"
   description="Scaffold page for /ems/pcb-manufacturing/."
 >
+  <HeroBanner data={hero} />
+  <PcbMfgCapabilitySection data={capability} />
+  <PcbMfgTechTableSection data={techTable} />
   <PcbProcessSection data={process} />
+  <QualityControlSection data={quality} />
+  <IndustrySection data={industry} />
   <WhyChooseUsSection data={whyChooseUs} />
-  <section class="mx-auto max-w-7xl px-6 py-20">
-    <h1 class="text-4xl font-semibold tracking-tight text-slate-900">PCB Manufacturing</h1>
-    <p class="mt-4 max-w-2xl text-base leading-7 text-slate-600">
-      Route scaffold initialized for the PCB Manufacturing service page.
-    </p>
-  </section>
+  <ProductGallerySection data={productGallery} />
+  <FaqSection data={faq} />
 </EmsLayout>

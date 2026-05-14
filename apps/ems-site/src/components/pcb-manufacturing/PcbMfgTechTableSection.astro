@@ -1,0 +1,179 @@
+---
+import { getAssetPath } from '../../lib/assets';
+
+export interface PcbMfgTechTableRow {
+  item: string;
+  mass_production: string;
+  sample_prototype: string;
+}
+
+export interface Props {
+  data: {
+    title: string;
+    description: string;
+    rows: PcbMfgTechTableRow[];
+  };
+}
+
+const { data } = Astro.props;
+
+const icons = {
+  item: '/images/pcb-manufacturing/mp3rcfh6-raj22he.svg',
+  mass: '/images/pcb-manufacturing/mp3rcfh6-6dkx6il.svg',
+  sample: '/images/pcb-manufacturing/mp3rcfh6-t8vlll2.svg'
+};
+---
+
+<section class="pcb-mfg-tech-table-section bg-white">
+  <div class="mx-auto max-w-7xl px-6 py-24 sm:py-28">
+    <div class="text-center">
+      <h2 class="text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">{data.title}</h2>
+      <p class="mx-auto mt-4 max-w-3xl text-base leading-7 text-slate-600 sm:text-lg">{data.description}</p>
+    </div>
+
+    <div class="mt-12 rounded-2xl border border-slate-200 bg-white shadow-[0_12px_19px_-4px_rgba(0,0,0,0.10),0_5px_7px_-5px_rgba(0,0,0,0.10)]">
+      <div class="pcb-mfg-tech-table-wrapper">
+        <table class="pcb-mfg-tech-table">
+          <thead>
+            <tr>
+              <th scope="col">
+                <span class="pcb-mfg-tech-th-inner">
+                  <img src={getAssetPath(icons.item)} alt="" class="pcb-mfg-tech-th-icon" />
+                  <span>Item</span>
+                </span>
+              </th>
+              <th scope="col">
+                <span class="pcb-mfg-tech-th-inner">
+                  <img src={getAssetPath(icons.mass)} alt="" class="pcb-mfg-tech-th-icon" />
+                  <span>Mass Production</span>
+                </span>
+              </th>
+              <th scope="col">
+                <span class="pcb-mfg-tech-th-inner">
+                  <img src={getAssetPath(icons.sample)} alt="" class="pcb-mfg-tech-th-icon" />
+                  <span>Sample/Prototype</span>
+                </span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.rows.map((row) => (
+              <tr>
+                <td>
+                  <span class="pcb-mfg-tech-item-cell">
+                    <span class="pcb-mfg-tech-item-text">{row.item}</span>
+                  </span>
+                </td>
+                <td>{row.mass_production}</td>
+                <td>{row.sample_prototype}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .pcb-mfg-tech-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 16px;
+  }
+
+  .pcb-mfg-tech-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    min-width: 920px;
+  }
+
+  .pcb-mfg-tech-table th,
+  .pcb-mfg-tech-table td {
+    padding: 22px 24px;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 15px;
+    line-height: 1.35;
+  }
+
+  .pcb-mfg-tech-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background-image: linear-gradient(90deg, #ea543f 0%, #be3625 100%);
+    color: #ffffff;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.25px;
+    font-size: 14px;
+  }
+
+  .pcb-mfg-tech-table thead th + th {
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .pcb-mfg-tech-th-inner {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+  }
+
+  .pcb-mfg-tech-th-icon {
+    width: 20px;
+    height: 20px;
+    flex: none;
+  }
+
+  .pcb-mfg-tech-table tbody tr:nth-child(even) {
+    background-color: #f9fafb;
+  }
+
+  .pcb-mfg-tech-table tbody tr:hover {
+    background-color: rgba(239, 83, 63, 0.10);
+  }
+
+  .pcb-mfg-tech-table td {
+    color: #364153;
+    font-size: 15px;
+  }
+
+  .pcb-mfg-tech-table td:first-child {
+    color: #101828;
+    font-weight: 500;
+  }
+
+  .pcb-mfg-tech-item-cell {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  @media (max-width: 768px) {
+    .pcb-mfg-tech-table {
+      min-width: 760px;
+    }
+
+    .pcb-mfg-tech-table th:first-child,
+    .pcb-mfg-tech-table td:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 1;
+      background-color: #ffffff;
+      box-shadow: 4px 0 10px -2px rgba(0, 0, 0, 0.06);
+    }
+
+    .pcb-mfg-tech-table tbody tr:nth-child(even) td:first-child {
+      background-color: #f9fafb;
+    }
+
+    .pcb-mfg-tech-table tbody tr:hover td:first-child {
+      background-color: rgba(239, 83, 63, 0.10);
+    }
+
+    .pcb-mfg-tech-table thead th:first-child {
+      z-index: 3;
+      background-image: linear-gradient(90deg, #ea543f 0%, #be3625 100%);
+    }
+  }
+</style>

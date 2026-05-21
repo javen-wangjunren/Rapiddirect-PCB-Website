@@ -12,6 +12,7 @@ const modules: { key: keyof typeof pcbDesignSchema; label: string }[] = [
   { key: 'capability', label: 'Capability' },
   { key: 'workflow', label: 'Workflow' },
   { key: 'simulation', label: 'Simulation' },
+  { key: 'process', label: 'Process' },
   { key: 'deliverables', label: 'Deliverables' },
   { key: 'industry', label: 'Industry' },
   { key: 'why_choose_us', label: 'Why Choose Us' },
@@ -55,6 +56,10 @@ export default function PcbDesignEditorContentModules({ contentJson, onModuleCha
                   {m.key === 'workflow' ? (
                     <div className="mb-3 text-xs leading-5 text-[var(--admin-fg-muted)]">
                       layout=standard 使用 steps/image_url；layout=special 使用 special_title/special_description/special_cta。
+                    </div>
+                  ) : m.key === 'process' ? (
+                    <div className="mb-3 text-xs leading-5 text-[var(--admin-fg-muted)]">
+                      items.description 支持少量 HTML：span/br/strong/em（其余标签会被清理）。
                     </div>
                   ) : m.key === 'simulation' ? (
                     <div className="mb-3 text-xs leading-5 text-[var(--admin-fg-muted)]">

@@ -1,0 +1,116 @@
+---
+import type { ComponentsSourcingSourceCapabilityContent } from '../../types/components-sourcing';
+import { getAssetPath } from '../../lib/assets';
+
+export interface Props {
+  data: ComponentsSourcingSourceCapabilityContent;
+}
+
+const { data } = Astro.props;
+
+const coreServices = Array.isArray((data as any)?.core_services) ? ((data as any).core_services as any[]) : [];
+const categories = Array.isArray((data as any)?.categories?.items) ? ((data as any).categories.items as any[]) : [];
+const supplyChannels = Array.isArray((data as any)?.supply_chain?.items) ? ((data as any).supply_chain.items as any[]) : [];
+const brands = Array.isArray((data as any)?.brands?.items) ? ((data as any).brands.items as any[]) : [];
+---
+
+<section class="bg-[#F5F5F5] py-20 sm:py-24">
+  <div class="mx-auto max-w-[1280px] px-6">
+    <div class="text-center">
+      <h2 class="text-3xl font-extrabold tracking-tight text-[#1a1a1a] sm:text-4xl">{data.title}</h2>
+      <p class="mx-auto mt-4 max-w-3xl text-base leading-7 text-[#666666] sm:text-lg">{data.description}</p>
+    </div>
+
+    <div class="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      {coreServices.map((item) => (
+        <article class="group rounded-2xl bg-white px-6 py-8 shadow-[0_4px_20px_rgba(0,0,0,0.03)] ring-1 ring-transparent transition hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(0,0,0,0.08)] hover:ring-[#ef533f]">
+          <div class="mb-5 flex h-10 w-10 items-center justify-center text-[#ef533f]" set:html={item.icon_svg} />
+          <h3 class="text-base font-bold leading-6 text-[#1a1a1a]">{item.title}</h3>
+          <p class="mt-3 text-sm leading-6 text-[#666666]">{item.description}</p>
+        </article>
+      ))}
+    </div>
+
+    <div class="mt-20 flex items-center gap-3">
+      <h3 class="text-xl font-extrabold text-[#1a1a1a] sm:text-2xl">{data.categories.title}</h3>
+      <div class="h-px flex-1 bg-[#e5e7eb]" />
+    </div>
+
+    <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {categories.map((item) => (
+        <article class="group flex flex-col overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white shadow-[0_4px_15px_rgba(0,0,0,0.03)] transition hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)]">
+          <div class="relative h-40 overflow-hidden bg-slate-200">
+            {item.image_url ? (
+              <img
+                src={getAssetPath(item.image_url)}
+                alt=""
+                class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.05]"
+                loading="lazy"
+                decoding="async"
+              />
+            ) : (
+              <div class="flex h-full w-full items-center justify-center px-6 text-center text-[13px] font-semibold text-slate-500">
+                {item.image_placeholder}
+              </div>
+            )}
+          </div>
+          <div class="px-6 py-5 text-center">
+            <h4 class="text-sm font-bold text-[#1a1a1a] sm:text-base">{item.title}</h4>
+          </div>
+        </article>
+      ))}
+    </div>
+
+    <div class="mt-20 flex items-center gap-3">
+      <h3 class="text-xl font-extrabold text-[#1a1a1a] sm:text-2xl">Authorized Supply Chain & Brands</h3>
+      <div class="h-px flex-1 bg-[#e5e7eb]" />
+    </div>
+
+    <div class="mt-8 flex flex-col gap-6 lg:flex-row lg:items-stretch">
+      <div class="rounded-3xl border border-[#e5e7eb] bg-white p-8 shadow-[0_4px_20px_rgba(0,0,0,0.02)] lg:w-[35%] lg:p-10">
+        <h4 class="text-lg font-extrabold text-[#1a1a1a] sm:text-xl">{data.supply_chain.title}</h4>
+        <ul class="mt-7 space-y-5">
+          {supplyChannels.map((item) => (
+            <li class="flex items-start gap-3">
+              <svg
+                class="mt-0.5 h-6 w-6 flex-none text-emerald-500"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              <div class="min-w-0">
+                <strong class="block text-sm font-semibold text-[#1a1a1a] sm:text-base">{item.title}</strong>
+                <span class="mt-1 block text-sm leading-6 text-[#666666]">{item.description}</span>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="flex flex-1 flex-col rounded-3xl border border-[#e5e7eb] bg-white p-8 shadow-[0_4px_20px_rgba(0,0,0,0.02)] lg:p-10">
+        <h4 class="text-lg font-extrabold text-[#1a1a1a] sm:text-xl">{data.brands.title}</h4>
+        <div class="mt-7 grid flex-1 grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          {brands.map((item) => (
+            <div class="group flex h-20 items-center justify-center overflow-hidden rounded-xl border border-[#e5e7eb] bg-white transition hover:-translate-y-0.5 hover:border-[#ef533f] hover:shadow-[0_4px_15px_rgba(239,83,63,0.1)]">
+              {item.logo_url ? (
+                <img src={getAssetPath(item.logo_url)} alt={item.name} class="h-full w-full object-contain p-4" loading="lazy" decoding="async" />
+              ) : (
+                <span class="px-3 text-center text-[13px] font-semibold text-slate-500">{item.name}</span>
+              )}
+            </div>
+          ))}
+          {data.brands.more_label && (
+            <div class="flex h-20 items-center justify-center rounded-xl bg-slate-200 px-3 text-center text-sm font-bold text-slate-500">
+              {data.brands.more_label}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+

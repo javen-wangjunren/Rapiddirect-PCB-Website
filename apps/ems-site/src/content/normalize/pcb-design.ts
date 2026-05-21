@@ -63,6 +63,23 @@ export function normalizePcbDesignContentJson(data: any) {
 
         const specialCta = stage?.special_cta ?? stage?.mfg_cta;
 
+        const specialTitle =
+          typeof stage?.special_title === 'string'
+            ? stage.special_title
+            : typeof stage?.mfg_title === 'string'
+              ? stage.mfg_title
+              : '';
+
+        const specialDescription =
+          typeof stage?.special_description === 'string'
+            ? stage.special_description
+            : typeof stage?.mfg_description === 'string'
+              ? stage.mfg_description
+              : '';
+
+        const resolvedSpecialTitle = specialTitle.trim() ? specialTitle : '';
+        const resolvedSpecialDescription = specialDescription.trim() ? specialDescription : '';
+
         return {
           ...(stage && typeof stage === 'object' ? stage : {}),
           id,
@@ -74,25 +91,15 @@ export function normalizePcbDesignContentJson(data: any) {
           image_url: typeof stage?.image_url === 'string' ? stage.image_url : '',
           image_alt: typeof stage?.image_alt === 'string' ? stage.image_alt : '',
           image_placeholder: typeof stage?.image_placeholder === 'string' ? stage.image_placeholder : '',
-          special_title: typeof stage?.special_title === 'string' ? stage.special_title : typeof stage?.mfg_title === 'string' ? stage.mfg_title : '',
-          special_description:
-            typeof stage?.special_description === 'string'
-              ? stage.special_description
-              : typeof stage?.mfg_description === 'string'
-                ? stage.mfg_description
-                : '',
+          special_title: resolvedSpecialTitle,
+          special_description: resolvedSpecialDescription,
           special_cta: {
             label: typeof specialCta?.label === 'string' ? specialCta.label : '',
             href: typeof specialCta?.href === 'string' ? specialCta.href : '',
           },
           is_mfg: layout === 'special',
-          mfg_title: typeof stage?.mfg_title === 'string' ? stage.mfg_title : typeof stage?.special_title === 'string' ? stage.special_title : '',
-          mfg_description:
-            typeof stage?.mfg_description === 'string'
-              ? stage.mfg_description
-              : typeof stage?.special_description === 'string'
-                ? stage.special_description
-                : '',
+          mfg_title: resolvedSpecialTitle,
+          mfg_description: resolvedSpecialDescription,
           mfg_cta: {
             label: typeof specialCta?.label === 'string' ? specialCta.label : '',
             href: typeof specialCta?.href === 'string' ? specialCta.href : '',

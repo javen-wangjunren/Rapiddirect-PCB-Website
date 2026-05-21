@@ -1,15 +1,46 @@
 ---
+export const prerender = false;
+
 import EmsLayout from '../layouts/EmsLayout.astro';
+import HeroBanner from '../components/common/HeroBanner.astro';
+import SourceCapabilitySection from '../components/components-sourcing/SourceCapabilitySection.astro';
+import SourceProcessSection from '../components/components-sourcing/SourceProcessSection.astro';
+import SourceQualityControlSection from '../components/components-sourcing/SourceQualityControlSection.astro';
+import SourceSolutionsSection from '../components/components-sourcing/SourceSolutionsSection.astro';
+import IndustrySection from '../components/common/IndustrySection.astro';
+import WhyChooseUsSection from '../components/common/WhyChooseUsSection.astro';
+import FaqSection from '../components/common/FaqSection.astro';
+import QuoteFormSection from '../components/common/QuoteFormSection.astro';
+import { componentsSourcingDefaults } from '../content/defaults/components-sourcing';
+import { normalizeComponentsSourcingContentJson } from '../content/normalize/components-sourcing';
+import { createSupabaseClient } from '../lib/supabase/client';
+import { mergeSectionFallback } from '../lib/supabase/mappers';
+import { getPublishedPageBundleBySlug } from '../lib/supabase/queries';
+
+const slug = Astro.url.pathname;
+
+const supabase = createSupabaseClient();
+const bundle = supabase ? await getPublishedPageBundleBySlug(supabase, slug) : null;
+
+const contentJson = bundle?.content?.content_json ?? null;
+const data = normalizeComponentsSourcingContentJson(
+  mergeSectionFallback(componentsSourcingDefaults as any, contentJson) as any
+) as any;
+
+const title = bundle?.seo?.meta_title ?? 'Electronic Component Sourcing | RapidDirect';
+const description =
+  bundle?.seo?.meta_description ??
+  'Reliable component sourcing with BOM validation, alternates management, and traceability support for prototyping and production.';
 ---
 
-<EmsLayout
-  title="Components Sourcing | RapidDirect"
-  description="Scaffold page for /ems/components-sourcing/."
->
-  <section class="mx-auto max-w-7xl px-6 py-20">
-    <h1 class="text-4xl font-semibold tracking-tight text-slate-900">Components Sourcing</h1>
-    <p class="mt-4 max-w-2xl text-base leading-7 text-slate-600">
-      Route scaffold initialized for the Components Sourcing service page.
-    </p>
-  </section>
+<EmsLayout title={title} description={description}>
+  <HeroBanner data={data.hero} />
+  <SourceCapabilitySection data={data.source_capability} />
+  <SourceProcessSection data={data.source_process} />
+  <SourceQualityControlSection data={data.source_quality_control} />
+  <SourceSolutionsSection data={data.source_solutions} />
+  <IndustrySection data={data.industry} />
+  <WhyChooseUsSection data={data.why_choose_us} />
+  <FaqSection data={data.faq} />
+  <QuoteFormSection data={data.quote_form} />
 </EmsLayout>

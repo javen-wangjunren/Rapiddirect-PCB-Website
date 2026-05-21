@@ -1,0 +1,86 @@
+---
+import type { ComponentsSourcingSourceQualityControlContent } from '../../types/components-sourcing';
+import { getAssetPath } from '../../lib/assets';
+
+export interface Props {
+  data: ComponentsSourcingSourceQualityControlContent;
+}
+
+const { data } = Astro.props;
+const badges = Array.isArray((data as any)?.trust_badges) ? ((data as any).trust_badges as any[]) : [];
+const items = Array.isArray((data as any)?.items) ? ((data as any).items as any[]) : [];
+const visual = (data as any)?.visual ?? {};
+---
+
+<section class="overflow-hidden bg-white py-[100px]">
+  <div class="mx-auto flex max-w-[1280px] flex-col items-center gap-16 px-6 lg:flex-row lg:gap-[60px]">
+    <div class="w-full lg:w-[52%]">
+      <span class="mb-4 block text-sm font-bold uppercase tracking-[1px] text-[#ef533f]">{data.tag}</span>
+      <h2 class="text-[32px] font-extrabold leading-[1.15] tracking-[-1px] text-[#1e293b] sm:text-[40px]">
+        {data.title}
+      </h2>
+      <p class="mt-6 text-base leading-7 text-[#64748b] sm:text-lg">{data.lead}</p>
+
+      <div class="mt-8 flex flex-wrap gap-3">
+        {badges.map((badge) => (
+          <div class="inline-flex items-center gap-2 rounded-[50px] border border-[#a7f3d0] bg-[#ecfdf5] px-4 py-2 text-sm font-bold text-[#047857]">
+            <span class="h-[18px] w-[18px] text-[#10b981]" set:html={badge.icon_svg} />
+            <span>{badge.label}</span>
+          </div>
+        ))}
+      </div>
+
+      <div class="mt-10 flex flex-col gap-6">
+        {items.map((item) => (
+          <div
+            class={`group flex flex-col gap-3 rounded-2xl border p-5 transition-all duration-300 sm:flex-row sm:gap-4 ${
+              item.is_highlighted
+                ? 'border-[#fff0ed] bg-[#fffaf9]'
+                : 'border-transparent bg-[#f8fafc] hover:border-[#e2e8f0] hover:bg-white hover:shadow-[0_10px_30px_rgba(0,0,0,0.04)] hover:translate-x-1'
+            }`}
+          >
+            <div
+              class={`flex h-10 w-10 flex-none items-center justify-center rounded-xl shadow-[0_2px_10px_rgba(0,0,0,0.05)] ${
+                item.is_highlighted ? 'bg-[#ef533f] text-white' : 'bg-white text-[#ef533f]'
+              }`}
+              set:html={item.icon_svg}
+            />
+            <div class="min-w-0">
+              <h4 class="text-base font-bold text-[#1e293b] sm:text-lg">{item.title}</h4>
+              <p class="mt-1 text-sm leading-6 text-[#64748b]">{item.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="relative w-full flex-1">
+      <div class="group relative aspect-video overflow-hidden rounded-3xl bg-slate-200 text-center shadow-[0_20px_50px_rgba(0,0,0,0.08)] lg:aspect-[4/5]">
+        {visual.image_url ? (
+          <img
+            src={getAssetPath(visual.image_url)}
+            alt=""
+            class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+            loading="lazy"
+            decoding="async"
+          />
+        ) : (
+          <div class="flex h-full w-full items-center justify-center px-6 py-10 text-center text-[15px] font-semibold leading-7 text-slate-500">
+            {visual.image_placeholder}
+          </div>
+        )}
+      </div>
+
+      {visual?.floating_card && (
+        <div class="absolute bottom-5 left-5 right-5 z-10 flex items-center gap-4 rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-[0_15px_35px_rgba(0,0,0,0.1)] lg:bottom-[-20px] lg:left-[-30px] lg:right-auto">
+          <div class="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-[#ecfdf5] text-[#10b981]" set:html={visual.floating_card.icon_svg} />
+          <div class="min-w-0">
+            <div class="text-base font-extrabold text-[#1e293b]">{visual.floating_card.title}</div>
+            <div class="mt-1 text-sm font-semibold text-[#64748b]">{visual.floating_card.subtitle}</div>
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+</section>
+

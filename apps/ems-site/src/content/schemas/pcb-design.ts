@@ -23,6 +23,7 @@ export const pcbDesignSchema = {
       type: 'array',
       items: {
         name: 'string',
+        image_url: 'string',
         description: {
           kind: 'string',
           text: 'string',
@@ -101,6 +102,35 @@ export const pcbDesignSchema = {
     },
     footer: {
       description: 'string',
+      cta: {
+        label: 'string',
+        href: 'string'
+      }
+    }
+  },
+  process: {
+    title: 'string',
+    description: 'string',
+    items: {
+      type: 'array',
+      items: {
+        icon: 'string',
+        title: 'string',
+        description: 'string',
+        tags: 'array',
+        image_url: 'string'
+      }
+    },
+    trust_base: {
+      title: 'string',
+      benefits: {
+        type: 'array',
+        items: {
+          icon: 'string',
+          title: 'string',
+          description: 'string'
+        }
+      },
       cta: {
         label: 'string',
         href: 'string'

@@ -41,7 +41,7 @@ const sidebarDialogId = 'admin-sidebar-dialog';
         </>
       ) : null}
 
-      <div class="min-w-0 flex-1 overflow-y-auto">
+      <div class="min-w-0 flex-1 overflow-y-auto" data-admin-scroll-container>
         <AdminTopbar title={title} sidebarDialogId={showSidebar ? sidebarDialogId : undefined} />
         <main class="mx-auto max-w-[var(--admin-page-max)] px-[var(--admin-page-px)] py-[var(--admin-page-py)]">
           <slot />

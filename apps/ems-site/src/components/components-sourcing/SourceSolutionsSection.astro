@@ -1,0 +1,55 @@
+---
+import type { ComponentsSourcingSourceSolutionsContent } from '../../types/components-sourcing';
+
+export interface Props {
+  data: ComponentsSourcingSourceSolutionsContent;
+}
+
+const { data } = Astro.props;
+const cards = Array.isArray((data as any)?.cards) ? ((data as any).cards as any[]) : [];
+---
+
+<section class="bg-[#F5F5F5] py-[100px]">
+  <div class="mx-auto max-w-[1100px] px-6">
+    <div class="text-center">
+      <h2 class="text-3xl font-extrabold tracking-tight text-[#1a1a1a] sm:text-4xl">{data.title}</h2>
+      <p class="mx-auto mt-4 max-w-[700px] text-base leading-7 text-[#555555] sm:text-lg">{data.description}</p>
+    </div>
+
+    <div class="mt-[60px] grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
+      {cards.map((card) => (
+        <article class="flex flex-col rounded-lg border border-[#e5e7eb] bg-white p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] transition hover:-translate-y-1 hover:border-[#ef533f] hover:shadow-[0_15px_35px_rgba(0,0,0,0.08)] sm:p-10">
+          <div class="mb-8">
+            <div class="mb-5 flex h-12 w-12 items-center justify-center rounded-lg bg-[#fff0ed] p-2.5 text-[#ef533f]" set:html={card.icon_svg} />
+            <h3 class="text-[22px] font-extrabold leading-snug text-[#1a1a1a] md:text-2xl">{card.title}</h3>
+          </div>
+
+          <ul class="mb-8 flex-1 space-y-4">
+            {(Array.isArray(card.points) ? card.points : []).map((text: string) => (
+              <li class="flex items-start gap-3">
+                <svg
+                  class="mt-0.5 h-5 w-5 flex-none text-emerald-500"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span class="text-base font-medium leading-6 text-[#555555]">{text}</span>
+              </li>
+            ))}
+          </ul>
+
+          <div class="flex items-start gap-3 rounded-md bg-[#f8fafc] p-5" style="border-left: 4px solid #ef533f;">
+            <div class="mt-0.5 h-5 w-5 flex-none text-[#ef533f]" set:html={card.value_box?.icon_svg} />
+            <span class="text-[15px] font-bold leading-6 text-[#1a1a1a]">{card.value_box?.text}</span>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+

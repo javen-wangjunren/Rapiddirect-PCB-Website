@@ -12,7 +12,6 @@ export interface EmsEditorPublishSidebarProps {
   onSaveDraft: () => void;
   onPublish: () => void;
   onQuickSave: () => void;
-  onTrash: () => void;
 }
 
 export default function EmsEditorPublishSidebar({
@@ -25,8 +24,7 @@ export default function EmsEditorPublishSidebar({
   canPublish,
   onSaveDraft,
   onPublish,
-  onQuickSave,
-  onTrash
+  onQuickSave
 }: EmsEditorPublishSidebarProps) {
   const resolvedPreviewHref = previewHref?.startsWith('/') ? previewHref : getAssetPath(previewHref || '/');
   return (
@@ -87,10 +85,7 @@ export default function EmsEditorPublishSidebar({
               {status === 'published' ? 'Update' : 'Publish'}
             </button>
           </div>
-          <div className="mt-2 flex items-center justify-between">
-            <button type="button" className="text-sm text-[#d63638] hover:underline" onClick={onTrash}>
-              Move to Trash
-            </button>
+          <div className="mt-2 flex items-center justify-end">
             <button type="button" className="text-sm text-[#2271b1] hover:underline" onClick={onQuickSave}>
               Quick Save
             </button>

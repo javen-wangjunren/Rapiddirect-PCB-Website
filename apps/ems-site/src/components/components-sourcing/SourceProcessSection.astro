@@ -1,0 +1,218 @@
+---
+import type { ComponentsSourcingSourceProcessContent } from '../../types/components-sourcing';
+import { getAssetPath } from '../../lib/assets';
+
+export interface Props {
+  data: ComponentsSourcingSourceProcessContent;
+}
+
+const { data } = Astro.props;
+const steps = Array.isArray((data as any)?.steps) ? ((data as any).steps as any[]) : [];
+---
+
+<section class="bg-[#F5F5F5] py-20 sm:py-24">
+  <div class="mx-auto max-w-[1200px] px-6">
+    <div class="text-center">
+      <h2 class="text-3xl font-extrabold tracking-tight text-[#1a1a1a] sm:text-4xl">{data.title}</h2>
+      <p class="mx-auto mt-4 max-w-3xl text-base leading-7 text-[#666666] sm:text-lg">{data.description}</p>
+    </div>
+
+    <div class="stepper-nav relative mx-auto mt-12 flex max-w-[1000px] justify-between">
+      <div class="absolute left-0 right-0 top-6 h-0.5 bg-[#e5e7eb]" aria-hidden="true"></div>
+      {steps.map((step, index) => (
+        <button
+          type="button"
+          class={`step-btn relative z-10 flex w-[120px] flex-col items-center gap-3 bg-transparent ${
+            index === 0 ? 'active' : ''
+          }`}
+          data-target={step.id}
+        >
+          <div class="step-dot flex h-12 w-12 items-center justify-center rounded-full border-2 border-[#e5e7eb] bg-white text-base font-extrabold text-slate-400 transition">
+            {index + 1}
+          </div>
+          <div class="step-label text-center text-sm font-semibold leading-snug text-slate-400 transition">{step.nav_label}</div>
+        </button>
+      ))}
+    </div>
+
+    <div class="mt-10 overflow-hidden rounded-[20px] border border-[#e5e7eb] bg-white shadow-[0_10px_40px_rgba(0,0,0,0.03)]">
+      {steps.map((step, index) => (
+        <div id={step.id} class={`step-panel ${index === 0 ? 'active' : ''}`}>
+          <div class="panel-text">
+            <span class="step-badge mb-3 block text-[13px] font-bold uppercase tracking-[1px] text-[#ef533f]">
+              {step.badge}
+            </span>
+            <h3 class="text-2xl font-extrabold leading-tight text-[#1a1a1a] sm:text-[28px]">{step.title}</h3>
+            <p class="mt-5 text-base leading-7 text-[#666666]">{step.description}</p>
+          </div>
+          <div class="panel-visual">
+            {step.image_url ? (
+              <img src={getAssetPath(step.image_url)} alt={step.title} class="absolute inset-0 h-full w-full object-cover" loading="lazy" decoding="async" />
+            ) : (
+              <div class="img-placeholder-text">{step.image_placeholder}</div>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  function initSourceProcess() {
+    const root = document;
+    const stepBtns = root.querySelectorAll('.step-btn') as NodeListOf<HTMLElement>;
+    const stepPanels = root.querySelectorAll('.step-panel') as NodeListOf<HTMLElement>;
+    if (stepBtns.length === 0 || stepPanels.length === 0) return;
+
+    const setActive = (btn: HTMLElement) => {
+      stepBtns.forEach((b) => {
+        b.classList.remove('active');
+        const dot = b.querySelector('.step-dot');
+        const label = b.querySelector('.step-label');
+        if (dot) dot.classList.remove('bg-[#ef533f]', 'border-[#ef533f]', 'text-white', 'shadow-[0_0_0_6px_rgba(239,83,63,0.15)]');
+        if (dot) dot.classList.add('bg-white', 'border-[#e5e7eb]', 'text-slate-400');
+        if (label) label.classList.remove('text-[#1a1a1a]', 'font-extrabold');
+        if (label) label.classList.add('text-slate-400', 'font-semibold');
+      });
+
+      stepPanels.forEach((p) => p.classList.remove('active'));
+
+      btn.classList.add('active');
+      const dot = btn.querySelector('.step-dot');
+      const label = btn.querySelector('.step-label');
+      if (dot) dot.classList.remove('bg-white', 'border-[#e5e7eb]', 'text-slate-400');
+      if (dot) dot.classList.add('bg-[#ef533f]', 'border-[#ef533f]', 'text-white', 'shadow-[0_0_0_6px_rgba(239,83,63,0.15)]');
+      if (label) label.classList.remove('text-slate-400', 'font-semibold');
+      if (label) label.classList.add('text-[#1a1a1a]', 'font-extrabold');
+
+      const targetId = btn.getAttribute('data-target');
+      if (!targetId) return;
+      const panel = document.getElementById(targetId);
+      if (panel) panel.classList.add('active');
+    };
+
+    stepBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        setActive(btn);
+        if (window.innerWidth <= 992) {
+          btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', initSourceProcess);
+  document.addEventListener('astro:page-load', initSourceProcess);
+</script>
+
+<style>
+  .step-btn:hover .step-dot {
+    border-color: #ef533f;
+    color: #ef533f;
+  }
+
+  .step-btn:hover .step-label {
+    color: #1a1a1a;
+  }
+
+  .step-btn.active .step-dot {
+    background-color: #ef533f;
+    border-color: #ef533f;
+    color: #ffffff;
+    box-shadow: 0 0 0 6px rgba(239, 83, 63, 0.15);
+  }
+
+  .step-btn.active .step-label {
+    color: #1a1a1a;
+    font-weight: 800;
+  }
+
+  .step-panel {
+    display: none;
+    padding: 40px;
+    animation: fadeIn 0.4s ease forwards;
+  }
+
+  .step-panel.active {
+    display: flex;
+    gap: 40px;
+    align-items: center;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .panel-text {
+    flex: 0 0 45%;
+  }
+
+  .panel-visual {
+    flex: 1;
+    aspect-ratio: 16/10;
+    background-color: #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e5e7eb;
+    position: relative;
+  }
+
+  .img-placeholder-text {
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    padding: 20px;
+    max-width: 80%;
+  }
+
+  @media (max-width: 992px) {
+    .stepper-nav {
+      overflow-x: auto;
+      padding-bottom: 20px;
+      justify-content: flex-start;
+      gap: 20px;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+    }
+
+    .stepper-nav::-webkit-scrollbar {
+      display: none;
+    }
+
+    .stepper-nav > button {
+      flex: 0 0 100px;
+      scroll-snap-align: start;
+    }
+
+    .stepper-nav > div[aria-hidden='true'] {
+      width: 800px;
+    }
+
+    .step-panel.active {
+      flex-direction: column;
+      padding: 30px 20px;
+      gap: 30px;
+    }
+
+    .panel-text {
+      flex: none;
+      width: 100%;
+    }
+
+    .panel-visual {
+      width: 100%;
+    }
+  }
+</style>

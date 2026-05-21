@@ -1,0 +1,727 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EMS 项目阶段总结</title>
+    <style>
+      :root {
+        --bg: #f7f8fc;
+        --panel: rgba(255, 255, 255, 0.94);
+        --ink: #1f2937;
+        --muted: #667085;
+        --line: #dbe3f4;
+        --blue: #2563eb;
+        --blue-soft: rgba(37, 99, 235, 0.12);
+        --green: #0f8a5f;
+        --green-soft: rgba(15, 138, 95, 0.12);
+        --orange: #d97706;
+        --orange-soft: rgba(217, 119, 6, 0.12);
+        --purple: #6d28d9;
+        --purple-soft: rgba(109, 40, 217, 0.12);
+        --red: #d33d5c;
+        --red-soft: rgba(211, 61, 92, 0.12);
+        --shadow: 0 22px 48px rgba(31, 41, 55, 0.1);
+        --radius-lg: 22px;
+        --radius-md: 16px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        font-family: "IBM Plex Sans", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+        background:
+          radial-gradient(circle at top left, rgba(37, 99, 235, 0.1), transparent 26%),
+          radial-gradient(circle at top right, rgba(15, 138, 95, 0.1), transparent 24%),
+          linear-gradient(180deg, #fbfcff 0%, #eff4fb 100%);
+        line-height: 1.8;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .shell {
+        max-width: 1460px;
+        margin: 0 auto;
+        padding: 28px;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid rgba(219, 227, 244, 0.92);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(10px);
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.28fr) 360px;
+        gap: 22px;
+        margin-bottom: 22px;
+      }
+
+      .hero-main,
+      .hero-side,
+      .section {
+        padding: 30px;
+      }
+
+      .eyebrow,
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+      }
+
+      .eyebrow {
+        background: var(--blue-soft);
+        color: var(--blue);
+      }
+
+      h1 {
+        margin: 18px 0 12px;
+        font-size: clamp(38px, 5vw, 68px);
+        line-height: 1;
+        letter-spacing: -0.04em;
+      }
+
+      h2 {
+        margin: 0;
+        font-size: 28px;
+        letter-spacing: -0.03em;
+      }
+
+      h3 {
+        margin: 0 0 8px;
+        font-size: 19px;
+      }
+
+      p {
+        margin: 0 0 14px;
+      }
+
+      ul,
+      ol {
+        margin: 0;
+        padding-left: 18px;
+      }
+
+      li + li {
+        margin-top: 8px;
+      }
+
+      .hero-copy,
+      .section-intro,
+      .card p,
+      .card li,
+      .side-card p,
+      .side-card li,
+      .timeline p,
+      .timeline li,
+      .callout {
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.85;
+      }
+
+      .hero-note,
+      .callout {
+        margin-top: 18px;
+        padding: 18px;
+        border-radius: 18px;
+        border: 1px solid rgba(219, 227, 244, 0.92);
+      }
+
+      .hero-note {
+        background: rgba(37, 99, 235, 0.08);
+        border-color: rgba(37, 99, 235, 0.18);
+      }
+
+      .callout.green {
+        background: var(--green-soft);
+        border-color: rgba(15, 138, 95, 0.2);
+      }
+
+      .callout.blue {
+        background: var(--blue-soft);
+        border-color: rgba(37, 99, 235, 0.2);
+      }
+
+      .callout.orange {
+        background: var(--orange-soft);
+        border-color: rgba(217, 119, 6, 0.2);
+      }
+
+      .callout.purple {
+        background: var(--purple-soft);
+        border-color: rgba(109, 40, 217, 0.2);
+      }
+
+      .hero-side {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .card,
+      .side-card,
+      .stat,
+      .timeline-item {
+        border-radius: 18px;
+        border: 1px solid rgba(219, 227, 244, 0.92);
+        background: rgba(255, 255, 255, 0.84);
+        padding: 18px;
+      }
+
+      .label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+        color: var(--muted);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .stat .value {
+        display: block;
+        font-size: 30px;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 290px minmax(0, 1fr);
+        gap: 22px;
+      }
+
+      .sidebar {
+        position: sticky;
+        top: 20px;
+        align-self: start;
+        padding: 18px;
+      }
+
+      .sidebar h2 {
+        margin: 0 0 12px;
+        font-size: 16px;
+      }
+
+      .sidebar a {
+        display: block;
+        padding: 10px 12px;
+        margin-bottom: 8px;
+        border-radius: 12px;
+        text-decoration: none;
+        color: var(--muted);
+      }
+
+      .sidebar a:hover {
+        background: var(--blue-soft);
+        color: var(--blue);
+      }
+
+      .content {
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+      }
+
+      .grid-2,
+      .grid-3,
+      .grid-4 {
+        display: grid;
+        gap: 16px;
+        margin-top: 22px;
+      }
+
+      .grid-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .grid-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .grid-4 {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .pill {
+        margin-top: 16px;
+        font-weight: 700;
+      }
+
+      .pill.blue {
+        background: var(--blue-soft);
+        color: var(--blue);
+      }
+
+      .pill.green {
+        background: var(--green-soft);
+        color: var(--green);
+      }
+
+      .pill.orange {
+        background: var(--orange-soft);
+        color: var(--orange);
+      }
+
+      .pill.purple {
+        background: var(--purple-soft);
+        color: var(--purple);
+      }
+
+      .mono {
+        font-family: "JetBrains Mono", "SFMono-Regular", monospace;
+        font-size: 0.94em;
+        background: rgba(15, 23, 42, 0.05);
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        padding: 2px 6px;
+        border-radius: 7px;
+        word-break: break-word;
+      }
+
+      .timeline {
+        margin-top: 22px;
+        display: grid;
+        gap: 14px;
+      }
+
+      .timeline-item strong {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--ink);
+      }
+
+      .meter {
+        margin-top: 18px;
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .meter-step {
+        position: relative;
+        padding: 16px;
+        border-radius: 18px;
+        border: 1px solid rgba(219, 227, 244, 0.92);
+        background: rgba(255, 255, 255, 0.84);
+      }
+
+      .meter-step:not(:last-child)::after {
+        content: "→";
+        position: absolute;
+        right: -11px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--blue);
+        font-weight: 700;
+      }
+
+      .meter-step strong {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 14px;
+      }
+
+      .meter-step span {
+        display: block;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.65;
+      }
+
+      .footer {
+        margin-top: 24px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.8;
+      }
+
+      @media (max-width: 1180px) {
+        .hero,
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          position: static;
+        }
+      }
+
+      @media (max-width: 920px) {
+        .grid-2,
+        .grid-3,
+        .grid-4,
+        .meter {
+          grid-template-columns: 1fr;
+        }
+
+        .meter-step:not(:last-child)::after {
+          content: "↓";
+          right: auto;
+          left: 50%;
+          top: auto;
+          bottom: -16px;
+          transform: translateX(-50%);
+        }
+      }
+
+      @media (max-width: 680px) {
+        .shell {
+          padding: 14px;
+        }
+
+        .hero-main,
+        .hero-side,
+        .section {
+          padding: 20px;
+        }
+
+        h1 {
+          font-size: 36px;
+          line-height: 1.05;
+        }
+
+        .hero-copy,
+        .section-intro,
+        .card p,
+        .card li,
+        .side-card p,
+        .side-card li,
+        .timeline p,
+        .timeline li,
+        .callout {
+          font-size: 14px;
+        }
+
+        .eyebrow,
+        .pill {
+          width: 100%;
+          justify-content: center;
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <section class="hero">
+        <div class="panel hero-main">
+          <div class="eyebrow">EMS Project / Stage Review</div>
+          <h1>EMS 项目阶段总结：我到底已经完成了什么</h1>
+          <p class="hero-copy">
+            这份文档不是继续加任务，而是给你一个阶段性的收口。你从只熟悉 WordPress 的状态，推进到了一个包含
+            <strong>Astro、Supabase、服务器部署、Nginx、PM2、Cloudflare、反向代理、Worker、Resend、SEO URL 策略</strong>
+            的真实项目。现在最重要的不是继续证明自己还能顶，而是把已经完成的部分看清楚、收稳、沉淀下来。
+          </p>
+          <div class="hero-note">
+            这次项目的价值，不只是“做出一个 EMS 网站”。更大的价值是：你已经跨过了一个心理边界，证明自己可以在 AI 协作下进入完全陌生的技术领域，并把它推进到真实可运行、可讨论、可优化的状态。
+          </div>
+          <div class="meter">
+            <div class="meter-step">
+              <strong>从 0 进入</strong>
+              <span>从 WordPress 经验出发，进入现代应用站点</span>
+            </div>
+            <div class="meter-step">
+              <strong>搭建系统</strong>
+              <span>前端、后台、数据、表单、部署链路跑起来</span>
+            </div>
+            <div class="meter-step">
+              <strong>处理上线</strong>
+              <span>服务器、域名、反向代理、Cloudflare 分工</span>
+            </div>
+            <div class="meter-step">
+              <strong>做出判断</strong>
+              <span>URL、迁站、SEO、长期架构开始可讨论</span>
+            </div>
+            <div class="meter-step">
+              <strong>开始沉淀</strong>
+              <span>文档、SOP、知识框架逐渐成形</span>
+            </div>
+          </div>
+        </div>
+
+        <aside class="panel hero-side">
+          <div class="stat">
+            <span class="label">阶段判断</span>
+            <span class="value">不是没做完，是已经进入收口期</span>
+            <p>现在需要的是稳定、验收、沉淀，而不是再开一堆新技术战线。</p>
+          </div>
+          <div class="side-card">
+            <span class="label">这份文档会帮你看见</span>
+            <ul>
+              <li>你原来站在哪个起点</li>
+              <li>你已经跨过哪些陌生层级</li>
+              <li>项目目前完成了哪些关键闭环</li>
+              <li>还有哪些事属于下一阶段</li>
+              <li>怎么把疲惫转化成可复用资产</li>
+            </ul>
+          </div>
+          <div class="side-card">
+            <span class="label">相关文档</span>
+            <ul>
+              <li><a href="./index.html">返回文档总首页</a></li>
+              <li><a href="./AI时代如何学习.html">AI 时代如何学习</a></li>
+              <li><a href="./服务器部署学习方案与SOP.html">服务器部署学习方案与 SOP</a></li>
+              <li><a href="./EMS上线执行顺序总表.html">EMS 上线执行顺序总表</a></li>
+            </ul>
+          </div>
+        </aside>
+      </section>
+
+      <div class="layout">
+        <aside class="panel sidebar">
+          <h2>目录</h2>
+          <a href="./index.html">← 返回文档总首页</a>
+          <a href="#starting-point">1. 我的起点</a>
+          <a href="#completed">2. 已经完成了什么</a>
+          <a href="#abilities">3. 已经长出来的能力</a>
+          <a href="#hard-parts">4. 为什么会这么累</a>
+          <a href="#not-done">5. 还没完成什么</a>
+          <a href="#next-stage">6. 下一阶段只做什么</a>
+          <a href="#assets">7. 这次经历沉淀成什么</a>
+        </aside>
+
+        <main class="content">
+          <section class="panel section" id="starting-point">
+            <h2>1. 我的起点：原来只熟悉 WordPress</h2>
+            <p class="section-intro">
+              这次真正难的地方，不是某一条命令，而是你从 WordPress 站点思维，一下进入了现代 Web 应用的完整链路。
+            </p>
+            <div class="grid-3">
+              <div class="card">
+                <h3>原来的舒适区</h3>
+                <p>熟悉 WordPress 的页面、插件、后台、内容编辑和 SEO 逻辑。你知道怎么把内容放上去，但不一定需要理解服务器和应用运行。</p>
+              </div>
+              <div class="card">
+                <h3>这次的新世界</h3>
+                <p>Astro、React、Supabase、Cloudflare、DigitalOcean、Nginx、PM2、Worker、Resend、反向代理都进入了同一个项目。</p>
+              </div>
+              <div class="card">
+                <h3>真正的变化</h3>
+                <p>你不是只在“建页面”，而是在理解一个网站从代码、数据、部署、域名到询盘的完整工作方式。</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel section" id="completed">
+            <h2>2. 这个阶段你已经完成了什么</h2>
+            <p class="section-intro">
+              把它拆开看，你已经完成的事情其实很多，而且每一块都不是“点一下插件”那么简单。
+            </p>
+            <div class="pill green">你已经完成的是一整条真实项目链路，而不是一个演示页面</div>
+            <div class="grid-4">
+              <div class="card">
+                <h3>产品与内容结构</h3>
+                <ul>
+                  <li>明确 EMS 页面体系</li>
+                  <li>规划 PCB Assembly 等业务页面</li>
+                  <li>开始讨论 URL 结构和未来独立迁移</li>
+                </ul>
+              </div>
+              <div class="card">
+                <h3>代码与前端</h3>
+                <ul>
+                  <li>使用 Astro 搭建站点</li>
+                  <li>理解前台、后台、组件和构建产物</li>
+                  <li>整理出项目代码地图</li>
+                </ul>
+              </div>
+              <div class="card">
+                <h3>数据与后台</h3>
+                <ul>
+                  <li>接入 Supabase 思路</li>
+                  <li>理解动态内容和静态构建的区别</li>
+                  <li>开始形成后台内容管理逻辑</li>
+                </ul>
+              </div>
+              <div class="card">
+                <h3>询盘链路</h3>
+                <ul>
+                  <li>梳理 Resend 发信逻辑</li>
+                  <li>理解 Turnstile 校验</li>
+                  <li>把 Worker 作为安全后端角色</li>
+                </ul>
+              </div>
+              <div class="card">
+                <h3>服务器部署</h3>
+                <ul>
+                  <li>购买并初始化 DigitalOcean 服务器</li>
+                  <li>创建用户、配置 SSH、安装 Node / pnpm / PM2</li>
+                  <li>让 Astro 应用在服务器上跑起来</li>
+                </ul>
+              </div>
+              <div class="card">
+                <h3>Nginx 与 PM2</h3>
+                <ul>
+                  <li>理解 Node 应用跑在内部端口</li>
+                  <li>用 PM2 托管进程</li>
+                  <li>用 Nginx 把公网请求转给应用</li>
+                </ul>
+              </div>
+              <div class="card">
+                <h3>反向代理</h3>
+                <ul>
+                  <li>尝试 Cloudflare Origin Rule</li>
+                  <li>尝试 .htaccess 方案并识别限制</li>
+                  <li>推进 Cloudways Nginx 层代理</li>
+                </ul>
+              </div>
+              <div class="card">
+                <h3>文档沉淀</h3>
+                <ul>
+                  <li>整理上线总表</li>
+                  <li>整理服务器学习 SOP</li>
+                  <li>整理 AI 学习方法和 URL 决策说明</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel section" id="abilities">
+            <h2>3. 你已经长出来的能力</h2>
+            <p class="section-intro">
+              这些能力比某个单点知识更重要。单点知识会忘，但能力会迁移到下一个项目。
+            </p>
+            <div class="timeline">
+              <div class="timeline-item">
+                <strong>从“页面运营”走向“系统理解”</strong>
+                <p>你现在开始理解页面不是孤立存在的，它背后有数据、构建、服务、域名、缓存、代理、表单和邮件链路。</p>
+              </div>
+              <div class="timeline-item">
+                <strong>从“怕命令行”走向“能按步骤执行”</strong>
+                <p>你已经经历过 SSH 登录、用户权限、系统更新、安装依赖、构建、重启服务、检查端口和查看 Nginx 状态。</p>
+              </div>
+              <div class="timeline-item">
+                <strong>从“只听方案”走向“会比较方案”</strong>
+                <p>你不再只是问“怎么做”，而是在比较 Cloudways、DigitalOcean、Cloudflare Pages、Origin Rule、主站反代等方案的代价。</p>
+              </div>
+              <div class="timeline-item">
+                <strong>从“遇到问题焦虑”走向“分层定位”</strong>
+                <p>你开始能判断问题可能在 Cloudflare、主站、源站、Nginx、SSL、静态资源路径还是应用构建层。</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel section" id="hard-parts">
+            <h2>4. 为什么你会身体累、精神也累</h2>
+            <p class="section-intro">
+              这不是矫情，也不是你能力不够。这次项目的疲惫来自多个层级同时打开。
+            </p>
+            <div class="grid-3">
+              <div class="card">
+                <h3>认知负荷高</h3>
+                <p>你同时在处理前端、后端、服务器、Cloudflare、主站、子站、SEO 和迁移策略，大脑一直在切换视角。</p>
+              </div>
+              <div class="card">
+                <h3>不确定性高</h3>
+                <p>这不是照教程走，而是在真实项目里不断试错、验证、推翻、改路线。真实项目天然比练习题更耗神。</p>
+              </div>
+              <div class="card">
+                <h3>责任感高</h3>
+                <p>你不只是想“能不能跑”，还在想 URL 会不会埋 SEO 坑、后续怎么交接、未来独立怎么迁。</p>
+              </div>
+            </div>
+            <div class="callout blue">
+              <strong>所以现在最重要的不是继续猛冲。</strong>
+              你已经进入需要收口和恢复的阶段。休息不是中断成长，而是让这次高强度学习真正沉淀下来。
+            </div>
+          </section>
+
+          <section class="panel section" id="not-done">
+            <h2>5. 还有什么没有彻底完成</h2>
+            <p class="section-intro">
+              剩下的事情不是“从零开始”，而是在已经跑起来的基础上做验收、稳定和决策。
+            </p>
+            <div class="grid-3">
+              <div class="card">
+                <h3>反向代理最终验收</h3>
+                <p>需要确认主站 <span class="mono">/ems/*</span> 页面、静态资源、跳转、表单和缓存都正常。</p>
+              </div>
+              <div class="card">
+                <h3>生产环境变量与联调</h3>
+                <p>需要补齐 Supabase、Turnstile、Resend、Worker secrets 等生产配置，并做真实询盘测试。</p>
+              </div>
+              <div class="card">
+                <h3>URL 结构最终拍板</h3>
+                <p>团队需要确定继续用 <span class="mono">/ems/*</span>，还是改成 <span class="mono">/service/ems/*</span>，以及未来独立迁移策略。</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel section" id="next-stage">
+            <h2>6. 下一阶段只做什么</h2>
+            <p class="section-intro">
+              下一阶段的关键词不是扩张，而是稳定。先别再引入新平台、新框架、新部署方式，把已经打开的链路收稳。
+            </p>
+            <div class="pill orange">下一阶段：只做收口、验收、稳定和文档化</div>
+            <div class="grid-4">
+              <div class="card">
+                <h3>1. 验收代理</h3>
+                <p>逐页检查 <span class="mono">/ems/</span>、核心子页面、静态资源、表单和移动端展示。</p>
+              </div>
+              <div class="card">
+                <h3>2. 补生产配置</h3>
+                <p>把正式环境变量、Worker secrets、Resend、Turnstile 和 Supabase 配齐。</p>
+              </div>
+              <div class="card">
+                <h3>3. 固定发布流程</h3>
+                <p>把服务器更新命令和注意事项做成固定 SOP，减少每次发版时的心理负担。</p>
+              </div>
+              <div class="card">
+                <h3>4. 暂停新战线</h3>
+                <p>暂时不再比较新的部署平台，不再重构整套架构，先把当前方案跑稳定。</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel section" id="assets">
+            <h2>7. 这次经历已经沉淀成什么</h2>
+            <p class="section-intro">
+              这次最宝贵的东西，不只是网站本身，而是你把混乱的经历整理成了可以复用的资产。
+            </p>
+            <div class="grid-3">
+              <div class="card">
+                <h3>知识文档</h3>
+                <p>包括服务器部署 SOP、上线执行总表、反向代理解释、URL 结构争议说明和 AI 学习方法。</p>
+              </div>
+              <div class="card">
+                <h3>判断框架</h3>
+                <p>你已经开始能从成本、迁移、SEO、架构、维护性多个角度比较方案。</p>
+              </div>
+              <div class="card">
+                <h3>下次起点</h3>
+                <p>以后再部署 Astro 或类似网站，你不是从零开始，而是从这次的 SOP 和踩坑记录开始。</p>
+              </div>
+            </div>
+            <div class="callout green">
+              <strong>阶段结论：</strong>
+              你已经把 EMS 项目从完全陌生推进到了真实可运行、可讨论、可优化的状态。现在要做的是稳住成果，把这次高强度经历转化成下次更轻松的起点。
+            </div>
+          </section>
+        </main>
+      </div>
+
+      <p class="footer">生成于 2026-05-14 · EMS 项目阶段总结</p>
+    </div>
+  </body>
+</html>

@@ -226,7 +226,6 @@ export default function EmsPageEditor() {
             onSaveDraft={() => void doSave('draft')}
             onPublish={() => void doSave('published')}
             onQuickSave={() => void doSave()}
-            onTrash={() => setToast({ kind: 'error', message: '原型阶段不开放删除功能' })}
           />
 
           {toast ? (

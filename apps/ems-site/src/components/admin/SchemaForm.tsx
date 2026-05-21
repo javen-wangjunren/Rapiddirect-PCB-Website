@@ -71,6 +71,12 @@ const getStringAt = (value: JsonValue, path: string[]) => {
 const buildItemSummary = (item: JsonValue, fallback: string) => {
   if (!isObject(item)) return fallback;
 
+  const label = getStringAt(item, ['label']);
+  if (label) return truncateText(label, 90);
+
+  const header = getStringAt(item, ['header']);
+  if (header) return truncateText(header, 90);
+
   const question = getStringAt(item, ['question']);
   if (question) return truncateText(question, 90);
 
@@ -89,6 +95,9 @@ const buildItemSummary = (item: JsonValue, fallback: string) => {
 
   const name = getStringAt(item, ['name']);
   if (name) return truncateText(name, 90);
+
+  const platform = getStringAt(item, ['platform']);
+  if (platform) return truncateText(platform, 90);
 
   return fallback;
 };

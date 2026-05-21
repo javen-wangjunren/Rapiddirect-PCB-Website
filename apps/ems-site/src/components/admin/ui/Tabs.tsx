@@ -21,7 +21,12 @@ export function Tabs<T extends string>({ items, value, onValueChange, className,
 
   const focusByIndex = (idx: number) => {
     const el = refs.current[idx];
-    if (el) el.focus();
+    if (!el) return;
+    try {
+      (el as any).focus({ preventScroll: true });
+    } catch {
+      el.focus();
+    }
   };
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {

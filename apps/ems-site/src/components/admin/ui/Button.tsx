@@ -23,7 +23,7 @@ const variants: Record<ButtonVariant, string> = {
   primary:
     'bg-[var(--admin-primary)] text-white shadow-[var(--admin-shadow-sm)] hover:bg-[var(--admin-primary-hover)]',
   secondary:
-    'border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-fg)] hover:bg-[var(--admin-surface-muted)]',
+    'border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-fg)] shadow-[var(--admin-shadow-sm)] hover:bg-[var(--admin-surface-muted)]',
   ghost: 'text-[var(--admin-primary)] hover:bg-[var(--admin-primary-soft)]',
   danger:
     'bg-[var(--admin-danger)] text-white shadow-[var(--admin-shadow-sm)] hover:bg-[var(--admin-danger-hover)]'

@@ -1,34 +1,52 @@
 ---
 import { getAssetPath } from '../../lib/assets';
 
-export interface ProductGalleryFilter {
-  label: string;
-  value: string;
-}
-
 export interface ProductGallerySpec {
   label: string;
   value: string;
 }
 
 export interface ProductGalleryItem {
-  category: string;
   title: string;
   subtitle: string;
-  image_url?: string;
+  image_url: string;
   specs: ProductGallerySpec[];
+}
+
+export interface ProductGalleryTab {
+  label: string;
+  items: ProductGalleryItem[];
 }
 
 export interface Props {
   data: {
     title: string;
     description: string;
-    filters: ProductGalleryFilter[];
-    items: ProductGalleryItem[];
+    tabs: ProductGalleryTab[];
   };
 }
 
 const { data } = Astro.props;
+
+const slugify = (input: string) =>
+  input
+    .toLowerCase()
+    .trim()
+    .replace(/['"]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+const tabsInput = Array.isArray(data.tabs) ? data.tabs : [];
+const derivedTabs = tabsInput
+  .filter((t) => t && typeof (t as any).label === 'string' && Array.isArray((t as any).items))
+  .map((t) => ({
+    label: (t as any).label as string,
+    key: slugify((t as any).label as string),
+    items: (t as any).items as ProductGalleryItem[]
+  }))
+  .filter((t) => t.key);
+
+const cards = derivedTabs.flatMap((tab) => tab.items.map((item) => ({ ...item, category: tab.key })));
 ---
 
 <section class="product-gallery-section">
@@ -39,22 +57,19 @@ const { data } = Astro.props;
     </div>
 
     <div class="product-gallery-tabs" role="tablist" aria-label="Product gallery filter">
-      {data.filters.map((filter, idx) => (
-        <button
-          type="button"
-          class:list={['product-gallery-tab', idx === 0 && 'is-active']}
-          data-filter={filter.value}
-          role="tab"
-          aria-selected={idx === 0 ? 'true' : 'false'}
-        >
-          {filter.label}
+      <button type="button" class="product-gallery-tab is-active" data-filter="all" role="tab" aria-selected="true">
+        All Boards
+      </button>
+      {derivedTabs.map((tab) => (
+        <button type="button" class="product-gallery-tab" data-filter={tab.key} role="tab" aria-selected="false">
+          {tab.label}
         </button>
       ))}
     </div>
 
     <div class="product-gallery-grid" data-gallery-grid>
-      {data.items.map((item) => (
-        <article class="product-gallery-card" data-category={item.category} tabindex="0">
+      {cards.map((item) => (
+        <article class="product-gallery-card" data-category={(item as any).category} tabindex="0">
           <div class="product-gallery-media">
             {item.image_url ? (
               <img src={getAssetPath(item.image_url)} alt="" class="product-gallery-img" loading="lazy" />
@@ -220,6 +235,11 @@ const { data } = Astro.props;
     transform: translateY(0);
   }
 
+  .product-gallery-card.is-open .product-gallery-overlay {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
   .product-gallery-overlay h4 {
     font-size: 18px;
     margin-bottom: 15px;
@@ -325,5 +345,25 @@ const { data } = Astro.props;
         card.classList.toggle('is-hidden', !shouldShow);
       });
     }
+
+    const shouldEnableClickOverlay = () => {
+      if (window.matchMedia && window.matchMedia('(hover: none)').matches) return true;
+      return window.innerWidth <= 768;
+    };
+
+    const toggleCard = (card: Element) => {
+      if (!shouldEnableClickOverlay()) return;
+      card.classList.toggle('is-open');
+    };
+
+    cards.forEach((card) => {
+      card.addEventListener('click', () => toggleCard(card));
+      card.addEventListener('keydown', (evt) => {
+        const key = (evt as KeyboardEvent).key;
+        if (key !== 'Enter' && key !== ' ') return;
+        evt.preventDefault();
+        toggleCard(card);
+      });
+    });
   });
 </script>

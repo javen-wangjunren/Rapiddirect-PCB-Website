@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { createAdminSupabaseClient } from '../../lib/supabase/adminClient';
+import { getHref } from '../../lib/assets';
 import { Button } from './ui';
 
 export default function AdminUserMenu() {
@@ -24,7 +25,7 @@ export default function AdminUserMenu() {
   return (
     <div className="flex items-center gap-2">
       {email ? <span className="hidden text-sm text-[var(--admin-fg-muted)] md:inline">{email}</span> : null}
-      <a href="/" className="hidden md:inline">
+      <a href={getHref('/')} className="hidden md:inline">
         <Button variant="ghost" size="sm" type="button">
           View site
         </Button>

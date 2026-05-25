@@ -28,13 +28,5 @@ export const mergeSectionFallback = <T extends Record<string, unknown>>(
   input: unknown
 ): T => {
   const cleaned = pruneEmpty(input);
-  if (!isRecord(cleaned)) return fallback;
-
-  const out: Record<string, unknown> = { ...fallback };
-  for (const key of Object.keys(fallback)) {
-    if (key in cleaned) {
-      out[key] = deepMerge((fallback as any)[key], (cleaned as Record<string, unknown>)[key]);
-    }
-  }
-  return out as T;
+  return deepMerge(fallback, cleaned) as T;
 };

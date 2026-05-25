@@ -16,51 +16,47 @@ export const componentsSourcingSchema = {
     },
   },
   source_capability: {
-    advantage: {
-      title: 'string',
-      description: 'string',
+    title: 'string',
+    description: 'string',
+    core_services: {
+      type: 'array',
       items: {
-        type: 'array',
-        items: {
-          icon_url: 'string',
-          title: 'string',
-          description: 'string',
-        },
+        icon_svg: 'string',
+        title: 'string',
+        description: 'string',
       },
     },
-    components: {
+    categories: {
       title: 'string',
       items: {
         type: 'array',
         items: {
-          image_url: 'string',
           title: 'string',
+          image_placeholder: 'string',
+          image_url: 'string',
         },
       },
     },
     supply_chain: {
       title: 'string',
-      network: {
-        title: 'string',
+      items: {
+        type: 'array',
         items: {
-          type: 'array',
-          items: {
-            title: 'string',
-            description: 'string',
-          },
+          title: 'string',
+          description: 'string',
         },
       },
-      brands: {
-        title: 'string',
+    },
+    brands: {
+      title: 'string',
+      items: {
+        type: 'array',
         items: {
-          type: 'array',
-          items: {
-            name: 'string',
-            image_url: 'string',
-          },
+          name: 'string',
+          logo_url: 'string',
         },
-        more_label: 'string',
       },
+      more_label: 'string',
     },
   },
   source_process: {
@@ -69,9 +65,12 @@ export const componentsSourcingSchema = {
     steps: {
       type: 'array',
       items: {
-        label: 'string',
+        id: 'string',
+        nav_label: 'string',
+        badge: 'string',
         title: 'string',
         description: 'string',
+        image_placeholder: 'string',
         image_url: 'string',
       },
     },
@@ -225,4 +224,3 @@ export const componentsSourcingSchema = {
     submit_label: 'string',
   },
 };
-

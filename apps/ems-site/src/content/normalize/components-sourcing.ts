@@ -62,6 +62,7 @@ const normalizeSourceCapabilityBrand = (input: unknown) => {
 
 const normalizeSourceCapability = (input: unknown) => {
   const obj = isObject(input) ? (input as any) : {};
+  const legacyAdvantage = isObject(obj.advantage) ? (obj.advantage as any) : {};
   const coreServices = Array.isArray(obj.core_services) ? obj.core_services : [];
   const categoriesObj = isObject(obj.categories) ? (obj.categories as any) : {};
   const categoryItems = Array.isArray(categoriesObj.items) ? categoriesObj.items : [];
@@ -70,9 +71,12 @@ const normalizeSourceCapability = (input: unknown) => {
   const brandsObj = isObject(obj.brands) ? (obj.brands as any) : {};
   const brandItems = Array.isArray(brandsObj.items) ? brandsObj.items : [];
 
+  const legacyTitle = asString(legacyAdvantage.title);
+  const legacyDescription = asString(legacyAdvantage.description);
+
   return {
-    title: asString(obj.title),
-    description: asString(obj.description),
+    title: legacyTitle || asString(obj.title),
+    description: legacyDescription || asString(obj.description),
     core_services: coreServices.map(normalizeSourceCapabilityCoreService),
     categories: {
       title: asString(categoriesObj.title),

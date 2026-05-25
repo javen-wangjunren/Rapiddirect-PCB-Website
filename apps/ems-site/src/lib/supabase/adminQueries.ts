@@ -217,3 +217,12 @@ export const saveAdminBundle = async (
 
   return { ok: true };
 };
+
+export const deletePageForAdmin = async (
+  supabase: SupabaseClient,
+  pageId: string
+): Promise<{ ok: true } | { ok: false; message: string }> => {
+  const res = await supabase.from('pages').delete().eq('id', pageId);
+  if (res.error) return { ok: false, message: res.error.message };
+  return { ok: true };
+};

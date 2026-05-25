@@ -23,10 +23,10 @@ import { siteFooterSchema } from '../../content/schemas/site-footer';
 import { siteHeaderSchema } from '../../content/schemas/site-header';
 import { getAssetPath } from '../../lib/assets';
 import { createAdminSupabaseClient } from '../../lib/supabase/adminClient';
-import { createPageForAdmin, getPageBundleBySlugForAdmin, saveAdminBundle } from '../../lib/supabase/adminQueries';
+import { createPageForAdmin, deletePageForAdmin, getPageBundleBySlugForAdmin, saveAdminBundle } from '../../lib/supabase/adminQueries';
 import type { TemplateType } from '../../types/page';
 import type { JsonValue } from '../../utils/jsonTree';
-import { deepMerge, isObject } from '../../utils/jsonTree';
+import { deepMerge, isObject, pruneEmpty } from '../../utils/jsonTree';
 import EmsEditorContentModules from './EmsEditorContentModules';
 import ComponentsSourcingEditorContentModules from './ComponentsSourcingEditorContentModules';
 import PcbAssemblyEditorContentModules from './PcbAssemblyEditorContentModules';
@@ -93,8 +93,10 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
 
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const [leaveConfirmOpen, setLeaveConfirmOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const beforeUnloadHandlerRef = useRef<((e: BeforeUnloadEvent) => void) | null>(null);
 
   useEffect(() => {
@@ -164,30 +166,32 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
       });
 
       const raw = (bundle.content?.content_json ?? {}) as any;
+      const cleanedRaw = pruneEmpty(raw);
+      const safeRaw = (isObject(cleanedRaw) ? cleanedRaw : {}) as any;
       const template = (bundle.page.template_type ?? 'ems_home') as TemplateType;
       if (template === 'ems_home') {
-        const merged = deepMerge(emsHomeDefaults as any, (isObject(raw) ? raw : {}) as any) as JsonValue;
+        const merged = deepMerge(emsHomeDefaults as any, safeRaw as any) as JsonValue;
         setContentJson(normalizeEmsHomeContentJson(merged));
       } else if (template === 'components_sourcing') {
-        const merged = deepMerge(componentsSourcingDefaults as any, (isObject(raw) ? raw : {}) as any) as JsonValue;
+        const merged = deepMerge(componentsSourcingDefaults as any, safeRaw as any) as JsonValue;
         setContentJson(normalizeComponentsSourcingContentJson(merged));
       } else if (template === 'pcb_assembly') {
-        const merged = deepMerge(pcbAssemblyDefaults as any, (isObject(raw) ? raw : {}) as any) as JsonValue;
+        const merged = deepMerge(pcbAssemblyDefaults as any, safeRaw as any) as JsonValue;
         setContentJson(normalizePcbAssemblyContentJson(merged));
       } else if (template === 'pcb_design') {
-        const merged = deepMerge(pcbDesignDefaults as any, (isObject(raw) ? raw : {}) as any) as JsonValue;
+        const merged = deepMerge(pcbDesignDefaults as any, safeRaw as any) as JsonValue;
         setContentJson(normalizePcbDesignContentJson(merged));
       } else if (template === 'pcb_manufacturing') {
-        const merged = deepMerge(pcbManufacturingDefaults as any, (isObject(raw) ? raw : {}) as any) as JsonValue;
+        const merged = deepMerge(pcbManufacturingDefaults as any, safeRaw as any) as JsonValue;
         setContentJson(normalizePcbManufacturingContentJson(merged));
       } else if (template === 'site_footer') {
-        const merged = deepMerge(siteFooterDefaults as any, (isObject(raw) ? raw : {}) as any) as JsonValue;
+        const merged = deepMerge(siteFooterDefaults as any, safeRaw as any) as JsonValue;
         setContentJson(normalizeSiteFooterContentJson(merged));
       } else if (template === 'site_header') {
-        const merged = deepMerge(siteHeaderDefaults as any, (isObject(raw) ? raw : {}) as any) as JsonValue;
+        const merged = deepMerge(siteHeaderDefaults as any, safeRaw as any) as JsonValue;
         setContentJson(normalizeSiteHeaderContentJson(merged));
       } else {
-        const safeObj = isObject(raw) ? raw : {};
+        const safeObj = safeRaw ?? {};
         setContentJson(safeObj as any);
       }
 
@@ -295,6 +299,9 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
                 ? normalizeSiteHeaderContentJson(contentJson)
             : contentJson;
 
+    const cleanedContent = pruneEmpty(normalizedContent);
+    const safeContent = isObject(cleanedContent) ? cleanedContent : {};
+
     const res = await saveAdminBundle(supabase, {
       pageId,
       page: {
@@ -312,7 +319,7 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
         og_image: seo.og_image,
         noindex: seo.noindex
       },
-      contentJson: normalizedContent
+      contentJson: safeContent
     });
     setSaving(false);
     if (!res.ok) {
@@ -322,6 +329,22 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
     if (nextStatus) setStatus(nextStatus);
     setDirty(false);
     push({ kind: 'success', message: nextStatus === 'published' ? '已发布' : '已保存' });
+  };
+
+  const doDelete = async () => {
+    if (!supabase) return;
+    if (!pageId) return;
+    setDeleting(true);
+    const res = await deletePageForAdmin(supabase, pageId);
+    setDeleting(false);
+    if (!res.ok) {
+      push({ kind: 'error', message: res.message });
+      return;
+    }
+    disableBeforeUnload();
+    setDirty(false);
+    push({ kind: 'success', message: '已删除页面' });
+    window.location.assign(getAssetPath('/admin/pages/'));
   };
 
   const onCopyPermalink = async () => {
@@ -400,6 +423,9 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
           </Button>
           <Button variant="secondary" onClick={() => window.open(previewHref, '_blank', 'noreferrer')}>
             Preview
+          </Button>
+          <Button variant="danger" loading={deleting} disabled={!pageId || saving} onClick={() => setDeleteConfirmOpen(true)}>
+            Delete
           </Button>
           <Button variant="secondary" loading={saving} disabled={!canPublish} onClick={() => void doSave('draft')}>
             Save Draft
@@ -598,6 +624,21 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
           disableBeforeUnload();
           setDirty(false);
           window.location.assign(getAssetPath('/admin/pages/'));
+        }}
+      />
+
+      <ConfirmDialog
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
+        title="删除页面？"
+        description={`将永久删除 “${title || 'Untitled'}” (${previewHref})，并同步删除内容与 SEO。该操作不可撤销。`}
+        confirmText="删除"
+        cancelText="取消"
+        intent="danger"
+        loading={deleting}
+        onConfirm={async () => {
+          setDeleteConfirmOpen(false);
+          await doDelete();
         }}
       />
     </>

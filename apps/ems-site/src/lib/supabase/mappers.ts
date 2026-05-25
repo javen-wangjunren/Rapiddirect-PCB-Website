@@ -1,3 +1,5 @@
+import { pruneEmpty } from '../../utils/jsonTree';
+
 const isRecord = (value: unknown): value is Record<string, unknown> => {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 };
@@ -25,12 +27,13 @@ export const mergeSectionFallback = <T extends Record<string, unknown>>(
   fallback: T,
   input: unknown
 ): T => {
-  if (!isRecord(input)) return fallback;
+  const cleaned = pruneEmpty(input);
+  if (!isRecord(cleaned)) return fallback;
 
   const out: Record<string, unknown> = { ...fallback };
   for (const key of Object.keys(fallback)) {
-    if (key in input) {
-      out[key] = deepMerge((fallback as any)[key], (input as Record<string, unknown>)[key]);
+    if (key in cleaned) {
+      out[key] = deepMerge((fallback as any)[key], (cleaned as Record<string, unknown>)[key]);
     }
   }
   return out as T;

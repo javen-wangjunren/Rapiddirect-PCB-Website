@@ -27,6 +27,24 @@ export const deepMerge = (fallback: JsonValue, input: JsonValue): JsonValue => {
   return input ?? fallback;
 };
 
+export const pruneEmpty = (value: unknown): unknown => {
+  if (value === null || value === undefined) return undefined;
+  if (typeof value === 'string' && value.trim() === '') return undefined;
+  if (Array.isArray(value)) {
+    const next = value.map(pruneEmpty).filter((v) => v !== undefined);
+    return next.length > 0 ? next : undefined;
+  }
+  if (isObject(value)) {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value)) {
+      const next = pruneEmpty(v);
+      if (next !== undefined) out[k] = next;
+    }
+    return Object.keys(out).length > 0 ? out : undefined;
+  }
+  return value;
+};
+
 const cloneContainer = (value: JsonValue): JsonValue => {
   if (Array.isArray(value)) return [...value];
   if (isObject(value)) return { ...(value as Record<string, JsonValue>) };
@@ -54,4 +72,3 @@ export const setAtPath = (root: JsonValue, path: (string | number)[], value: Jso
     [head]: setAtPath(next as JsonValue, rest, value)
   };
 };
-

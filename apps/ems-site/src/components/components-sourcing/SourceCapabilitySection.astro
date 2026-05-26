@@ -39,7 +39,7 @@ const brands = Array.isArray((data as any)?.brands?.items) ? ((data as any).bran
     <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {categories.map((item) => (
         <article class="group flex flex-col overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white shadow-[0_4px_15px_rgba(0,0,0,0.03)] transition hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)]">
-          <div class="relative h-40 overflow-hidden bg-slate-200">
+          <div class="relative w-full aspect-[4/3] overflow-hidden bg-slate-200">
             {item.image_url ? (
               <img
                 src={getAssetPath(item.image_url)}
@@ -113,4 +113,3 @@ const brands = Array.isArray((data as any)?.brands?.items) ? ((data as any).bran
     </div>
   </div>
 </section>
-

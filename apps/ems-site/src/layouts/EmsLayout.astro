@@ -20,6 +20,15 @@ const {
   description = 'EMS subsite under /ems built with Astro, React, Tailwind, and Supabase.'
 } = Astro.props;
 
+const headers = Astro.request?.headers;
+const forwardedHost =
+  headers?.get('x-forwarded-host') ?? headers?.get('x-original-host') ?? headers?.get('host') ?? '';
+const hostname = forwardedHost.split(',')[0].trim().toLowerCase() || Astro.url.hostname.toLowerCase();
+const indexableHosts = new Set(['rapiddirect.com', 'www.rapiddirect.com']);
+const isIndexableHost = indexableHosts.has(hostname);
+const robots = isIndexableHost ? 'index, follow' : 'noindex, nofollow';
+const canonicalUrl = `https://rapiddirect.com${Astro.url.pathname}`;
+
 const footerSlug = '/ems/_global/footer/';
 const footerSupabase = createSupabaseClient();
 const footerBundle = footerSupabase ? await getPublishedPageBundleBySlug(footerSupabase, footerSlug) : null;
@@ -40,8 +49,9 @@ const headerData = normalizeSiteHeaderContentJson(deepMerge(siteHeaderDefaults a
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <meta name="robots" content="noindex, nofollow" />
-    <meta name="googlebot" content="noindex, nofollow" />
+    <meta name="robots" content={robots} />
+    <meta name="googlebot" content={robots} />
+    <link rel="canonical" href={canonicalUrl} />
   </head>
   <body class="bg-slate-50 text-slate-950 antialiased">
     <div class="min-h-screen">

@@ -27,6 +27,7 @@ const hasLengthWithin = (value: string, max: number): boolean => {
 const json = (data: unknown, init?: ResponseInit) => {
   const headers = new Headers(init?.headers);
   headers.set('content-type', 'application/json; charset=utf-8');
+  headers.set('cache-control', 'no-store');
   return new Response(JSON.stringify(data), { ...init, headers });
 };
 
@@ -36,6 +37,7 @@ const withCors = (res: Response, origin: string | null) => {
   headers.set('access-control-allow-methods', 'POST, OPTIONS');
   headers.set('access-control-allow-headers', 'content-type');
   headers.set('access-control-max-age', '86400');
+  headers.set('cache-control', 'no-store');
   return new Response(res.body, { status: res.status, headers });
 };
 

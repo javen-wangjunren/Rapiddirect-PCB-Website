@@ -20,24 +20,17 @@ const {
   description = 'EMS subsite under /ems built with Astro, React, Tailwind, and Supabase.'
 } = Astro.props;
 
-const headers = Astro.request?.headers;
-const forwardedHost =
-  headers?.get('x-forwarded-host') ?? headers?.get('x-original-host') ?? headers?.get('host') ?? '';
-const hostname = forwardedHost.split(',')[0].trim().toLowerCase() || Astro.url.hostname.toLowerCase();
-const indexableHosts = new Set(['rapiddirect.com', 'www.rapiddirect.com']);
-const isIndexableHost = indexableHosts.has(hostname);
-const robots = isIndexableHost ? 'index, follow' : 'noindex, nofollow';
+const robots = 'index, follow';
 const canonicalUrl = `https://rapiddirect.com${Astro.url.pathname}`;
 
 const footerSlug = '/ems/_global/footer/';
-const footerSupabase = createSupabaseClient();
-const footerBundle = footerSupabase ? await getPublishedPageBundleBySlug(footerSupabase, footerSlug) : null;
+const supabase = createSupabaseClient();
+const footerBundle = supabase ? await getPublishedPageBundleBySlug(supabase, footerSlug) : null;
 const footerRaw = (footerBundle?.content?.content_json ?? {}) as any;
 const footerData = normalizeSiteFooterContentJson(deepMerge(siteFooterDefaults as any, footerRaw as any));
 
 const headerSlug = '/ems/_global/header/';
-const headerSupabase = createSupabaseClient();
-const headerBundle = headerSupabase ? await getPublishedPageBundleBySlug(headerSupabase, headerSlug) : null;
+const headerBundle = supabase ? await getPublishedPageBundleBySlug(supabase, headerSlug) : null;
 const headerRaw = (headerBundle?.content?.content_json ?? {}) as any;
 const headerData = normalizeSiteHeaderContentJson(deepMerge(siteHeaderDefaults as any, headerRaw as any));
 ---

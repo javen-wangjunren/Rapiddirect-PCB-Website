@@ -10,7 +10,6 @@ const modules: { key: keyof typeof pcbManufacturingSchema; label: string }[] = [
   { key: 'hero', label: 'Hero' },
   { key: 'capability', label: 'Capability' },
   { key: 'tech_table', label: 'Tech Table' },
-  { key: 'process', label: 'Process' },
   { key: 'quality', label: 'Quality Control' },
   { key: 'industry', label: 'Industry' },
   { key: 'why_choose_us', label: 'Why Choose Us' },

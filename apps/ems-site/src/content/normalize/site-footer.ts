@@ -2,6 +2,7 @@ import type { JsonValue } from '../../utils/jsonTree.ts';
 import { isObject } from '../../utils/jsonTree.ts';
 
 const asString = (value: unknown) => (typeof value === 'string' ? value : '');
+const asBoolean = (value: unknown) => (typeof value === 'boolean' ? value : undefined);
 
 const normalizeStringList = (input: unknown) => {
   if (!Array.isArray(input)) return [] as string[];
@@ -9,10 +10,14 @@ const normalizeStringList = (input: unknown) => {
 };
 
 const normalizeLinks = (input: unknown) => {
-  if (!Array.isArray(input)) return [] as { label: string; href: string }[];
+  if (!Array.isArray(input)) return [] as { label: string; href: string; openInNewTab: boolean }[];
   return input.map((item) => {
     const obj = isObject(item) ? (item as any) : {};
-    return { label: asString(obj.label), href: asString(obj.href) };
+    return {
+      label: asString(obj.label),
+      href: asString(obj.href),
+      openInNewTab: asBoolean(obj.openInNewTab) ?? false
+    };
   });
 };
 

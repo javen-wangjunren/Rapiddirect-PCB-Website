@@ -2,7 +2,7 @@
 import { siteFooterDefaults } from '../../content/defaults/site-footer';
 import { getAssetPath, getHref } from '../../lib/assets';
 
-type LinkItem = { label?: string; href?: string };
+type LinkItem = { label?: string; href?: string; openInNewTab?: boolean };
 type MenuGroup = { title?: string; links?: LinkItem[] };
 type FooterData = {
   logo_url?: string;
@@ -133,7 +133,12 @@ const logoUrl = data?.logo_url?.trim() ? getAssetPath(data.logo_url) : fallbackL
             <ul class="space-y-4">
               {(menu.links ?? []).map((link) => (
                 <li>
-                  <a href={getHref(link.href ?? '#')} class="text-[15px] text-slate-600 transition hover:text-[#f25537]">
+                  <a
+                    href={getHref(link.href ?? '#')}
+                    target={link.openInNewTab ? '_blank' : undefined}
+                    rel={link.openInNewTab ? 'noopener noreferrer' : undefined}
+                    class="text-[15px] text-slate-600 transition hover:text-[#f25537]"
+                  >
                     {link.label}
                   </a>
                 </li>
@@ -148,7 +153,12 @@ const logoUrl = data?.logo_url?.trim() ? getAssetPath(data.logo_url) : fallbackL
       <div class="font-medium text-slate-900">{footerBottom.copyright ?? ''}</div>
       <div class="flex flex-wrap gap-x-6 gap-y-3 text-slate-900">
         {(footerBottom.legal_links ?? []).map((link) => (
-          <a href={getHref(link.href ?? '#')} class="transition hover:text-[#f25537]">
+          <a
+            href={getHref(link.href ?? '#')}
+            target={link.openInNewTab ? '_blank' : undefined}
+            rel={link.openInNewTab ? 'noopener noreferrer' : undefined}
+            class="transition hover:text-[#f25537]"
+          >
             {link.label}
           </a>
         ))}

@@ -79,7 +79,7 @@ export function QuoteFormSection({ data }: { data: QuoteFormContent }) {
   };
 
   return (
-    <section className="relative py-20">
+    <section id="quote" className="relative scroll-mt-24 py-20">
       <div className="absolute inset-x-0 top-0 h-1/2 bg-slate-50" />
       <div
         className="absolute inset-x-0 bottom-0 h-1/2 bg-cover bg-center"

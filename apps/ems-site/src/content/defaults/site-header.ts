@@ -3,18 +3,19 @@ export const siteHeaderDefaults = {
   cta_text: 'Get A Quote',
   cta_href: '#',
   nav_items: [
-    { label: 'PCB Fabrication', href: '#', children: [] },
-    { label: 'PCB Assembly', href: '#', children: [] },
-    { label: 'PCB Design', href: '#', children: [] },
-    { label: 'Component Sourcing', href: '#', children: [] },
+    { label: 'PCB Fabrication', href: '#', openInNewTab: false, children: [] },
+    { label: 'PCB Assembly', href: '#', openInNewTab: false, children: [] },
+    { label: 'PCB Design', href: '#', openInNewTab: false, children: [] },
+    { label: 'Component Sourcing', href: '#', openInNewTab: false, children: [] },
     {
       label: 'Mechanical Services',
       href: '#',
+      openInNewTab: false,
       children: [
-        { label: 'CNC Machining', href: '#' },
-        { label: '3D Printing', href: '#' },
-        { label: 'Sheet Metal Fabrication', href: '#' },
-        { label: 'Injection Molding', href: '#' }
+        { label: 'CNC Machining', href: '#', openInNewTab: false },
+        { label: '3D Printing', href: '#', openInNewTab: false },
+        { label: 'Sheet Metal Fabrication', href: '#', openInNewTab: false },
+        { label: 'Injection Molding', href: '#', openInNewTab: false }
       ]
     }
   ]

@@ -5,10 +5,29 @@ import { getAssetPath } from '../../lib/assets';
 
 export function QualityControlSection({ data }: { data: EmsHomeQualityContent }) {
   const [activeTabId, setActiveTabId] = React.useState<string>(data.tabs[0]?.id ?? '');
+  const preloadedRef = React.useRef<Set<string>>(new Set());
 
   const activeTab = data.tabs.find((tab) => tab.id === activeTabId) ?? data.tabs[0];
 
   if (!activeTab) return null;
+
+  React.useEffect(() => {
+    const urls = data.tabs
+      .map((tab) => (tab.content.left.image_url ? getAssetPath(tab.content.left.image_url) : ''))
+      .filter(Boolean);
+
+    const load = (src: string) => {
+      if (preloadedRef.current.has(src)) return;
+      preloadedRef.current.add(src);
+      const img = new Image();
+      img.decoding = 'async';
+      img.src = src;
+    };
+
+    urls.forEach(load);
+  }, [data.tabs]);
+
+  const heroImageSrc = getAssetPath(activeTab.content.left.image_url);
 
   return (
     <section className="bg-[#F5F5F5] py-16 sm:py-20">
@@ -61,9 +80,14 @@ export function QualityControlSection({ data }: { data: EmsHomeQualityContent })
         <div className="mt-10 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_10px_15px_-3px_rgba(0,0,0,0.10),0_4px_6px_-4px_rgba(0,0,0,0.10)]">
           <div className="flex flex-col lg:flex-row">
             <div className="relative w-full aspect-[8/5] lg:w-[800px] lg:shrink-0">
-              <div
-                className="absolute inset-0 bg-cover bg-center"
-                style={{ backgroundImage: `url(${getAssetPath(activeTab.content.left.image_url)})` }}
+              <img
+                key={activeTabId}
+                src={heroImageSrc}
+                alt=""
+                className="absolute inset-0 h-full w-full object-cover"
+                loading="eager"
+                decoding="async"
+                fetchPriority="high"
               />
               <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent" />
 

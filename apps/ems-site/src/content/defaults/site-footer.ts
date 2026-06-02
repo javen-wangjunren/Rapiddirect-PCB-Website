@@ -19,39 +19,39 @@ export const siteFooterDefaults = {
     capabilities: {
       title: 'Capabilities',
       links: [
-        { label: 'PCB Fabrication', href: '/pcb-manufacturing/' },
-        { label: 'PCB Assembly (PCBA)', href: '/pcb-assembly/' },
-        { label: 'PCB Design Services', href: '/pcb-design/' },
-        { label: 'Component Sourcing', href: '/components-sourcing/' }
+        { label: 'PCB Fabrication', href: '/pcb-manufacturing/', openInNewTab: false },
+        { label: 'PCB Assembly (PCBA)', href: '/pcb-assembly/', openInNewTab: false },
+        { label: 'PCB Design Services', href: '/pcb-design/', openInNewTab: false },
+        { label: 'Component Sourcing', href: '/components-sourcing/', openInNewTab: false }
       ]
     },
     resources: {
       title: 'Resources',
       links: [
-        { label: 'PCB Materials', href: '#' },
-        { label: 'Surface Finishes', href: '#' },
-        { label: 'Design Guidelines', href: '#' },
-        { label: 'Blog', href: '#' }
+        { label: 'PCB Materials', href: '#', openInNewTab: false },
+        { label: 'Surface Finishes', href: '#', openInNewTab: false },
+        { label: 'Design Guidelines', href: '#', openInNewTab: false },
+        { label: 'Blog', href: '#', openInNewTab: false }
       ]
     },
     about: {
       title: 'About',
       links: [
-        { label: 'About RapidDirect', href: '#' },
-        { label: 'Our Platform', href: '#' },
-        { label: 'Quality Assurance', href: '#' },
-        { label: 'Certifications', href: '#' },
-        { label: 'Contact Us', href: '#quote' }
+        { label: 'About RapidDirect', href: '#', openInNewTab: false },
+        { label: 'Our Platform', href: '#', openInNewTab: false },
+        { label: 'Quality Assurance', href: '#', openInNewTab: false },
+        { label: 'Certifications', href: '#', openInNewTab: false },
+        { label: 'Contact Us', href: '#quote', openInNewTab: false }
       ]
     }
   },
   footer_bottom: {
     copyright: 'Copyright © 2025 Shenzhen Rapid Direct Co., Ltd. All rights reserved',
     legal_links: [
-      { label: 'Privacy Policy', href: '#' },
-      { label: 'Cookie Policy', href: '#' },
-      { label: 'Terms and Conditions', href: '#' },
-      { label: 'Consent Preferences', href: '#' }
+      { label: 'Privacy Policy', href: '#', openInNewTab: false },
+      { label: 'Cookie Policy', href: '#', openInNewTab: false },
+      { label: 'Terms and Conditions', href: '#', openInNewTab: false },
+      { label: 'Consent Preferences', href: '#', openInNewTab: false }
     ]
   }
 } as const;

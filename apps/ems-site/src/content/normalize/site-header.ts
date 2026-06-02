@@ -2,23 +2,37 @@ import type { JsonValue } from '../../utils/jsonTree';
 import { isObject } from '../../utils/jsonTree';
 
 const asString = (value: unknown) => (typeof value === 'string' ? value : '');
+const asBoolean = (value: unknown) => (typeof value === 'boolean' ? value : undefined);
 
-const normalizeChildLinks = (input: unknown) => {
-  if (!Array.isArray(input)) return [] as { label: string; href: string }[];
+const normalizeChildLinks = (input: unknown, parentOpenInNewTab: boolean) => {
+  if (!Array.isArray(input)) return [] as { label: string; href: string; openInNewTab: boolean }[];
   return input.map((item) => {
     const obj = isObject(item) ? (item as any) : {};
-    return { label: asString(obj.label), href: asString(obj.href) };
+    const childOpenInNewTab = asBoolean(obj.openInNewTab);
+    return {
+      label: asString(obj.label),
+      href: asString(obj.href),
+      openInNewTab: childOpenInNewTab ?? parentOpenInNewTab
+    };
   });
 };
 
 const normalizeNavItems = (input: unknown) => {
-  if (!Array.isArray(input)) return [] as { label: string; href: string; children: { label: string; href: string }[] }[];
+  if (!Array.isArray(input))
+    return [] as {
+      label: string;
+      href: string;
+      openInNewTab: boolean;
+      children: { label: string; href: string; openInNewTab: boolean }[];
+    }[];
   return input.map((item) => {
     const obj = isObject(item) ? (item as any) : {};
+    const parentOpenInNewTab = asBoolean(obj.openInNewTab) ?? false;
     return {
       label: asString(obj.label),
       href: asString(obj.href),
-      children: normalizeChildLinks(obj.children)
+      openInNewTab: parentOpenInNewTab,
+      children: normalizeChildLinks(obj.children, parentOpenInNewTab)
     };
   });
 };

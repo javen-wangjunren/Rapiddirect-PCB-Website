@@ -9,11 +9,42 @@ const whiteIconFilter = 'brightness(0) invert(1)';
 
 export function IndustrySection({ data }: { data: EmsHomeIndustryContent }) {
   const [activeId, setActiveId] = React.useState<string>(data.items[0]?.tab.id ?? '');
+  const preloadedRef = React.useRef<Set<string>>(new Set());
 
   const active = data.items.find((x) => x.tab.id === activeId) ?? data.items[0];
   if (!active) return null;
 
   const activeImageSrc = active.card.image_url ? getAssetPath(active.card.image_url) : '';
+
+  React.useEffect(() => {
+    const urls = data.items
+      .map((item) => (item.card.image_url ? getAssetPath(item.card.image_url) : ''))
+      .filter(Boolean);
+
+    const load = (src: string) => {
+      if (preloadedRef.current.has(src)) return;
+      preloadedRef.current.add(src);
+      const img = new Image();
+      img.decoding = 'async';
+      img.src = src;
+    };
+
+    if (activeImageSrc) load(activeImageSrc);
+
+    const rest = urls.filter((u) => u !== activeImageSrc);
+    const schedule = (cb: () => void) => {
+      const w = window as any;
+      if (typeof w?.requestIdleCallback === 'function') return w.requestIdleCallback(cb, { timeout: 1500 });
+      return window.setTimeout(cb, 200);
+    };
+
+    const id = schedule(() => rest.forEach(load));
+    return () => {
+      const w = window as any;
+      if (typeof w?.cancelIdleCallback === 'function') w.cancelIdleCallback(id);
+      else window.clearTimeout(id);
+    };
+  }, [data.items, activeImageSrc]);
 
   return (
     <section className="bg-white py-16 sm:py-20">
@@ -95,11 +126,13 @@ export function IndustrySection({ data }: { data: EmsHomeIndustryContent }) {
 
               {activeImageSrc ? (
                 <img
+                  key={activeId}
                   src={activeImageSrc}
                   alt=""
                   className="h-[450px] w-[450px] rounded-[20px] object-cover"
-                  loading="lazy"
+                  loading="eager"
                   decoding="async"
+                  fetchPriority="high"
                 />
               ) : (
                 <div className="h-[450px] w-[450px] rounded-[20px] bg-white/60" />

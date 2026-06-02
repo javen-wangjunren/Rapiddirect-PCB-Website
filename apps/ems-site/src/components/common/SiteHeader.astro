@@ -2,8 +2,8 @@
 import { siteHeaderDefaults } from '../../content/defaults/site-header';
 import { getAssetPath, getHref } from '../../lib/assets';
 
-type ChildLink = { label?: string; href?: string };
-type NavItem = { label?: string; href?: string; children?: ChildLink[] };
+type ChildLink = { label?: string; href?: string; openInNewTab?: boolean };
+type NavItem = { label?: string; href?: string; openInNewTab?: boolean; children?: ChildLink[] };
 type HeaderData = {
   logo_url?: string;
   cta_text?: string;
@@ -42,7 +42,12 @@ const navItems = (data?.nav_items?.length ? data.nav_items : siteHeaderDefaults.
               </svg>
               <div class="dropdown-menu absolute left-[-20px] top-full min-w-[240px] rounded-lg border border-slate-100 bg-white px-0 py-3 opacity-0 shadow-[0_10px_30px_rgba(0,0,0,0.08)] transition-all duration-300 invisible translate-y-2.5 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0">
                 {item.children!.map((child) => (
-                  <a href={getHref(child.href ?? '#')} class="block px-6 py-3 text-[15px] font-medium text-[#475569] no-underline transition-all hover:text-[#f25537] hover:bg-[#fffaf9] hover:pl-7">
+                  <a
+                    href={getHref(child.href ?? '#')}
+                    target={child.openInNewTab ? '_blank' : undefined}
+                    rel={child.openInNewTab ? 'noopener noreferrer' : undefined}
+                    class="block px-6 py-3 text-[15px] font-medium text-[#475569] no-underline transition-all hover:text-[#f25537] hover:bg-[#fffaf9] hover:pl-7"
+                  >
                     {child.label}
                   </a>
                 ))}
@@ -51,7 +56,12 @@ const navItems = (data?.nav_items?.length ? data.nav_items : siteHeaderDefaults.
           );
         }
         return (
-          <a href={getHref(item.href ?? '#')} class="nav-item py-7 text-base font-bold text-[#0f172a] no-underline transition-colors hover:text-[#f25537]">
+          <a
+            href={getHref(item.href ?? '#')}
+            target={item.openInNewTab ? '_blank' : undefined}
+            rel={item.openInNewTab ? 'noopener noreferrer' : undefined}
+            class="nav-item py-7 text-base font-bold text-[#0f172a] no-underline transition-colors hover:text-[#f25537]"
+          >
             {item.label}
           </a>
         );

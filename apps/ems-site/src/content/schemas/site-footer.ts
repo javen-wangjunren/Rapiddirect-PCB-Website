@@ -19,7 +19,8 @@ export const siteFooterSchema = {
         type: 'array',
         items: {
           label: 'string',
-          href: 'string'
+          href: 'string',
+          openInNewTab: 'boolean'
         }
       }
     },
@@ -29,7 +30,8 @@ export const siteFooterSchema = {
         type: 'array',
         items: {
           label: 'string',
-          href: 'string'
+          href: 'string',
+          openInNewTab: 'boolean'
         }
       }
     },
@@ -39,7 +41,8 @@ export const siteFooterSchema = {
         type: 'array',
         items: {
           label: 'string',
-          href: 'string'
+          href: 'string',
+          openInNewTab: 'boolean'
         }
       }
     }
@@ -50,7 +53,8 @@ export const siteFooterSchema = {
       type: 'array',
       items: {
         label: 'string',
-        href: 'string'
+        href: 'string',
+        openInNewTab: 'boolean'
       }
     }
   }

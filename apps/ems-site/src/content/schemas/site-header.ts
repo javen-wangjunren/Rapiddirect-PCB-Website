@@ -7,11 +7,13 @@ export const siteHeaderSchema = {
     items: {
       label: 'string',
       href: 'string',
+      openInNewTab: 'boolean',
       children: {
         type: 'array',
         items: {
           label: 'string',
-          href: 'string'
+          href: 'string',
+          openInNewTab: 'boolean'
         }
       }
     }

@@ -29,7 +29,7 @@ const StepIcon = (props: { step: QcProcessStep; highlighted: boolean }) => {
 
   if (props.step.icon_url) {
     const src = getAssetPath(props.step.icon_url);
-    if (isImageUrl(src)) return <img src={src} alt="" className="h-[26px] w-[26px]" />;
+    if (isImageUrl(src)) return <img src={src} alt="" className="h-[26px] w-[26px] shrink-0" />;
   }
 
   const key = props.step.short_name.toLowerCase();
@@ -127,7 +127,7 @@ export function PcbaQualityControlSection(props: Props) {
 
         <div className="relative mt-16 flex gap-0 max-lg:flex-col max-lg:gap-10">
           <div className="relative flex w-full justify-between max-lg:flex-col max-lg:gap-10">
-            <div className="absolute left-[50px] right-[50px] top-[30px] h-[2px] bg-[#eaeaea] max-lg:bottom-0 max-lg:left-[50px] max-lg:right-auto max-lg:top-0 max-lg:h-auto max-lg:w-[2px]" />
+            <div className="absolute left-[50px] right-[50px] top-[30px] h-[2px] bg-[#eaeaea] max-lg:hidden" />
             {steps.map((step, idx) => {
               const highlighted = Boolean(step.highlight);
               return (
@@ -136,7 +136,7 @@ export function PcbaQualityControlSection(props: Props) {
                   className="relative z-[2] flex-1 px-4 text-center max-lg:flex max-lg:flex-none max-lg:gap-6 max-lg:px-0 max-lg:text-left"
                 >
                   <div
-                    className={`mx-auto mb-5 flex h-[60px] w-[60px] items-center justify-center rounded-full border-2 transition max-lg:mx-0 max-lg:mb-0 ${
+                    className={`mx-auto mb-5 flex h-[60px] w-[60px] shrink-0 items-center justify-center rounded-full border-2 transition max-lg:mx-0 max-lg:mb-0 ${
                       highlighted
                         ? 'border-[#ef533f] bg-[#ef533f] text-white shadow-[0_0_0_6px_#fff0ed] scale-[1.05]'
                         : 'border-[#eaeaea] bg-white text-[#666666] hover:border-[#ef533f] hover:text-[#ef533f]'

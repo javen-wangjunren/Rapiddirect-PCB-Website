@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { getAssetPath } from '../../lib/assets';
 import type { PcbaCapabilityContent } from '../../types/pcb-assembly';
@@ -34,10 +34,26 @@ export function PcbaCapabilitySection(props: Props) {
   const gallery = Array.isArray(props.data.gallery) ? props.data.gallery : [];
   const defaultTabId = getTabId(tabs[0] ?? {}, 0);
   const [activeTabId, setActiveTabId] = useState(defaultTabId);
+  const tabBarRef = useRef<HTMLDivElement | null>(null);
+  const tabBtnRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
 
   useEffect(() => {
     if (!tabs.some((t, idx) => getTabId(t, idx) === activeTabId)) setActiveTabId(defaultTabId);
   }, [defaultTabId, activeTabId, tabs]);
+
+  const scrollActiveTabIntoView = useCallback((tabId: string) => {
+    const bar = tabBarRef.current;
+    const btn = tabBtnRefs.current.get(tabId);
+    if (!bar || !btn) return;
+    const maxScroll = Math.max(0, bar.scrollWidth - bar.clientWidth);
+    if (maxScroll <= 2) return;
+    const left = clamp(btn.offsetLeft, 0, maxScroll);
+    bar.scrollTo({ left, behavior: 'smooth' });
+  }, []);
+
+  useEffect(() => {
+    requestAnimationFrame(() => scrollActiveTabIntoView(activeTabId));
+  }, [activeTabId, scrollActiveTabIntoView]);
 
   const activeTab = useMemo(
     () => tabs.find((t, idx) => getTabId(t, idx) === activeTabId) ?? tabs[0] ?? null,
@@ -143,7 +159,11 @@ export function PcbaCapabilitySection(props: Props) {
         </div>
 
         <div className="mt-10 rounded-2xl bg-[#111111] p-10 text-white shadow-[0_20px_40px_rgba(0,0,0,0.10)] max-md:px-5 max-md:py-8">
-          <div className="flex gap-8 overflow-x-auto border-b border-[#333333] pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="relative">
+            <div
+              ref={tabBarRef}
+              className="flex gap-8 overflow-x-auto border-b border-[#333333] pb-4 pr-10 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            >
             {tabs.map((t, idx) => {
               const tabId = getTabId(t, idx);
               const active = tabId === activeTabId;
@@ -151,6 +171,10 @@ export function PcbaCapabilitySection(props: Props) {
                 <button
                   key={tabId}
                   type="button"
+                  ref={(el) => {
+                    if (el) tabBtnRefs.current.set(tabId, el);
+                    else tabBtnRefs.current.delete(tabId);
+                  }}
                   className={`relative whitespace-nowrap pb-4 text-lg font-semibold transition ${
                     active ? 'text-white' : 'text-[#888888] hover:text-white'
                   }`}
@@ -161,6 +185,8 @@ export function PcbaCapabilitySection(props: Props) {
                 </button>
               );
             })}
+            </div>
+            <div className="pointer-events-none absolute right-0 top-0 h-full w-10 bg-gradient-to-l from-[#111111] to-transparent" />
           </div>
 
           <div className="mt-10 grid grid-cols-1 gap-5 lg:grid-cols-3">

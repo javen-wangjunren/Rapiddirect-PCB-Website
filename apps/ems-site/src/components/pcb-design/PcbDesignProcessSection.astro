@@ -98,7 +98,7 @@ const benefits = (Array.isArray(data?.trust_base?.benefits) ? data.trust_base.be
       {data.trust_base?.cta && (
         <a
           href={data.trust_base.cta.href}
-          class="inline-flex items-center gap-[10px] rounded-[50px] bg-[#ef533f] px-10 py-4 text-[17px] font-bold text-white shadow-[0_8px_20px_rgba(239,83,63,0.2)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#d64734] hover:shadow-[0_12px_30px_rgba(239,83,63,0.3)]"
+          class="inline-flex items-center gap-2.5 rounded-[50px] bg-[#ef533f] px-7 py-3 text-[15px] font-bold text-white shadow-[0_8px_20px_rgba(239,83,63,0.2)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#d64734] hover:shadow-[0_12px_30px_rgba(239,83,63,0.3)] sm:gap-[10px] sm:px-10 sm:py-4 sm:text-[17px]"
         >
           {data.trust_base.cta.label}
         </a>

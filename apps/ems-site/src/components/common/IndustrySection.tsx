@@ -10,11 +10,32 @@ const whiteIconFilter = 'brightness(0) invert(1)';
 export function IndustrySection({ data }: { data: EmsHomeIndustryContent }) {
   const [activeId, setActiveId] = React.useState<string>(data.items[0]?.tab.id ?? '');
   const preloadedRef = React.useRef<Set<string>>(new Set());
+  const contentRef = React.useRef<HTMLDivElement | null>(null);
+  const mobileTabsRef = React.useRef<Map<string, HTMLButtonElement>>(new Map());
+  const mobileTabsViewportRef = React.useRef<HTMLDivElement | null>(null);
 
   const active = data.items.find((x) => x.tab.id === activeId) ?? data.items[0];
   if (!active) return null;
 
   const activeImageSrc = active.card.image_url ? getAssetPath(active.card.image_url) : '';
+
+  const selectTab = React.useCallback((id: string, focusContent: boolean) => {
+    setActiveId(id);
+    if (!focusContent) return;
+    window.requestAnimationFrame(() => {
+      contentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }, []);
+
+  React.useEffect(() => {
+    const btn = mobileTabsRef.current.get(activeId);
+    const viewport = mobileTabsViewportRef.current;
+    if (!btn || !viewport) return;
+    const maxScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+    if (maxScroll <= 2) return;
+    const left = Math.max(0, Math.min(btn.offsetLeft, maxScroll));
+    viewport.scrollTo({ left, behavior: 'smooth' });
+  }, [activeId]);
 
   React.useEffect(() => {
     const urls = data.items
@@ -54,8 +75,13 @@ export function IndustrySection({ data }: { data: EmsHomeIndustryContent }) {
           <p className="mx-auto mt-4 max-w-3xl text-sm leading-6 text-slate-600 sm:text-base">{data.description}</p>
         </div>
 
-        <div className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-[320px_1fr]">
-          <div className="space-y-3">
+        <div className="mt-10 lg:hidden">
+          <div
+            ref={mobileTabsViewportRef}
+            className="flex gap-3 overflow-x-auto pb-2 [-webkit-overflow-scrolling:touch]"
+            role="tablist"
+            aria-label={data.title}
+          >
             {data.items.map((item) => {
               const isActive = item.tab.id === activeId;
               const tabIconSrc = item.tab.icon_url ? getAssetPath(item.tab.icon_url) : '';
@@ -63,15 +89,65 @@ export function IndustrySection({ data }: { data: EmsHomeIndustryContent }) {
                 <button
                   key={item.tab.id}
                   type="button"
-                  onClick={() => setActiveId(item.tab.id)}
+                  onClick={() => selectTab(item.tab.id, true)}
+                  ref={(el) => {
+                    if (el) mobileTabsRef.current.set(item.tab.id, el);
+                    else mobileTabsRef.current.delete(item.tab.id);
+                  }}
+                  className={[
+                    'shrink-0 flex items-center gap-2 rounded-full px-4 py-2.5 text-left transition',
+                    isActive
+                      ? 'bg-[#ea543f] shadow-[0_11px_16px_-3px_rgba(234,84,63,0.20),0_4px_6px_-4px_rgba(234,84,63,0.20)]'
+                      : 'border border-slate-200 bg-[#f9fafb] hover:bg-white'
+                  ].join(' ')}
+                  role="tab"
+                  aria-selected={isActive}
+                >
+                  <span className={['flex h-9 w-9 items-center justify-center rounded-full', isActive ? 'bg-white/20' : 'bg-white'].join(' ')}>
+                    {tabIconSrc ? (
+                      <img
+                        src={tabIconSrc}
+                        alt=""
+                        className="h-5 w-5"
+                        style={{ filter: isActive ? whiteIconFilter : orangeIconFilter }}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    ) : (
+                      <span className="h-5 w-5" aria-hidden="true" />
+                    )}
+                  </span>
+                  <span className={['whitespace-nowrap text-[14px] font-medium leading-5', isActive ? 'text-white' : 'text-slate-700'].join(' ')}>
+                    {item.tab.name}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="mt-6 grid grid-cols-1 gap-6 lg:mt-12 lg:grid-cols-[320px_1fr]">
+          <div className="hidden space-y-3 lg:block" role="tablist" aria-label={data.title}>
+            {data.items.map((item) => {
+              const isActive = item.tab.id === activeId;
+              const tabIconSrc = item.tab.icon_url ? getAssetPath(item.tab.icon_url) : '';
+              return (
+                <button
+                  key={item.tab.id}
+                  type="button"
+                  onClick={() => selectTab(item.tab.id, false)}
                   className={[
                     'flex w-full items-center gap-4 rounded-[15px] px-5 py-4 text-left transition',
                     isActive
                       ? 'bg-[#ea543f] shadow-[0_11px_16px_-3px_rgba(234,84,63,0.20),0_4px_6px_-4px_rgba(234,84,63,0.20)]'
                       : 'border border-slate-200 bg-[#f9fafb] hover:bg-white'
                   ].join(' ')}
+                  role="tab"
+                  aria-selected={isActive}
                 >
-                  <span className={['flex h-[51px] w-[51px] items-center justify-center rounded-[11px]', isActive ? 'bg-white/20' : 'bg-white'].join(' ')}>
+                  <span
+                    className={['flex h-[51px] w-[51px] items-center justify-center rounded-[11px]', isActive ? 'bg-white/20' : 'bg-white'].join(' ')}
+                  >
                     {tabIconSrc ? (
                       <img
                         src={tabIconSrc}
@@ -93,16 +169,23 @@ export function IndustrySection({ data }: { data: EmsHomeIndustryContent }) {
             })}
           </div>
 
-          <div className="overflow-hidden rounded-[15px] bg-[#e3e2e7] p-8 sm:p-9">
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_450px] lg:items-start">
+          <div ref={contentRef} className="scroll-mt-24 overflow-hidden rounded-[15px] bg-[#e3e2e7] p-6 sm:p-9" role="tabpanel">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_450px] lg:items-start">
               <div>
-                <h3 className="text-[26px] font-semibold leading-10 tracking-[0.4px] text-slate-900">{active.card.title}</h3>
-                <p className="mt-6 text-[17px] leading-[26px] text-slate-600">{active.card.description.paragraph}</p>
+                <h3 className="text-[22px] font-semibold leading-8 tracking-[0.4px] text-slate-900 sm:text-[26px] sm:leading-10">
+                  {active.card.title}
+                </h3>
+                <p className="mt-4 text-[15px] leading-6 text-slate-600 sm:mt-6 sm:text-[17px] sm:leading-[26px]">
+                  {active.card.description.paragraph}
+                </p>
 
-                <ul className="mt-10 space-y-3">
+                <ul className="mt-6 space-y-3 sm:mt-10">
                   {active.card.description.list.map((text, idx) => (
-                    <li key={`${text}-${idx}`} className="flex items-start gap-3 text-[19px] leading-[30px] text-slate-700">
-                      <span className="mt-[11px] h-[6px] w-[6px] flex-none rounded-full bg-[#ea543f]" />
+                    <li
+                      key={`${text}-${idx}`}
+                      className="flex items-start gap-3 text-[15px] leading-6 text-slate-700 sm:text-[19px] sm:leading-[30px]"
+                    >
+                      <span className="mt-2 h-[6px] w-[6px] flex-none rounded-full bg-[#ea543f] sm:mt-[11px]" />
                       <span className="min-w-0">{text}</span>
                     </li>
                   ))}
@@ -110,13 +193,13 @@ export function IndustrySection({ data }: { data: EmsHomeIndustryContent }) {
 
                 <a
                   href={getHref(active.card.cta.href)}
-                  className="mt-10 inline-flex items-center justify-center gap-3 rounded-[11px] bg-[#ea543f] px-9 py-4 text-[19px] font-medium leading-[30px] text-white shadow-[0_11px_16px_-3px_rgba(234,84,63,0.25),0_4px_6px_-4px_rgba(234,84,63,0.25)] transition hover:bg-[#d84c39] focus:outline-none focus:ring-2 focus:ring-[#ea543f]/50 focus:ring-offset-2"
+                  className="mt-7 inline-flex items-center justify-center gap-3 rounded-[11px] bg-[#ea543f] px-6 py-3 text-[15px] font-medium leading-6 text-white shadow-[0_11px_16px_-3px_rgba(234,84,63,0.25),0_4px_6px_-4px_rgba(234,84,63,0.25)] transition hover:bg-[#d84c39] focus:outline-none focus:ring-2 focus:ring-[#ea543f]/50 focus:ring-offset-2 sm:mt-10 sm:px-9 sm:py-4 sm:text-[19px] sm:leading-[30px]"
                 >
                   <span className="text-white">{active.card.cta.label}</span>
                   <img
                     src={getAssetPath('/icons/industry/moccppwi-o23suxz.svg')}
                     alt=""
-                    className="h-[21px] w-[21px]"
+                    className="h-5 w-5 sm:h-[21px] sm:w-[21px]"
                     style={{ filter: whiteIconFilter }}
                     loading="lazy"
                     decoding="async"
@@ -129,13 +212,13 @@ export function IndustrySection({ data }: { data: EmsHomeIndustryContent }) {
                   key={activeId}
                   src={activeImageSrc}
                   alt=""
-                  className="h-[450px] w-[450px] rounded-[20px] object-cover"
+                  className="h-56 w-full rounded-[20px] object-cover sm:h-80 lg:h-[450px] lg:w-[450px]"
                   loading="eager"
                   decoding="async"
                   fetchPriority="high"
                 />
               ) : (
-                <div className="h-[450px] w-[450px] rounded-[20px] bg-white/60" />
+                <div className="h-56 w-full rounded-[20px] bg-white/60 sm:h-80 lg:h-[450px] lg:w-[450px]" />
               )}
             </div>
           </div>

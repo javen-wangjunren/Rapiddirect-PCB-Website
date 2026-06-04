@@ -40,27 +40,45 @@ export function PcbProcessSection(props: Props) {
         </div>
 
         <div className="mt-10 overflow-hidden rounded-2xl border border-[#eaeaea] bg-white shadow-[0_10px_40px_rgba(0,0,0,0.04)]">
-          <div className="flex border-b border-[#eaeaea] bg-[#fcfcfc]">
-            {stages.map((stage, idx) => {
-              const active = idx === activeIndex;
-              return (
-                <button
-                  key={`${stage.stage_name}-${idx}`}
-                  type="button"
-                  className={`relative flex-1 px-4 py-4 text-center text-sm font-semibold transition ${
-                    active ? 'bg-white text-[#ef533f]' : 'text-[#666666] hover:text-[#ef533f]'
-                  }`}
-                  onClick={() => setActiveIndex(idx)}
-                >
-                  {stage.stage_name}
-                  <span
-                    className={`absolute bottom-0 left-0 h-[3px] w-full ${
-                      active ? 'bg-[#ef533f]' : 'bg-transparent'
+          <div className="border-b border-[#eaeaea] bg-[#fcfcfc]">
+            <div className="p-4 sm:hidden">
+              <label className="sr-only" htmlFor="pcb-process-stage">
+                Process Stage
+              </label>
+              <select
+                id="pcb-process-stage"
+                className="w-full rounded-lg border border-[#eaeaea] bg-white px-3 py-2 text-sm font-semibold text-[#1a1a1a] shadow-sm outline-none ring-[#ef533f]/20 focus:ring-2"
+                value={String(activeIndex)}
+                onChange={(e) => setActiveIndex(Number(e.target.value))}
+              >
+                {stages.map((stage, idx) => (
+                  <option key={`${stage.stage_name}-${idx}`} value={String(idx)}>
+                    {stage.stage_name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="hidden sm:flex">
+              {stages.map((stage, idx) => {
+                const active = idx === activeIndex;
+                return (
+                  <button
+                    key={`${stage.stage_name}-${idx}`}
+                    type="button"
+                    className={`relative flex-1 px-4 py-4 text-center text-sm font-semibold transition ${
+                      active ? 'bg-white text-[#ef533f]' : 'text-[#666666] hover:text-[#ef533f]'
                     }`}
-                  />
-                </button>
-              );
-            })}
+                    onClick={() => setActiveIndex(idx)}
+                  >
+                    {stage.stage_name}
+                    <span
+                      className={`absolute bottom-0 left-0 h-[3px] w-full ${active ? 'bg-[#ef533f]' : 'bg-transparent'}`}
+                    />
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <div className="grid gap-10 p-10 lg:grid-cols-[1.2fr_1fr]">

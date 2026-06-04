@@ -20,8 +20,10 @@ const ctaHref = data?.cta_href?.trim() || siteHeaderDefaults.cta_href;
 const navItems = (data?.nav_items?.length ? data.nav_items : siteHeaderDefaults.nav_items) as NavItem[];
 ---
 
-<header class="site-header sticky top-0 z-[1000] border-b border-slate-100 bg-white px-10">
-  <div class="mx-auto flex h-20 max-w-[1440px] items-center justify-between">
+<input id="ems-site-mobile-menu-toggle" type="checkbox" class="peer fixed left-0 top-0 h-px w-px opacity-0 pointer-events-none md:hidden" />
+
+<header class="site-header sticky top-0 z-[1000] border-b border-slate-100 bg-white px-4 sm:px-6 lg:px-10">
+  <div class="mx-auto flex h-20 max-w-[1440px] items-center justify-between gap-4">
     <a href={getHref('/')} class="flex items-center no-underline" aria-label="RapidDirect home">
       {logoUrl ? (
         <img src={logoUrl} alt="RapidDirect" class="h-10 w-auto object-contain" loading="eager" decoding="async" />
@@ -30,7 +32,19 @@ const navItems = (data?.nav_items?.length ? data.nav_items : siteHeaderDefaults.
       )}
     </a>
 
-    <nav class="flex items-center gap-8">
+    <label
+      for="ems-site-mobile-menu-toggle"
+      class="inline-flex h-10 w-10 items-center justify-center rounded border border-slate-200 text-slate-900 hover:bg-slate-50 md:hidden"
+      aria-label="Open menu"
+      aria-controls="ems-site-mobile-menu"
+      role="button"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-6 w-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </label>
+
+    <nav class="hidden items-center gap-8 md:flex">
       {navItems.map((item) => {
         const hasChildren = item.children && item.children.length > 0;
         if (hasChildren) {
@@ -68,13 +82,90 @@ const navItems = (data?.nav_items?.length ? data.nav_items : siteHeaderDefaults.
       })}
     </nav>
 
-    <div class="flex items-center gap-5">
+    <div class="hidden items-center gap-5 md:flex">
       <a href={getHref(ctaHref)} class="rounded px-7 py-3.5 text-base font-bold text-white no-underline transition-colors bg-[#f25537] hover:bg-[#d94527]">
         {ctaText}
       </a>
     </div>
   </div>
 </header>
+
+<div
+  id="ems-site-mobile-menu"
+  class="mobile-menu fixed inset-0 z-[1100] opacity-0 pointer-events-none transition-opacity duration-300 peer-checked:opacity-100 peer-checked:pointer-events-auto peer-checked:[&_.mobile-menu-panel]:translate-x-0 md:hidden"
+  role="dialog"
+  aria-modal="true"
+  aria-hidden="true"
+>
+  <label class="absolute inset-0 bg-slate-900/40" for="ems-site-mobile-menu-toggle" aria-label="Close menu"></label>
+
+  <div class="mobile-menu-panel absolute right-0 top-0 h-full w-[82vw] max-w-[380px] translate-x-full bg-white text-slate-900 shadow-[-20px_0_60px_rgba(15,23,42,0.18)] transition-transform duration-300 ease-out">
+    <div class="flex h-16 items-center justify-between border-b border-slate-200 px-5">
+      <div class="text-lg font-semibold tracking-tight">Menu</div>
+      <label
+        for="ems-site-mobile-menu-toggle"
+        class="inline-flex h-10 w-10 items-center justify-center rounded border border-slate-200 text-slate-900 hover:bg-slate-50"
+        aria-label="Close menu"
+        role="button"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-6 w-6">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6l-12 12" />
+        </svg>
+      </label>
+    </div>
+
+    <div class="h-[calc(100vh-4rem)] overflow-y-auto px-5 pb-6 pt-4">
+      <nav class="flex flex-col">
+        {navItems.map((item) => {
+          const hasChildren = item.children && item.children.length > 0;
+          if (hasChildren) {
+            return (
+              <details class="border-b border-slate-200 py-2">
+                <summary class="flex cursor-pointer list-none items-center justify-between py-3 text-base font-semibold text-slate-900">
+                  <span>{item.label}</span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5 text-slate-500">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6" />
+                  </svg>
+                </summary>
+                <div class="pb-3">
+                  {item.children!.map((child) => (
+                    <a
+                      href={getHref(child.href ?? '#')}
+                      target={child.openInNewTab ? '_blank' : undefined}
+                      rel={child.openInNewTab ? 'noopener noreferrer' : undefined}
+                      class="block rounded px-3 py-2 text-[15px] font-medium text-slate-600 hover:bg-slate-50 hover:text-[#f25537]"
+                    >
+                      {child.label}
+                    </a>
+                  ))}
+                </div>
+              </details>
+            );
+          }
+          return (
+            <a
+              href={getHref(item.href ?? '#')}
+              target={item.openInNewTab ? '_blank' : undefined}
+              rel={item.openInNewTab ? 'noopener noreferrer' : undefined}
+              class="border-b border-slate-200 py-4 text-base font-semibold text-slate-900 hover:bg-slate-50 hover:text-[#f25537]"
+            >
+              {item.label}
+            </a>
+          );
+        })}
+      </nav>
+
+      <div class="mt-6">
+        <a
+          href={getHref(ctaHref)}
+          class="block w-full rounded bg-[#f25537] px-6 py-3.5 text-center text-base font-bold text-white no-underline transition-colors hover:bg-[#d94527]"
+        >
+          {ctaText}
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
 
 <style>
   .has-dropdown:hover .dropdown-icon {
@@ -85,5 +176,14 @@ const navItems = (data?.nav_items?.length ? data.nav_items : siteHeaderDefaults.
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
+  }
+  .mobile-menu details[open] summary svg {
+    transform: rotate(180deg);
+  }
+</style>
+
+<style is:global>
+  body:has(#ems-site-mobile-menu-toggle:checked) {
+    overflow: hidden;
   }
 </style>

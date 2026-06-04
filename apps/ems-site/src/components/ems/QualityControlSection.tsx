@@ -8,6 +8,9 @@ export function QualityControlSection({ data }: { data: EmsHomeQualityContent })
 
   const activeTab = data.tabs.find((tab) => tab.id === activeTabId) ?? data.tabs[0];
 
+  const advantagesColsClass =
+    data.advantages.length === 1 ? 'grid-cols-1' : data.advantages.length === 2 ? 'grid-cols-2' : 'grid-cols-3';
+
   if (!activeTab) return null;
 
   return (
@@ -23,7 +26,7 @@ export function QualityControlSection({ data }: { data: EmsHomeQualityContent })
         </div>
 
         <div className="mx-auto mt-10 max-w-3xl rounded-2xl bg-[#e3e2e7] p-2">
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+          <div className="flex gap-2 overflow-x-auto sm:grid sm:grid-cols-3 sm:overflow-visible">
             {data.tabs.map((tab) => {
               const isActive = tab.id === activeTabId;
               const iconUrl = getAssetPath(tab.icon_url);
@@ -33,13 +36,13 @@ export function QualityControlSection({ data }: { data: EmsHomeQualityContent })
                   type="button"
                   onClick={() => setActiveTabId(tab.id)}
                   className={[
-                    'flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-medium transition',
+                    'flex h-11 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-xl px-3 text-xs font-medium transition sm:h-auto sm:px-6 sm:py-3 sm:text-sm',
                     isActive ? 'bg-[#ea543f] text-white' : 'text-slate-900 hover:bg-white/70'
                   ].join(' ')}
                 >
                   <span
                     aria-hidden="true"
-                    className="h-5 w-5 shrink-0 bg-current"
+                    className="h-4 w-4 shrink-0 bg-current sm:h-5 sm:w-5"
                     style={{
                       WebkitMaskImage: `url(${iconUrl})`,
                       maskImage: `url(${iconUrl})`,
@@ -107,14 +110,16 @@ export function QualityControlSection({ data }: { data: EmsHomeQualityContent })
           </div>
         </div>
 
-        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className={['mt-6 grid gap-2 sm:gap-4', advantagesColsClass].join(' ')}>
           {data.advantages.map((item, idx) => (
             <div
               key={`${item.title}-${idx}`}
-              className="rounded-xl border border-[#e3e2e7] bg-[#e3e2e7] px-6 py-4 text-center"
+              className="rounded-xl border border-[#e3e2e7] bg-[#e3e2e7] px-3 py-3 text-center sm:px-6 sm:py-4"
             >
-              <p className="text-xl font-semibold tracking-tight text-[#ea543f]">{item.title}</p>
-              <p className="mt-1 text-xs text-slate-600">{item.description}</p>
+              <p className="text-lg font-semibold tracking-tight text-[#ea543f] sm:text-xl">{item.title}</p>
+              <p className="mt-1 text-[10px] leading-tight text-slate-600 sm:text-xs sm:leading-5">
+                {item.description}
+              </p>
             </div>
           ))}
         </div>

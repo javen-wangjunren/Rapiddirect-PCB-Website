@@ -88,7 +88,7 @@ export function QuoteFormSection({ data }: { data: QuoteFormContent }) {
       <div className="absolute inset-x-0 bottom-0 h-1/2 bg-black/85" />
 
       <div className="relative mx-auto w-full max-w-3xl px-6">
-        <div className="rounded-2xl bg-white px-6 py-10 shadow-[0_30px_60px_rgba(0,0,0,0.15)] sm:px-12">
+        <div className="rounded-2xl bg-white px-6 py-8 shadow-[0_30px_60px_rgba(0,0,0,0.15)] sm:px-12 sm:py-10">
           <div className="text-center">
             <h2 className="text-3xl font-extrabold tracking-tight text-slate-900">
               {data.title}
@@ -96,8 +96,8 @@ export function QuoteFormSection({ data }: { data: QuoteFormContent }) {
             <p className="mt-3 text-sm text-slate-600">{data.description}</p>
           </div>
 
-          <form ref={formRef} onSubmit={onSubmit} className="mt-10">
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <form ref={formRef} onSubmit={onSubmit} className="mt-8 sm:mt-10">
+            <div className="grid grid-cols-2 gap-4 sm:gap-6">
               <div>
                 <label className="text-xs font-bold text-slate-900">
                   {data.name_field.label}{' '}
@@ -107,7 +107,7 @@ export function QuoteFormSection({ data }: { data: QuoteFormContent }) {
                   name="name"
                   required={data.name_field.required}
                   placeholder={data.name_field.placeholder}
-                  className="mt-2 w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-[#ef533f] focus:ring-4 focus:ring-[#ef533f]/10"
+                  className="mt-1.5 w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 outline-none transition focus:border-[#ef533f] focus:ring-4 focus:ring-[#ef533f]/10 sm:mt-2 sm:px-4 sm:py-3"
                 />
               </div>
 
@@ -120,11 +120,11 @@ export function QuoteFormSection({ data }: { data: QuoteFormContent }) {
                   name="company"
                   required={data.company_field.required}
                   placeholder={data.company_field.placeholder}
-                  className="mt-2 w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-[#ef533f] focus:ring-4 focus:ring-[#ef533f]/10"
+                  className="mt-1.5 w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 outline-none transition focus:border-[#ef533f] focus:ring-4 focus:ring-[#ef533f]/10 sm:mt-2 sm:px-4 sm:py-3"
                 />
               </div>
 
-              <div>
+              <div className="col-span-2">
                 <label className="text-xs font-bold text-slate-900">
                   {data.email_field.label}{' '}
                   {data.email_field.required && <span className="text-[#ef533f]">*</span>}
@@ -134,11 +134,11 @@ export function QuoteFormSection({ data }: { data: QuoteFormContent }) {
                   type="email"
                   required={data.email_field.required}
                   placeholder={data.email_field.placeholder}
-                  className="mt-2 w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-[#ef533f] focus:ring-4 focus:ring-[#ef533f]/10"
+                  className="mt-1.5 w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 outline-none transition focus:border-[#ef533f] focus:ring-4 focus:ring-[#ef533f]/10 sm:mt-2 sm:px-4 sm:py-3"
                 />
               </div>
 
-              <div>
+              <div className="col-span-2">
                 <label className="text-xs font-bold text-slate-900">
                   {data.phone_field.label}{' '}
                   {data.phone_field.required && <span className="text-[#ef533f]">*</span>}
@@ -148,12 +148,12 @@ export function QuoteFormSection({ data }: { data: QuoteFormContent }) {
                   type="tel"
                   required={data.phone_field.required}
                   placeholder={data.phone_field.placeholder}
-                  className="mt-2 w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-[#ef533f] focus:ring-4 focus:ring-[#ef533f]/10"
+                  className="mt-1.5 w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 outline-none transition focus:border-[#ef533f] focus:ring-4 focus:ring-[#ef533f]/10 sm:mt-2 sm:px-4 sm:py-3"
                 />
               </div>
             </div>
 
-            <div className="mt-6">
+            <div className="mt-5 sm:mt-6">
               <label className="text-xs font-bold text-slate-900">
                 {data.message_field.label}{' '}
                 {data.message_field.required && <span className="text-[#ef533f]">*</span>}
@@ -162,24 +162,24 @@ export function QuoteFormSection({ data }: { data: QuoteFormContent }) {
                 name="message"
                 required={data.message_field.required}
                 placeholder={data.message_field.placeholder}
-                className="mt-2 min-h-[120px] w-full resize-y rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-[#ef533f] focus:ring-4 focus:ring-[#ef533f]/10"
+                className="mt-1.5 min-h-[96px] w-full resize-y rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 outline-none transition focus:border-[#ef533f] focus:ring-4 focus:ring-[#ef533f]/10 sm:mt-2 sm:min-h-[120px] sm:px-4 sm:py-3"
               />
             </div>
 
-            <div className="mt-6">
+            <div className="mt-5 sm:mt-6">
               <label className="text-xs font-bold text-slate-900">
                 {data.upload.label}{' '}
                 <span className="font-medium text-slate-500">{data.upload.optional_text}</span>
               </label>
 
-              <label className="mt-2 flex cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 px-6 py-8 text-center transition hover:border-[#ef533f] hover:bg-[#fff0ed]">
+              <label className="mt-1.5 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-5 text-center transition hover:border-[#ef533f] hover:bg-[#fff0ed] sm:mt-2 sm:gap-3 sm:px-6 sm:py-8">
                 <input
                   type="file"
                   name="attachment"
                   className="hidden"
                   onChange={(e) => setFileName(e.target.files?.[0]?.name ?? '')}
                 />
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" className="text-[#ef533f]">
+                <svg className="h-6 w-6 text-[#ef533f] sm:h-7 sm:w-7" viewBox="0 0 24 24" fill="none">
                   <path
                     d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
                     stroke="currentColor"
@@ -210,7 +210,7 @@ export function QuoteFormSection({ data }: { data: QuoteFormContent }) {
             </div>
 
             {env.turnstileSiteKey && (
-              <div className="mt-6 flex justify-center">
+              <div className="mt-5 flex justify-center sm:mt-6">
                 <div className="cf-turnstile" data-sitekey={env.turnstileSiteKey} />
               </div>
             )}
@@ -229,7 +229,7 @@ export function QuoteFormSection({ data }: { data: QuoteFormContent }) {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="mt-8 w-full rounded-lg bg-[#ef533f] px-6 py-4 text-sm font-bold text-white shadow-[0_8px_20px_rgba(239,83,63,0.20)] transition hover:bg-[#d64734] disabled:cursor-not-allowed disabled:opacity-70"
+              className="mt-7 w-full rounded-lg bg-[#ef533f] px-6 py-3.5 text-sm font-bold text-white shadow-[0_8px_20px_rgba(239,83,63,0.20)] transition hover:bg-[#d64734] disabled:cursor-not-allowed disabled:opacity-70 sm:mt-8 sm:py-4"
             >
               {isSubmitting ? 'Submitting...' : data.submit_label}
             </button>

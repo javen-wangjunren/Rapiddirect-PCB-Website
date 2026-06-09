@@ -1,6 +1,6 @@
 ---
 import type { ComponentsSourcingSourceCapabilityContent } from '../../types/components-sourcing';
-import { getAssetPath } from '../../lib/assets';
+import { getAssetPath, getSupabaseImageUrl } from '../../lib/assets';
 
 export interface Props {
   data: ComponentsSourcingSourceCapabilityContent;
@@ -42,7 +42,9 @@ const brands = Array.isArray((data as any)?.brands?.items) ? ((data as any).bran
           <div class="relative w-full aspect-[4/3] overflow-hidden bg-slate-200">
             {item.image_url ? (
               <img
-                src={getAssetPath(item.image_url)}
+                src={getSupabaseImageUrl(item.image_url, { width: 600, quality: 75 })}
+                srcset={`${getSupabaseImageUrl(item.image_url, { width: 400, quality: 75 })} 400w, ${getSupabaseImageUrl(item.image_url, { width: 600, quality: 75 })} 600w, ${getSupabaseImageUrl(item.image_url, { width: 800, quality: 80 })} 800w`}
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 alt=""
                 class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.05]"
                 loading="lazy"
@@ -97,7 +99,23 @@ const brands = Array.isArray((data as any)?.brands?.items) ? ((data as any).bran
           {brands.map((item) => (
             <div class="group flex h-20 items-center justify-center overflow-hidden rounded-xl border border-[#e5e7eb] bg-white transition hover:-translate-y-0.5 hover:border-[#ef533f] hover:shadow-[0_4px_15px_rgba(239,83,63,0.1)]">
               {item.logo_url ? (
-                <img src={getAssetPath(item.logo_url)} alt={item.name} class="h-full w-full object-contain p-4" loading="lazy" decoding="async" />
+                <img
+                  src={
+                    String(item.logo_url).toLowerCase().endsWith('.svg')
+                      ? getAssetPath(item.logo_url)
+                      : getSupabaseImageUrl(item.logo_url, { width: 200, quality: 80 })
+                  }
+                  srcset={
+                    String(item.logo_url).toLowerCase().endsWith('.svg')
+                      ? undefined
+                      : `${getSupabaseImageUrl(item.logo_url, { width: 120, quality: 80 })} 120w, ${getSupabaseImageUrl(item.logo_url, { width: 200, quality: 80 })} 200w, ${getSupabaseImageUrl(item.logo_url, { width: 300, quality: 80 })} 300w`
+                  }
+                  sizes="80px"
+                  alt={item.name}
+                  class="h-full w-full object-contain p-4"
+                  loading="lazy"
+                  decoding="async"
+                />
               ) : (
                 <span class="px-3 text-center text-[13px] font-semibold text-slate-500">{item.name}</span>
               )}

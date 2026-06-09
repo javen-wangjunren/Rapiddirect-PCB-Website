@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { getAssetPath, getHref } from '../../lib/assets';
+import { getAssetPath, getHref, getSupabaseImageUrl } from '../../lib/assets';
 import type { ReviewsContent } from '../../types/reviews';
 
 type Props = {
@@ -87,8 +87,10 @@ export function ReviewsSection(props: Props) {
             className="relative z-0 flex gap-7 overflow-x-auto scroll-smooth pt-2 pb-8 [scroll-snap-type:x_mandatory] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             {props.data.reviews.map((r, idx) => {
-              const imgSrc = r.image_url ? getAssetPath(r.image_url) : '';
-              const avatarSrc = r.customer_avatar_url ? getAssetPath(r.customer_avatar_url) : '';
+              const rawImgSrc = r.image_url ? getAssetPath(r.image_url) : '';
+              const imgSrc = rawImgSrc ? getSupabaseImageUrl(rawImgSrc, { width: 900, quality: 75 }) : '';
+              const rawAvatarSrc = r.customer_avatar_url ? getAssetPath(r.customer_avatar_url) : '';
+              const avatarSrc = rawAvatarSrc ? getSupabaseImageUrl(rawAvatarSrc, { width: 96, quality: 80 }) : '';
               return (
                 <article
                   key={`${r.customer_name}-${idx}`}
@@ -105,7 +107,15 @@ export function ReviewsSection(props: Props) {
                     </div>
 
                     {imgSrc && isImageUrl(imgSrc) ? (
-                      <img src={imgSrc} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.05]" />
+                      <img
+                        src={imgSrc}
+                        srcSet={`${getSupabaseImageUrl(rawImgSrc, { width: 600, quality: 75 })} 600w, ${getSupabaseImageUrl(rawImgSrc, { width: 900, quality: 75 })} 900w, ${getSupabaseImageUrl(rawImgSrc, { width: 1200, quality: 80 })} 1200w`}
+                        sizes="(max-width: 640px) 85vw, (max-width: 1024px) 50vw, 33vw"
+                        alt=""
+                        className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.05]"
+                        loading="lazy"
+                        decoding="async"
+                      />
                     ) : (
                       <div className="absolute inset-0 flex items-center justify-center text-sm font-medium text-[#94a3b8]">
                         [ Image ]
@@ -117,7 +127,17 @@ export function ReviewsSection(props: Props) {
                     <div className="flex items-center justify-between gap-4 border-b border-[#f1f1f1] px-7 py-5">
                       <div className="flex min-w-0 items-center gap-4">
                         <div className="h-11 w-11 overflow-hidden rounded-full bg-[#f1f5f9]">
-                          {avatarSrc && isImageUrl(avatarSrc) ? <img src={avatarSrc} alt="" className="h-full w-full object-cover" /> : null}
+                          {avatarSrc && isImageUrl(avatarSrc) ? (
+                            <img
+                              src={avatarSrc}
+                              srcSet={`${getSupabaseImageUrl(rawAvatarSrc, { width: 64, quality: 80 })} 64w, ${getSupabaseImageUrl(rawAvatarSrc, { width: 96, quality: 80 })} 96w, ${getSupabaseImageUrl(rawAvatarSrc, { width: 128, quality: 80 })} 128w`}
+                              sizes="44px"
+                              alt=""
+                              className="h-full w-full object-cover"
+                              loading="lazy"
+                              decoding="async"
+                            />
+                          ) : null}
                         </div>
                         <div className="min-w-0">
                           <div className="truncate text-base font-semibold text-[#1a1a1a]">{r.customer_name}</div>

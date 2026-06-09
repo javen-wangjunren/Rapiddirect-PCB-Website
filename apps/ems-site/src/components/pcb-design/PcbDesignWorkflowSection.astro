@@ -1,6 +1,6 @@
 ---
 import type { PcbDesignWorkflowContent } from '../../types/pcb-design';
-import { getAssetPath } from '../../lib/assets';
+import { getSupabaseImageUrl } from '../../lib/assets';
 
 export interface Props {
   data: PcbDesignWorkflowContent;
@@ -76,9 +76,13 @@ const stages = (Array.isArray(data?.stages) ? data.stages : []) as Props['data']
                 <h3 class="mb-6 text-3xl font-extrabold">{stage.left_title}</h3>
                 {stage.image_url ? (
                   <img
-                    src={getAssetPath(stage.image_url)}
+                    src={getSupabaseImageUrl(stage.image_url, { width: 600, quality: 75 })}
+                    srcset={`${getSupabaseImageUrl(stage.image_url, { width: 480, quality: 75 })} 480w, ${getSupabaseImageUrl(stage.image_url, { width: 600, quality: 75 })} 600w, ${getSupabaseImageUrl(stage.image_url, { width: 900, quality: 80 })} 900w`}
+                    sizes="(max-width: 1024px) 100vw, 35vw"
                     alt={stage.image_alt || stage.left_title}
                     class="w-full rounded-[20px] object-cover"
+                    loading="lazy"
+                    decoding="async"
                   />
                 ) : (
                   <div class="flex aspect-square w-full items-center justify-center rounded-[20px] bg-black/5 text-sm text-[#94a3b8]">

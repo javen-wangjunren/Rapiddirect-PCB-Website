@@ -1,5 +1,5 @@
 ---
-import { getAssetPath } from '../../lib/assets';
+import { getSupabaseImageUrl } from '../../lib/assets';
 
 export interface ProductGallerySpec {
   label: string;
@@ -72,7 +72,15 @@ const cards = derivedTabs.flatMap((tab) => tab.items.map((item) => ({ ...item, c
         <article class="product-gallery-card" data-category={(item as any).category} tabindex="0">
           <div class="product-gallery-media">
             {item.image_url ? (
-              <img src={getAssetPath(item.image_url)} alt="" class="product-gallery-img" loading="lazy" />
+              <img
+                src={getSupabaseImageUrl(item.image_url, { width: 600, quality: 75 })}
+                srcset={`${getSupabaseImageUrl(item.image_url, { width: 400, quality: 75 })} 400w, ${getSupabaseImageUrl(item.image_url, { width: 600, quality: 75 })} 600w, ${getSupabaseImageUrl(item.image_url, { width: 800, quality: 80 })} 800w`}
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                alt=""
+                class="product-gallery-img"
+                loading="lazy"
+                decoding="async"
+              />
             ) : (
               <div class="product-gallery-img-fallback" aria-hidden="true" />
             )}

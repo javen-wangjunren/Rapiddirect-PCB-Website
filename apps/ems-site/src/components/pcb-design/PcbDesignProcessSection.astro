@@ -1,6 +1,6 @@
 ---
 import type { PcbDesignProcessContent } from '../../types/pcb-design';
-import { getAssetPath } from '../../lib/assets';
+import { getSupabaseImageUrl } from '../../lib/assets';
 import { getPcbDesignProcessBenefitIconSvg, getPcbDesignProcessItemIconSvg } from '../../content/icons/pcb-design-process';
 
 export interface Props {
@@ -63,9 +63,13 @@ const benefits = (Array.isArray(data?.trust_base?.benefits) ? data.trust_base.be
             {hasImage && (
               <div class={`timeline-content photo-module group relative ml-[60px] flex aspect-[16/9] w-[calc(100%-60px)] items-center justify-center overflow-hidden rounded-xl border border-[#e5e7eb] bg-[#f0f2f5] transition-transform duration-300 ease-out lg:ml-0 lg:aspect-[4/3] lg:w-[44%] ${isOdd ? 'order-2 lg:order-none' : 'order-2 lg:order-none'}`}>
                 <img
-                  src={getAssetPath(item.image_url)}
+                  src={getSupabaseImageUrl(item.image_url, { width: 900, quality: 75 })}
+                  srcset={`${getSupabaseImageUrl(item.image_url, { width: 600, quality: 75 })} 600w, ${getSupabaseImageUrl(item.image_url, { width: 900, quality: 75 })} 900w, ${getSupabaseImageUrl(item.image_url, { width: 1200, quality: 80 })} 1200w`}
+                  sizes="(max-width: 1024px) 100vw, 44vw"
                   alt={item.title}
                   class="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
             )}

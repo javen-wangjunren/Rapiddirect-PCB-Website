@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { getAssetPath } from '../../lib/assets';
+import { getAssetPath, getSupabaseImageUrl } from '../../lib/assets';
 import type { PcbaCapabilityContent } from '../../types/pcb-assembly';
 
 type Props = {
@@ -123,7 +123,7 @@ export function PcbaCapabilitySection(props: Props) {
             className="flex gap-6 overflow-x-auto scroll-smooth pb-5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:pb-6"
           >
             {gallery.map((item, idx) => {
-              const src = item.image_url ? getAssetPath(item.image_url) : '';
+              const src = item.image_url ? getSupabaseImageUrl(getAssetPath(item.image_url), { width: 600, quality: 75 }) : '';
               return (
                 <div
                   key={`${item.name}-${idx}`}
@@ -132,7 +132,15 @@ export function PcbaCapabilitySection(props: Props) {
                 >
                   <div className="flex h-[180px] w-full items-center justify-center bg-[#f0f2f5]">
                     {src && isImageUrl(src) ? (
-                      <img src={src} alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" />
+                      <img
+                        src={src}
+                        srcSet={`${getSupabaseImageUrl(getAssetPath(item.image_url), { width: 400, quality: 75 })} 400w, ${getSupabaseImageUrl(getAssetPath(item.image_url), { width: 600, quality: 75 })} 600w, ${getSupabaseImageUrl(getAssetPath(item.image_url), { width: 800, quality: 80 })} 800w`}
+                        sizes="(max-width: 640px) 85vw, 280px"
+                        alt=""
+                        className="h-full w-full object-cover"
+                        loading="lazy"
+                        decoding="async"
+                      />
                     ) : (
                       <div className="px-6 text-center text-sm font-medium text-[#94a3b8]">[ Image ]</div>
                     )}

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 
-import { getAssetPath } from '../../lib/assets';
+import { getAssetPath, getSupabaseImageUrl } from '../../lib/assets';
 import type { PcbProcessContent } from '../../types/pcb-process';
 
 type Props = {
@@ -29,7 +29,8 @@ export function PcbProcessSection(props: Props) {
 
   if (!activeStage) return null;
 
-  const imageSrc = activeStage.image_url ? getAssetPath(activeStage.image_url) : '';
+  const rawImageSrc = activeStage.image_url ? getAssetPath(activeStage.image_url) : '';
+  const imageSrc = rawImageSrc ? getSupabaseImageUrl(rawImageSrc, { width: 1200, quality: 75 }) : '';
 
   return (
     <section className="bg-[#f8f9fa] py-20">
@@ -85,7 +86,15 @@ export function PcbProcessSection(props: Props) {
             <div className="relative">
               <div className="relative aspect-[4/3] overflow-hidden rounded-xl border border-[#eaeaea] bg-[#f3f4f6] shadow-[0_18px_40px_rgba(0,0,0,0.10)]">
                 {imageSrc && isImageUrl(imageSrc) ? (
-                  <img src={imageSrc} alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" />
+                  <img
+                    src={imageSrc}
+                    srcSet={`${getSupabaseImageUrl(rawImageSrc, { width: 600, quality: 75 })} 600w, ${getSupabaseImageUrl(rawImageSrc, { width: 900, quality: 75 })} 900w, ${getSupabaseImageUrl(rawImageSrc, { width: 1200, quality: 75 })} 1200w, ${getSupabaseImageUrl(rawImageSrc, { width: 1600, quality: 80 })} 1600w`}
+                    sizes="(max-width: 1024px) 100vw, 55vw"
+                    alt=""
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                    decoding="async"
+                  />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center text-sm font-medium text-[#94a3b8]">[ Image ]</div>
                 )}

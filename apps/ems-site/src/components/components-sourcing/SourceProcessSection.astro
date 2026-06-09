@@ -1,6 +1,6 @@
 ---
 import type { ComponentsSourcingSourceProcessContent } from '../../types/components-sourcing';
-import { getAssetPath } from '../../lib/assets';
+import { getSupabaseImageUrl } from '../../lib/assets';
 
 export interface Props {
   data: ComponentsSourcingSourceProcessContent;
@@ -47,7 +47,15 @@ const steps = Array.isArray((data as any)?.steps) ? ((data as any).steps as any[
           </div>
           <div class="panel-visual">
             {step.image_url ? (
-              <img src={getAssetPath(step.image_url)} alt={step.title} class="absolute inset-0 h-full w-full object-cover" loading="lazy" decoding="async" />
+              <img
+                src={getSupabaseImageUrl(step.image_url, { width: 900, quality: 75 })}
+                srcset={`${getSupabaseImageUrl(step.image_url, { width: 600, quality: 75 })} 600w, ${getSupabaseImageUrl(step.image_url, { width: 900, quality: 75 })} 900w, ${getSupabaseImageUrl(step.image_url, { width: 1200, quality: 80 })} 1200w, ${getSupabaseImageUrl(step.image_url, { width: 1600, quality: 80 })} 1600w`}
+                sizes="(max-width: 992px) 100vw, 55vw"
+                alt={step.title}
+                class="absolute inset-0 h-full w-full object-cover"
+                loading="lazy"
+                decoding="async"
+              />
             ) : (
               <div class="img-placeholder-text">{step.image_placeholder}</div>
             )}

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type { EmsHomeIndustryContent } from '../../types/ems-home';
-import { getAssetPath, getHref } from '../../lib/assets';
+import { getAssetPath, getHref, getSupabaseImageUrl } from '../../lib/assets';
 
 const orangeIconFilter =
   'brightness(0) saturate(100%) invert(43%) sepia(75%) saturate(2369%) hue-rotate(336deg) brightness(98%) contrast(93%)';
@@ -17,7 +17,15 @@ export function IndustrySection({ data }: { data: EmsHomeIndustryContent }) {
   const active = data.items.find((x) => x.tab.id === activeId) ?? data.items[0];
   if (!active) return null;
 
-  const activeImageSrc = active.card.image_url ? getAssetPath(active.card.image_url) : '';
+  const activeImageSrc600 = active.card.image_url
+    ? getSupabaseImageUrl(active.card.image_url, { width: 600, quality: 75 })
+    : '';
+  const activeImageSrc900 = active.card.image_url
+    ? getSupabaseImageUrl(active.card.image_url, { width: 900, quality: 75 })
+    : '';
+  const activeImageSrc1200 = active.card.image_url
+    ? getSupabaseImageUrl(active.card.image_url, { width: 1200, quality: 80 })
+    : '';
 
   const selectTab = React.useCallback((id: string, focusContent: boolean) => {
     setActiveId(id);
@@ -39,7 +47,7 @@ export function IndustrySection({ data }: { data: EmsHomeIndustryContent }) {
 
   React.useEffect(() => {
     const urls = data.items
-      .map((item) => (item.card.image_url ? getAssetPath(item.card.image_url) : ''))
+      .map((item) => (item.card.image_url ? getSupabaseImageUrl(item.card.image_url, { width: 900, quality: 75 }) : ''))
       .filter(Boolean);
 
     const load = (src: string) => {
@@ -50,9 +58,9 @@ export function IndustrySection({ data }: { data: EmsHomeIndustryContent }) {
       img.src = src;
     };
 
-    if (activeImageSrc) load(activeImageSrc);
+    if (activeImageSrc900) load(activeImageSrc900);
 
-    const rest = urls.filter((u) => u !== activeImageSrc);
+    const rest = urls.filter((u) => u !== activeImageSrc900);
     const schedule = (cb: () => void) => {
       const w = window as any;
       if (typeof w?.requestIdleCallback === 'function') return w.requestIdleCallback(cb, { timeout: 1500 });
@@ -65,7 +73,7 @@ export function IndustrySection({ data }: { data: EmsHomeIndustryContent }) {
       if (typeof w?.cancelIdleCallback === 'function') w.cancelIdleCallback(id);
       else window.clearTimeout(id);
     };
-  }, [data.items, activeImageSrc]);
+  }, [data.items, activeImageSrc900]);
 
   return (
     <section className="bg-white py-16 sm:py-20">
@@ -207,10 +215,12 @@ export function IndustrySection({ data }: { data: EmsHomeIndustryContent }) {
                 </a>
               </div>
 
-              {activeImageSrc ? (
+              {activeImageSrc900 ? (
                 <img
                   key={activeId}
-                  src={activeImageSrc}
+                  src={activeImageSrc900}
+                  srcSet={`${activeImageSrc600} 600w, ${activeImageSrc900} 900w, ${activeImageSrc1200} 1200w`}
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 450px"
                   alt=""
                   className="h-56 w-full rounded-[20px] object-cover sm:h-80 lg:h-[450px] lg:w-[450px]"
                   loading="eager"

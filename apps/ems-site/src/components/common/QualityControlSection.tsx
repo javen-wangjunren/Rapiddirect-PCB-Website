@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type { EmsHomeQualityContent } from '../../types/ems-home';
-import { getAssetPath } from '../../lib/assets';
+import { getAssetPath, getSupabaseImageUrl } from '../../lib/assets';
 
 export function QualityControlSection({ data }: { data: EmsHomeQualityContent }) {
   const [activeTabId, setActiveTabId] = React.useState<string>(data.tabs[0]?.id ?? '');
@@ -13,7 +13,9 @@ export function QualityControlSection({ data }: { data: EmsHomeQualityContent })
 
   React.useEffect(() => {
     const urls = data.tabs
-      .map((tab) => (tab.content.left.image_url ? getAssetPath(tab.content.left.image_url) : ''))
+      .map((tab) =>
+        tab.content.left.image_url ? getSupabaseImageUrl(tab.content.left.image_url, { width: 900, quality: 75 }) : ''
+      )
       .filter(Boolean);
 
     const load = (src: string) => {
@@ -27,7 +29,15 @@ export function QualityControlSection({ data }: { data: EmsHomeQualityContent })
     urls.forEach(load);
   }, [data.tabs]);
 
-  const heroImageSrc = getAssetPath(activeTab.content.left.image_url);
+  const heroImageSrc600 = activeTab.content.left.image_url
+    ? getSupabaseImageUrl(activeTab.content.left.image_url, { width: 600, quality: 75 })
+    : '';
+  const heroImageSrc900 = activeTab.content.left.image_url
+    ? getSupabaseImageUrl(activeTab.content.left.image_url, { width: 900, quality: 75 })
+    : '';
+  const heroImageSrc1200 = activeTab.content.left.image_url
+    ? getSupabaseImageUrl(activeTab.content.left.image_url, { width: 1200, quality: 80 })
+    : '';
 
   return (
     <section className="bg-[#F5F5F5] py-16 sm:py-20">
@@ -82,7 +92,9 @@ export function QualityControlSection({ data }: { data: EmsHomeQualityContent })
             <div className="relative w-full aspect-[8/5] lg:w-[800px] lg:shrink-0">
               <img
                 key={activeTabId}
-                src={heroImageSrc}
+                src={heroImageSrc900}
+                srcSet={`${heroImageSrc600} 600w, ${heroImageSrc900} 900w, ${heroImageSrc1200} 1200w`}
+                sizes="(max-width: 1024px) 100vw, 800px"
                 alt=""
                 className="absolute inset-0 h-full w-full object-cover"
                 loading="eager"

@@ -1,6 +1,6 @@
 ---
 import type { ComponentsSourcingSourceQualityControlContent } from '../../types/components-sourcing';
-import { getAssetPath } from '../../lib/assets';
+import { getSupabaseImageUrl } from '../../lib/assets';
 
 export interface Props {
   data: ComponentsSourcingSourceQualityControlContent;
@@ -58,7 +58,9 @@ const visual = (data as any)?.visual ?? {};
       <div class="group relative aspect-[4/5] overflow-hidden rounded-3xl bg-slate-200 text-center shadow-[0_20px_50px_rgba(0,0,0,0.08)]">
         {visual.image_url ? (
           <img
-            src={getAssetPath(visual.image_url)}
+            src={getSupabaseImageUrl(visual.image_url, { width: 900, quality: 75 })}
+            srcset={`${getSupabaseImageUrl(visual.image_url, { width: 600, quality: 75 })} 600w, ${getSupabaseImageUrl(visual.image_url, { width: 900, quality: 75 })} 900w, ${getSupabaseImageUrl(visual.image_url, { width: 1200, quality: 80 })} 1200w, ${getSupabaseImageUrl(visual.image_url, { width: 1600, quality: 80 })} 1600w`}
+            sizes="(max-width: 1024px) 100vw, 48vw"
             alt=""
             class="absolute inset-0 h-full w-full object-contain transition duration-500 md:object-cover group-hover:scale-[1.03]"
             loading="lazy"

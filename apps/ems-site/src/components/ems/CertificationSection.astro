@@ -1,6 +1,6 @@
 ---
 import type { EmsHomeCertificationContent } from '../../types/ems-home';
-import { getAssetPath } from '../../lib/assets';
+import { getAssetPath, getSupabaseImageUrl } from '../../lib/assets';
 
 export interface Props {
   data: EmsHomeCertificationContent;
@@ -34,13 +34,45 @@ for (let i = 0; i < data.items.length; i += 2) {
                 <article class="overflow-hidden rounded-xl border border-slate-200 bg-[linear-gradient(130deg,#ffffff_0%,#f9fafb_100%)]">
                   <div class="h-0.5 w-full bg-[#ea543f]" />
                   <div class="p-4">
-                    <img src={getAssetPath(item.icon_url)} alt="" class="h-10 w-10 object-contain" loading="lazy" decoding="async" />
+                    <img
+                      src={
+                        String(item.icon_url).toLowerCase().endsWith('.svg')
+                          ? getAssetPath(item.icon_url)
+                          : getSupabaseImageUrl(item.icon_url, { width: 96, quality: 80 })
+                      }
+                      srcset={
+                        String(item.icon_url).toLowerCase().endsWith('.svg')
+                          ? undefined
+                          : `${getSupabaseImageUrl(item.icon_url, { width: 64, quality: 80 })} 64w, ${getSupabaseImageUrl(item.icon_url, { width: 96, quality: 80 })} 96w, ${getSupabaseImageUrl(item.icon_url, { width: 128, quality: 80 })} 128w`
+                      }
+                      sizes="56px"
+                      alt=""
+                      class="h-10 w-10 object-contain"
+                      loading="lazy"
+                      decoding="async"
+                    />
                     <h3 class="mt-3 text-[16px] font-medium leading-6 text-slate-900">
                       {item.name}
                     </h3>
                     <p class="mt-0.5 text-[13px] leading-5 text-slate-500">{item.description}</p>
                     <div class="mt-2 flex items-center gap-1.5">
-                      <img src={getAssetPath(item.time_icon_url)} alt="" class="h-[14px] w-[14px]" loading="lazy" decoding="async" />
+                      <img
+                        src={
+                          String(item.time_icon_url).toLowerCase().endsWith('.svg')
+                            ? getAssetPath(item.time_icon_url)
+                            : getSupabaseImageUrl(item.time_icon_url, { width: 24, quality: 80 })
+                        }
+                        srcset={
+                          String(item.time_icon_url).toLowerCase().endsWith('.svg')
+                            ? undefined
+                            : `${getSupabaseImageUrl(item.time_icon_url, { width: 16, quality: 80 })} 16w, ${getSupabaseImageUrl(item.time_icon_url, { width: 24, quality: 80 })} 24w, ${getSupabaseImageUrl(item.time_icon_url, { width: 32, quality: 80 })} 32w`
+                        }
+                        sizes="15px"
+                        alt=""
+                        class="h-[14px] w-[14px]"
+                        loading="lazy"
+                        decoding="async"
+                      />
                       <span class="text-[13px] leading-5 text-[#ea543f]">{item.time_text}</span>
                     </div>
                   </div>
@@ -57,13 +89,45 @@ for (let i = 0; i < data.items.length; i += 2) {
         <article class="w-full overflow-hidden rounded-xl border border-slate-200 bg-[linear-gradient(130deg,#ffffff_0%,#f9fafb_100%)] sm:w-[calc(33.333%-1rem)] lg:w-[calc(16.666%-1rem)]">
           <div class="h-0.5 w-full bg-[#ea543f] sm:w-[215px]" />
           <div class="p-6">
-            <img src={getAssetPath(item.icon_url)} alt="" class="h-14 w-14 object-contain" loading="lazy" decoding="async" />
+            <img
+              src={
+                String(item.icon_url).toLowerCase().endsWith('.svg')
+                  ? getAssetPath(item.icon_url)
+                  : getSupabaseImageUrl(item.icon_url, { width: 96, quality: 80 })
+              }
+              srcset={
+                String(item.icon_url).toLowerCase().endsWith('.svg')
+                  ? undefined
+                  : `${getSupabaseImageUrl(item.icon_url, { width: 64, quality: 80 })} 64w, ${getSupabaseImageUrl(item.icon_url, { width: 96, quality: 80 })} 96w, ${getSupabaseImageUrl(item.icon_url, { width: 128, quality: 80 })} 128w`
+              }
+              sizes="56px"
+              alt=""
+              class="h-14 w-14 object-contain"
+              loading="lazy"
+              decoding="async"
+            />
             <h3 class="mt-4 text-[19px] font-medium leading-7 text-slate-900">
               {item.name}
             </h3>
             <p class="mt-1 text-[15px] leading-[19px] text-slate-500">{item.description}</p>
             <div class="mt-3 flex items-center gap-2">
-              <img src={getAssetPath(item.time_icon_url)} alt="" class="h-[15px] w-[15px]" loading="lazy" decoding="async" />
+              <img
+                src={
+                  String(item.time_icon_url).toLowerCase().endsWith('.svg')
+                    ? getAssetPath(item.time_icon_url)
+                    : getSupabaseImageUrl(item.time_icon_url, { width: 24, quality: 80 })
+                }
+                srcset={
+                  String(item.time_icon_url).toLowerCase().endsWith('.svg')
+                    ? undefined
+                    : `${getSupabaseImageUrl(item.time_icon_url, { width: 16, quality: 80 })} 16w, ${getSupabaseImageUrl(item.time_icon_url, { width: 24, quality: 80 })} 24w, ${getSupabaseImageUrl(item.time_icon_url, { width: 32, quality: 80 })} 32w`
+                }
+                sizes="15px"
+                alt=""
+                class="h-[15px] w-[15px]"
+                loading="lazy"
+                decoding="async"
+              />
               <span class="text-[15px] leading-[19px] text-[#ea543f]">{item.time_text}</span>
             </div>
           </div>

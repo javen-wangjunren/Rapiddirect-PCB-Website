@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { getAssetPath } from '../../lib/assets';
+import { getAssetPath, getSupabaseImageUrl } from '../../lib/assets';
 import type { PcbaQualityControlContent, QcProcessStep } from '../../types/pcb-assembly';
 
 type Props = {
@@ -178,7 +178,8 @@ export function PcbaQualityControlSection(props: Props) {
               className="relative z-0 flex gap-6 overflow-x-auto scroll-smooth pb-5 [scroll-snap-type:x_mandatory] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             >
               {equipment.items.map((it, idx) => {
-                const src = it.image_url ? getAssetPath(it.image_url) : '';
+                const rawSrc = it.image_url ? getAssetPath(it.image_url) : '';
+                const src = rawSrc ? getSupabaseImageUrl(rawSrc, { width: 900, quality: 75 }) : '';
                 return (
                   <div
                     key={`${it.name}-${idx}`}
@@ -187,7 +188,15 @@ export function PcbaQualityControlSection(props: Props) {
                   >
                     <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-[#eaeaea] bg-[#f4f6f9]">
                       {src && isImageUrl(src) ? (
-                        <img src={src} alt="" className="h-full w-full object-cover transition duration-500 hover:scale-[1.05]" />
+                        <img
+                          src={src}
+                          srcSet={`${getSupabaseImageUrl(rawSrc, { width: 600, quality: 75 })} 600w, ${getSupabaseImageUrl(rawSrc, { width: 900, quality: 75 })} 900w, ${getSupabaseImageUrl(rawSrc, { width: 1200, quality: 80 })} 1200w`}
+                          sizes="(max-width: 640px) 85vw, (max-width: 1024px) 50vw, 33vw"
+                          alt=""
+                          className="h-full w-full object-cover transition duration-500 hover:scale-[1.05]"
+                          loading="lazy"
+                          decoding="async"
+                        />
                       ) : (
                         <div className="absolute inset-0 flex items-center justify-center text-sm font-medium text-[#94a3b8]">[ Image ]</div>
                       )}

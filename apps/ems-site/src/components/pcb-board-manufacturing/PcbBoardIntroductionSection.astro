@@ -1,0 +1,234 @@
+---
+import { getSupabaseImageUrl } from '../../lib/assets';
+
+export interface PcbBoardIntroductionFeature {
+  title: string;
+  description: string;
+}
+
+export interface Props {
+  data: {
+    title: string;
+    description: string;
+    image_url?: string;
+    image_alt?: string;
+    features: PcbBoardIntroductionFeature[];
+  };
+}
+
+const { data } = Astro.props;
+const features = Array.isArray(data.features) ? data.features : [];
+---
+
+<section class="pcb-board-introduction-section">
+  <div class="mx-auto max-w-7xl px-6 py-24 sm:py-28">
+    <div class="pcb-board-introduction-layout">
+      <div class="pcb-board-introduction-visual">
+        <div class="pcb-board-introduction-image-shell">
+          {data.image_url ? (
+            <img
+              src={getSupabaseImageUrl(data.image_url, { width: 1200, quality: 80 })}
+              srcset={`${getSupabaseImageUrl(data.image_url, { width: 640, quality: 75 })} 640w, ${getSupabaseImageUrl(data.image_url, { width: 960, quality: 80 })} 960w, ${getSupabaseImageUrl(data.image_url, { width: 1200, quality: 80 })} 1200w`}
+              sizes="(max-width: 1023px) 100vw, 46vw"
+              alt={data.image_alt ?? ''}
+              class="pcb-board-introduction-image"
+              loading="lazy"
+              decoding="async"
+            />
+          ) : (
+            <div class="pcb-board-introduction-image-fallback" aria-hidden="true">
+              <span>HDI Cross-Section</span>
+              <span>Microvias</span>
+              <span>Fine-Line Routing</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div class="pcb-board-introduction-content">
+        <h2 class="pcb-board-introduction-title">{data.title}</h2>
+        <p class="pcb-board-introduction-description">{data.description}</p>
+
+        {features.length > 0 && (
+          <ul class="pcb-board-introduction-feature-list">
+            {features.map((feature) => (
+              <li class="pcb-board-introduction-feature-item">
+                <span class="pcb-board-introduction-feature-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M20 7L10.25 16.75L5 11.5"
+                      stroke="currentColor"
+                      stroke-width="2.8"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    ></path>
+                  </svg>
+                </span>
+                <div class="pcb-board-introduction-feature-copy">
+                  <strong>{feature.title}</strong>
+                  <p>{feature.description}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .pcb-board-introduction-section {
+    background:
+      radial-gradient(circle at top left, rgba(239, 83, 63, 0.07), transparent 28%),
+      linear-gradient(180deg, #ffffff 0%, #fbfcfd 100%);
+  }
+
+  .pcb-board-introduction-layout {
+    display: grid;
+    gap: 3rem;
+    align-items: center;
+  }
+
+  @media (min-width: 1024px) {
+    .pcb-board-introduction-layout {
+      grid-template-columns: minmax(0, 1.02fr) minmax(0, 1.18fr);
+      gap: 4rem;
+    }
+  }
+
+  .pcb-board-introduction-image-shell {
+    position: relative;
+    overflow: hidden;
+    border-radius: 24px;
+    border: 1px solid #e2e8f0;
+    background:
+      linear-gradient(135deg, rgba(15, 23, 42, 0.04), rgba(15, 23, 42, 0.01)),
+      #f8fafc;
+    box-shadow:
+      0 24px 48px rgba(15, 23, 42, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    aspect-ratio: 4 / 3;
+  }
+
+  .pcb-board-introduction-image {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    transition: transform 0.45s ease;
+  }
+
+  .pcb-board-introduction-image-shell:hover .pcb-board-introduction-image {
+    transform: scale(1.03);
+  }
+
+  .pcb-board-introduction-image-fallback {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    gap: 0.9rem;
+    padding: 2rem;
+    color: #0f172a;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-align: center;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(239, 83, 63, 0.22), transparent 32%),
+      radial-gradient(circle at 80% 72%, rgba(15, 23, 42, 0.14), transparent 30%),
+      linear-gradient(140deg, rgba(255, 255, 255, 0.92), rgba(241, 245, 249, 0.94));
+  }
+
+  .pcb-board-introduction-content {
+    max-width: 42rem;
+  }
+
+  .pcb-board-introduction-eyebrow {
+    display: inline-flex;
+    margin-bottom: 0.9rem;
+    color: #ef533f;
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .pcb-board-introduction-title {
+    margin: 0;
+    color: #0f172a;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.12;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+
+  .pcb-board-introduction-description {
+    margin: 1.5rem 0 0;
+    color: #475569;
+    font-size: 1rem;
+    line-height: 1.85;
+  }
+
+  .pcb-board-introduction-feature-list {
+    list-style: none;
+    margin: 2rem 0 0;
+    padding: 1.5rem 0 0;
+    border-top: 1px solid #e2e8f0;
+    display: grid;
+    gap: 1rem;
+  }
+
+  .pcb-board-introduction-feature-item {
+    display: flex;
+    gap: 0.9rem;
+    align-items: flex-start;
+  }
+
+  .pcb-board-introduction-feature-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.4rem;
+    height: 1.4rem;
+    color: #10b981;
+    flex: none;
+    margin-top: 0.18rem;
+  }
+
+  .pcb-board-introduction-feature-icon svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .pcb-board-introduction-feature-copy strong {
+    display: block;
+    color: #0f172a;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.5;
+  }
+
+  .pcb-board-introduction-feature-copy p {
+    margin: 0.25rem 0 0;
+    color: #475569;
+    font-size: 0.95rem;
+    line-height: 1.7;
+  }
+
+  @media (max-width: 768px) {
+    .pcb-board-introduction-layout {
+      gap: 2rem;
+    }
+
+    .pcb-board-introduction-image-shell {
+      border-radius: 18px;
+    }
+
+    .pcb-board-introduction-feature-list {
+      gap: 0.9rem;
+    }
+  }
+</style>

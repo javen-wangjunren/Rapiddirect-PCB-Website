@@ -1,0 +1,12 @@
+---
+import type { PcbBoardStackupContent } from './PcbBoardStackupSection';
+import { PcbBoardStackupSection as PcbBoardStackupSectionReact } from './PcbBoardStackupSection';
+
+export interface Props {
+  data: PcbBoardStackupContent;
+}
+
+const { data } = Astro.props;
+---
+
+<PcbBoardStackupSectionReact data={data} client:load />

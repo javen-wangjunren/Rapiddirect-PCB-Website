@@ -1,0 +1,12 @@
+---
+import type { PcbBoardAdvantageContent } from './PcbBoardAdvantageSection';
+import { PcbBoardAdvantageSection as PcbBoardAdvantageSectionReact } from './PcbBoardAdvantageSection';
+
+export interface Props {
+  data: PcbBoardAdvantageContent;
+}
+
+const { data } = Astro.props;
+---
+
+<PcbBoardAdvantageSectionReact data={data} client:load />

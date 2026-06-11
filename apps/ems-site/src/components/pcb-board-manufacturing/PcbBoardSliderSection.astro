@@ -1,0 +1,13 @@
+---
+import type { PcbBoardSliderContent } from './PcbBoardSliderSection';
+import { PcbBoardSliderSection as PcbBoardSliderSectionReact } from './PcbBoardSliderSection';
+
+export interface Props {
+  data: PcbBoardSliderContent;
+}
+
+const { data } = Astro.props;
+---
+
+<PcbBoardSliderSectionReact data={data} client:load />
+

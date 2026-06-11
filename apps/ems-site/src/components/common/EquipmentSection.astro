@@ -4,12 +4,14 @@ import { getSupabaseImageUrl } from '../../lib/assets';
 
 export interface Props {
   data: EmsHomeEquipmentContent;
+  variant?: 'white' | 'muted';
 }
 
 const { data } = Astro.props;
+const variant = Astro.props.variant ?? 'white';
 ---
 
-<section class="bg-white py-16 sm:py-20">
+<section class:list={[variant === 'muted' ? 'bg-[#f8f9fa]' : 'bg-white', 'py-16 sm:py-20']}>
   <div class="mx-auto max-w-[1394px] px-6">
     <div class="text-center">
       <h2 class="text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">

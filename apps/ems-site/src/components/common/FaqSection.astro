@@ -4,9 +4,10 @@ import { FaqSection as FaqSectionReact } from './FaqSection';
 
 export interface Props {
   data: EmsHomeFaqContent;
+  variant?: 'white' | 'muted';
 }
 
 const { data } = Astro.props;
 ---
 
-<FaqSectionReact data={data} client:load />
+<FaqSectionReact data={data} variant={Astro.props.variant} client:load />

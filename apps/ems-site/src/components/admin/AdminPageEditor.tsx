@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { emsHomeDefaults } from '../../content/defaults/ems';
 import { componentsSourcingDefaults } from '../../content/defaults/components-sourcing';
+import { pcbBoardManufacturingDefaults } from '../../content/defaults/pcb-board-manufacturing';
 import { pcbAssemblyDefaults } from '../../content/defaults/pcb-assembly';
 import { pcbDesignDefaults } from '../../content/defaults/pcb-design';
 import { pcbManufacturingDefaults } from '../../content/defaults/pcb-manufacturing';
@@ -9,6 +10,7 @@ import { siteFooterDefaults } from '../../content/defaults/site-footer';
 import { siteHeaderDefaults } from '../../content/defaults/site-header';
 import { normalizeEmsHomeContentJson } from '../../content/normalize/ems';
 import { normalizeComponentsSourcingContentJson } from '../../content/normalize/components-sourcing';
+import { normalizePcbBoardManufacturingContentJson } from '../../content/normalize/pcb-board-manufacturing';
 import { normalizePcbAssemblyContentJson } from '../../content/normalize/pcb-assembly';
 import { normalizePcbDesignContentJson } from '../../content/normalize/pcb-design';
 import { normalizePcbManufacturingContentJson } from '../../content/normalize/pcb-manufacturing';
@@ -16,6 +18,7 @@ import { normalizeSiteFooterContentJson } from '../../content/normalize/site-foo
 import { normalizeSiteHeaderContentJson } from '../../content/normalize/site-header';
 import { emsHomeSchema } from '../../content/schemas/ems';
 import { componentsSourcingSchema } from '../../content/schemas/components-sourcing';
+import { pcbBoardManufacturingSchema } from '../../content/schemas/pcb-board-manufacturing';
 import { pcbAssemblySchema } from '../../content/schemas/pcb-assembly';
 import { pcbDesignSchema } from '../../content/schemas/pcb-design';
 import { pcbManufacturingSchema } from '../../content/schemas/pcb-manufacturing';
@@ -29,6 +32,7 @@ import type { JsonValue } from '../../utils/jsonTree';
 import { deepMerge, isObject, pruneEmpty } from '../../utils/jsonTree';
 import EmsEditorContentModules from './EmsEditorContentModules';
 import ComponentsSourcingEditorContentModules from './ComponentsSourcingEditorContentModules';
+import PcbBoardManufacturingEditorContentModules from './PcbBoardManufacturingEditorContentModules';
 import PcbAssemblyEditorContentModules from './PcbAssemblyEditorContentModules';
 import PcbDesignEditorContentModules from './PcbDesignEditorContentModules';
 import PcbManufacturingEditorContentModules from './PcbManufacturingEditorContentModules';
@@ -175,6 +179,9 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
       } else if (template === 'components_sourcing') {
         const merged = deepMerge(componentsSourcingDefaults as any, safeRaw as any) as JsonValue;
         setContentJson(normalizeComponentsSourcingContentJson(merged));
+      } else if (template === 'pcb_board_manufacturing') {
+        const merged = deepMerge(pcbBoardManufacturingDefaults as any, safeRaw as any) as JsonValue;
+        setContentJson(normalizePcbBoardManufacturingContentJson(merged));
       } else if (template === 'pcb_assembly') {
         const merged = deepMerge(pcbAssemblyDefaults as any, safeRaw as any) as JsonValue;
         setContentJson(normalizePcbAssemblyContentJson(merged));
@@ -241,12 +248,21 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
 
   const isEmsHome = templateType === 'ems_home';
   const isComponentsSourcing = templateType === 'components_sourcing';
+  const isPcbBoardManufacturing = templateType === 'pcb_board_manufacturing';
   const isPcbAssembly = templateType === 'pcb_assembly';
   const isPcbDesign = templateType === 'pcb_design';
   const isPcbManufacturing = templateType === 'pcb_manufacturing';
   const isSiteFooter = templateType === 'site_footer';
   const isSiteHeader = templateType === 'site_header';
-  const hasSchema = isEmsHome || isComponentsSourcing || isPcbAssembly || isPcbDesign || isPcbManufacturing || isSiteFooter || isSiteHeader;
+  const hasSchema =
+    isEmsHome ||
+    isComponentsSourcing ||
+    isPcbBoardManufacturing ||
+    isPcbAssembly ||
+    isPcbDesign ||
+    isPcbManufacturing ||
+    isSiteFooter ||
+    isSiteHeader;
 
   const onContentKeyChange = (key: string, next: JsonValue) => {
     const obj = (isObject(contentJson) ? (contentJson as any) : {}) as Record<string, JsonValue>;
@@ -259,6 +275,10 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
   };
 
   const onComponentsSourcingModuleChange = (key: keyof typeof componentsSourcingSchema, next: JsonValue) => {
+    onContentKeyChange(String(key), next);
+  };
+
+  const onPcbBoardManufacturingModuleChange = (key: keyof typeof pcbBoardManufacturingSchema, next: JsonValue) => {
     onContentKeyChange(String(key), next);
   };
 
@@ -287,6 +307,8 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
         ? normalizeEmsHomeContentJson(contentJson)
         : templateType === 'components_sourcing'
           ? normalizeComponentsSourcingContentJson(contentJson)
+          : templateType === 'pcb_board_manufacturing'
+            ? normalizePcbBoardManufacturingContentJson(contentJson)
           : templateType === 'pcb_assembly'
             ? normalizePcbAssemblyContentJson(contentJson)
             : templateType === 'pcb_design'
@@ -487,6 +509,7 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
               <option value="ems_home">ems_home</option>
               <option value="ems_service">ems_service</option>
               <option value="components_sourcing">components_sourcing</option>
+              <option value="pcb_board_manufacturing">pcb_board_manufacturing</option>
               <option value="pcb_assembly">pcb_assembly</option>
               <option value="pcb_design">pcb_design</option>
               <option value="pcb_manufacturing">pcb_manufacturing</option>
@@ -539,6 +562,13 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
         <ComponentsSourcingEditorContentModules
           contentJson={contentJson}
           onModuleChange={onComponentsSourcingModuleChange}
+        />
+      );
+    if (isPcbBoardManufacturing)
+      return (
+        <PcbBoardManufacturingEditorContentModules
+          contentJson={contentJson}
+          onModuleChange={onPcbBoardManufacturingModuleChange}
         />
       );
     if (isPcbAssembly) return <PcbAssemblyEditorContentModules contentJson={contentJson} onModuleChange={onPcbAssemblyModuleChange} />;
@@ -604,7 +634,7 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
           {content}
           <Card>
             <CardBody className="pt-[var(--admin-card-p)] text-sm text-[var(--admin-fg-muted)]">
-              原型阶段：`ems_home`、`components_sourcing`、`pcb_assembly`、`pcb_design`、`pcb_manufacturing`、`site_footer`、`site_header` 支持
+              原型阶段：`ems_home`、`components_sourcing`、`pcb_board_manufacturing`、`pcb_assembly`、`pcb_design`、`pcb_manufacturing`、`site_footer`、`site_header` 支持
               schema 表单；其他模板仍使用 JSON 编辑占位。
               {!hasSchema ? '（当前模板无 schema）' : null}
             </CardBody>

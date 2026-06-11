@@ -18,9 +18,11 @@ export interface Props {
     };
     rows: PcbMfgTechTableRow[];
   };
+  variant?: 'white' | 'muted';
 }
 
 const { data } = Astro.props;
+const variant = Astro.props.variant ?? 'white';
 
 const icons = {
   item: '/images/pcb-manufacturing/mp3rcfh6-raj22he.svg',
@@ -29,7 +31,7 @@ const icons = {
 };
 ---
 
-<section class="pcb-mfg-tech-table-section bg-white">
+<section class:list={['pcb-mfg-tech-table-section', variant === 'muted' ? 'bg-[#f8f9fa]' : 'bg-white']}>
   <div class="mx-auto max-w-7xl px-6 py-24 sm:py-28">
     <div class="text-center">
       <h2 class="text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">{data.title}</h2>

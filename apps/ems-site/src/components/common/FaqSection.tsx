@@ -2,11 +2,11 @@ import React from 'react';
 
 import type { EmsHomeFaqContent } from '../../types/ems-home';
 
-export function FaqSection({ data }: { data: EmsHomeFaqContent }) {
+export function FaqSection({ data, variant = 'white' }: { data: EmsHomeFaqContent; variant?: 'white' | 'muted' }) {
   const [openIndex, setOpenIndex] = React.useState<number>(0);
 
   return (
-    <section className="bg-white py-16 sm:py-20">
+    <section className={[variant === 'muted' ? 'bg-[#f8f9fa]' : 'bg-white', 'py-16 sm:py-20'].join(' ')}>
       <div className="mx-auto max-w-7xl px-6">
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-[360px_1fr] lg:gap-16">
           <div className="pt-2">

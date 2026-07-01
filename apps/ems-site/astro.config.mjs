@@ -6,6 +6,8 @@ import node from '@astrojs/node';
 import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
+const isDev = process.argv.includes('dev');
+
 export default defineConfig({
   site: 'https://rapiddirect.com',
   base: '/ems',
@@ -18,6 +20,7 @@ export default defineConfig({
   integrations: [react()],
 
   vite: {
+    define: isDev ? { 'process.env.NODE_ENV': '"development"' } : undefined,
     plugins: [tailwindcss()]
   }
 });

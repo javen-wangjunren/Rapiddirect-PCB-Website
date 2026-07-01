@@ -1,23 +1,10 @@
 import { emsHomeSchema } from './ems';
+import { faqSchema } from './modules/faq';
+import { heroSchema } from './modules/hero';
 import { pcbManufacturingSchema } from './pcb-manufacturing';
 
 export const pcbBoardManufacturingSchema = {
-  hero: {
-    background_image_url: 'string',
-    title: 'string',
-    benefits: {
-      type: 'array',
-      items: {
-        title: 'string',
-        description: 'string'
-      }
-    },
-    benefit_conclusion: 'string',
-    cta: {
-      label: 'string',
-      href: 'string'
-    }
-  },
+  hero: heroSchema,
   introduction: {
     title: 'string',
     description: 'string',
@@ -75,5 +62,5 @@ export const pcbBoardManufacturingSchema = {
   },
   equipment: emsHomeSchema.equipment
   ,
-  faq: emsHomeSchema.faq
+  faq: faqSchema
 };

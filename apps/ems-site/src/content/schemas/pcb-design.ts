@@ -1,21 +1,8 @@
+import { faqSchema } from './modules/faq';
+import { heroSchema } from './modules/hero';
+
 export const pcbDesignSchema = {
-  hero: {
-    background_image_url: 'string',
-    title: 'string',
-    benefits: {
-      type: 'array',
-      items: {
-        icon_key: 'string',
-        title: 'string',
-        description: 'string'
-      }
-    },
-    benefit_conclusion: 'string',
-    cta: {
-      label: 'string',
-      href: 'string'
-    }
-  },
+  hero: heroSchema,
   services: {
     title: 'string',
     description: 'string',
@@ -209,16 +196,7 @@ export const pcbDesignSchema = {
       }
     }
   },
-  faq: {
-    title: 'string',
-    items: {
-      type: 'array',
-      items: {
-        question: 'string',
-        answer: 'string'
-      }
-    }
-  },
+  faq: faqSchema,
   cta: {
     title: 'string',
     description: 'string',

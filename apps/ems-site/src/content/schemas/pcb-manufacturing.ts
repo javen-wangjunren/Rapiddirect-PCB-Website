@@ -1,52 +1,12 @@
+import { faqSchema } from './modules/faq';
+import { capabilitySchema } from './modules/capability';
+import { heroSchema } from './modules/hero';
+import { techTableSchema } from './modules/tech-table';
+
 export const pcbManufacturingSchema = {
-  hero: {
-    title: 'string',
-    background_image_url: 'string',
-    benefits: {
-      type: 'array',
-      items: {
-        title: 'string',
-        description: 'string'
-      }
-    },
-    benefit_conclusion: 'string',
-    cta: {
-      href: 'string',
-      label: 'string'
-    }
-  },
-  capability: {
-    title: 'string',
-    description: 'string',
-    items: {
-      type: 'array',
-      items: {
-        title: 'string',
-        description: 'string',
-        image_url: 'string',
-        cta: {
-          href: 'string'
-        }
-      }
-    }
-  },
-  tech_table: {
-    title: 'string',
-    description: 'string',
-    columns: {
-      col_1: 'string',
-      col_2: 'string',
-      col_3: 'string'
-    },
-    rows: {
-      type: 'array',
-      items: {
-        col_1: 'string',
-        col_2: 'string',
-        col_3: 'string'
-      }
-    }
-  },
+  hero: heroSchema,
+  capability: capabilitySchema,
+  tech_table: techTableSchema,
   process: {
     title: 'string',
     desc: 'string',
@@ -176,51 +136,5 @@ export const pcbManufacturingSchema = {
       }
     }
   },
-  faq: {
-    title: 'string',
-    items: {
-      type: 'array',
-      items: {
-        question: 'string',
-        answer: 'string'
-      }
-    }
-  },
-  quote_form: {
-    title: 'string',
-    description: 'string',
-    background_image_url: 'string',
-    name_field: {
-      label: 'string',
-      placeholder: 'string',
-      required: 'boolean'
-    },
-    company_field: {
-      label: 'string',
-      placeholder: 'string',
-      required: 'boolean'
-    },
-    email_field: {
-      label: 'string',
-      placeholder: 'string',
-      required: 'boolean'
-    },
-    phone_field: {
-      label: 'string',
-      placeholder: 'string',
-      required: 'boolean'
-    },
-    message_field: {
-      label: 'string',
-      placeholder: 'string',
-      required: 'boolean'
-    },
-    upload: {
-      label: 'string',
-      optional_text: 'string',
-      button_text: 'string',
-      help_text: 'string'
-    },
-    submit_label: 'string'
-  }
+  faq: faqSchema
 };

@@ -1,0 +1,247 @@
+---
+import { getSupabaseImageUrl } from '../../lib/assets';
+
+export interface Props {
+  data: {
+    title: string;
+    description?: string;
+    items: Array<{
+      title: string;
+      description: string;
+      image_url?: string;
+    }>;
+  };
+}
+
+const { data } = Astro.props;
+const items = Array.isArray(data.items) ? data.items : [];
+---
+
+<section class="bg-white py-20 sm:py-24" data-pcb-advantage-root>
+  <div class="mx-auto max-w-7xl px-6">
+    <div class="text-center">
+      <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">{data.title}</h2>
+      {data.description && <p class="mx-auto mt-4 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">{data.description}</p>}
+    </div>
+
+    <div class="relative mt-14 overflow-hidden px-10 sm:mt-16" data-pcb-advantage-wrapper>
+      <button
+        type="button"
+        class="pcb-advantage-btn pcb-advantage-btn-prev"
+        aria-label="Previous"
+        data-pcb-advantage-prev
+      >
+        ←
+      </button>
+      <button type="button" class="pcb-advantage-btn pcb-advantage-btn-next" aria-label="Next" data-pcb-advantage-next>
+        →
+      </button>
+
+      <div class="pcb-advantage-track" data-pcb-advantage-track>
+        {items.map((item) => (
+          <article class="pcb-advantage-card">
+            <div class="pcb-advantage-media">
+              {item.image_url ? (
+                <img
+                  src={getSupabaseImageUrl(item.image_url, { width: 900, quality: 75 })}
+                  srcset={`${getSupabaseImageUrl(item.image_url, { width: 600, quality: 75 })} 600w, ${getSupabaseImageUrl(item.image_url, { width: 900, quality: 75 })} 900w, ${getSupabaseImageUrl(item.image_url, { width: 1200, quality: 80 })} 1200w, ${getSupabaseImageUrl(item.image_url, { width: 1600, quality: 80 })} 1600w`}
+                  sizes="(max-width: 576px) 100vw, (max-width: 992px) 50vw, 33vw"
+                  alt=""
+                  class="h-full w-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
+              ) : (
+                <div class="pcb-advantage-media-fallback" aria-hidden="true" />
+              )}
+            </div>
+            <div class="p-5">
+              <h3 class="text-base font-extrabold text-slate-900">{item.title}</h3>
+              <p class="mt-2 text-sm leading-6 text-slate-600">{item.description}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .pcb-advantage-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+    border-radius: 9999px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .pcb-advantage-btn:hover {
+    background: #fff5f3;
+    border-color: #ffe0db;
+    color: #f25537;
+  }
+
+  .pcb-advantage-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    background: #ffffff;
+    border-color: #e2e8f0;
+    color: #475569;
+  }
+
+  .pcb-advantage-btn-prev {
+    left: 0;
+  }
+
+  .pcb-advantage-btn-next {
+    right: 0;
+  }
+
+  .pcb-advantage-track {
+    display: flex;
+    gap: 24px;
+    transition: transform 0.5s ease;
+    will-change: transform;
+  }
+
+  .pcb-advantage-card {
+    flex: 0 0 calc(33.333% - 16px);
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+    transition: all 0.2s ease;
+  }
+
+  .pcb-advantage-card:hover {
+    border-color: #ffe0db;
+    background-color: #fff5f3;
+    box-shadow: 0 12px 24px rgba(242, 85, 55, 0.08);
+    transform: translateY(-4px);
+  }
+
+  .pcb-advantage-media {
+    aspect-ratio: 4/3;
+    min-height: 200px;
+    background: #e2e8f0;
+  }
+
+  .pcb-advantage-media-fallback {
+    width: 100%;
+    height: 100%;
+    background:
+      radial-gradient(circle at 20% 30%, rgba(242, 85, 55, 0.14), transparent 45%),
+      radial-gradient(circle at 75% 40%, rgba(15, 23, 42, 0.08), transparent 55%),
+      linear-gradient(135deg, rgba(148, 163, 184, 0.24), rgba(148, 163, 184, 0.12));
+  }
+
+  @media (max-width: 992px) {
+    .pcb-advantage-card {
+      flex: 0 0 calc(50% - 12px);
+    }
+
+    .pcb-advantage-media {
+      min-height: 180px;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .pcb-advantage-card {
+      flex: 0 0 100%;
+    }
+
+    .pcb-advantage-media {
+      min-height: 160px;
+    }
+
+    .pcb-advantage-btn {
+      width: 40px;
+      height: 40px;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const root = document.querySelector<HTMLElement>('[data-pcb-advantage-root]');
+    if (!root) return;
+
+    const track = root.querySelector<HTMLElement>('[data-pcb-advantage-track]');
+    const wrapper = root.querySelector<HTMLElement>('[data-pcb-advantage-wrapper]');
+    const prevBtn = root.querySelector<HTMLButtonElement>('[data-pcb-advantage-prev]');
+    const nextBtn = root.querySelector<HTMLButtonElement>('[data-pcb-advantage-next]');
+    const cards = Array.from(root.querySelectorAll<HTMLElement>('.pcb-advantage-card'));
+
+    if (!track || !wrapper || !prevBtn || !nextBtn || !cards.length) return;
+
+    let currentIndex = 0;
+    let cardWidth = 0;
+    const gap = 24;
+
+    const getVisibleCardCount = () => {
+      if (window.innerWidth <= 576) return 1;
+      if (window.innerWidth <= 992) return 2;
+      return 3;
+    };
+
+    const getInnerWidth = () => {
+      const styles = window.getComputedStyle(wrapper);
+      const paddingLeft = Number.parseFloat(styles.paddingLeft || '0');
+      const paddingRight = Number.parseFloat(styles.paddingRight || '0');
+      return Math.max(0, wrapper.clientWidth - paddingLeft - paddingRight);
+    };
+
+    const calculateCardWidth = () => {
+      const visible = getVisibleCardCount();
+      const gaps = Math.max(0, visible - 1);
+      const innerWidth = getInnerWidth();
+      cardWidth = (innerWidth - gap * gaps) / visible;
+      cards.forEach((card) => {
+        card.style.flex = `0 0 ${cardWidth}px`;
+      });
+    };
+
+    const update = () => {
+      const translateValue = -currentIndex * (cardWidth + gap);
+      track.style.transform = `translateX(${translateValue}px)`;
+      prevBtn.disabled = currentIndex === 0;
+      nextBtn.disabled = currentIndex >= cards.length - getVisibleCardCount();
+    };
+
+    const onPrev = () => {
+      if (currentIndex > 0) {
+        currentIndex -= 1;
+        update();
+      }
+    };
+
+    const onNext = () => {
+      if (currentIndex < cards.length - getVisibleCardCount()) {
+        currentIndex += 1;
+        update();
+      }
+    };
+
+    calculateCardWidth();
+    update();
+
+    prevBtn.addEventListener('click', onPrev);
+    nextBtn.addEventListener('click', onNext);
+
+    window.addEventListener('resize', () => {
+      calculateCardWidth();
+      update();
+    });
+  });
+</script>

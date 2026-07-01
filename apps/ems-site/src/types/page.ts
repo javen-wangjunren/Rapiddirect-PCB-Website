@@ -5,6 +5,7 @@ export type TemplateType =
   | 'pcb_design'
   | 'pcb_manufacturing'
   | 'pcb_board_manufacturing'
+  | 'pcb_applications'
   | 'components_sourcing'
   | 'site_footer'
   | 'site_header';

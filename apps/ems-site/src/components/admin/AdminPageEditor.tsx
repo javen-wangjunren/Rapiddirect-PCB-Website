@@ -4,6 +4,7 @@ import { emsHomeDefaults } from '../../content/defaults/ems';
 import { componentsSourcingDefaults } from '../../content/defaults/components-sourcing';
 import { pcbBoardManufacturingDefaults } from '../../content/defaults/pcb-board-manufacturing';
 import { pcbAssemblyDefaults } from '../../content/defaults/pcb-assembly';
+import { pcbApplicationsDefaults } from '../../content/defaults/pcb-applications';
 import { pcbDesignDefaults } from '../../content/defaults/pcb-design';
 import { pcbManufacturingDefaults } from '../../content/defaults/pcb-manufacturing';
 import { siteFooterDefaults } from '../../content/defaults/site-footer';
@@ -12,6 +13,7 @@ import { normalizeEmsHomeContentJson } from '../../content/normalize/ems';
 import { normalizeComponentsSourcingContentJson } from '../../content/normalize/components-sourcing';
 import { normalizePcbBoardManufacturingContentJson } from '../../content/normalize/pcb-board-manufacturing';
 import { normalizePcbAssemblyContentJson } from '../../content/normalize/pcb-assembly';
+import { normalizePcbApplicationsContentJson } from '../../content/normalize/pcb-applications';
 import { normalizePcbDesignContentJson } from '../../content/normalize/pcb-design';
 import { normalizePcbManufacturingContentJson } from '../../content/normalize/pcb-manufacturing';
 import { normalizeSiteFooterContentJson } from '../../content/normalize/site-footer';
@@ -20,6 +22,7 @@ import { emsHomeSchema } from '../../content/schemas/ems';
 import { componentsSourcingSchema } from '../../content/schemas/components-sourcing';
 import { pcbBoardManufacturingSchema } from '../../content/schemas/pcb-board-manufacturing';
 import { pcbAssemblySchema } from '../../content/schemas/pcb-assembly';
+import { pcbApplicationsSchema } from '../../content/schemas/pcb-applications';
 import { pcbDesignSchema } from '../../content/schemas/pcb-design';
 import { pcbManufacturingSchema } from '../../content/schemas/pcb-manufacturing';
 import { siteFooterSchema } from '../../content/schemas/site-footer';
@@ -32,6 +35,7 @@ import type { JsonValue } from '../../utils/jsonTree';
 import { deepMerge, isObject, pruneEmpty } from '../../utils/jsonTree';
 import EmsEditorContentModules from './EmsEditorContentModules';
 import ComponentsSourcingEditorContentModules from './ComponentsSourcingEditorContentModules';
+import PcbApplicationsEditorContentModules from './PcbApplicationsEditorContentModules';
 import PcbBoardManufacturingEditorContentModules from './PcbBoardManufacturingEditorContentModules';
 import PcbAssemblyEditorContentModules from './PcbAssemblyEditorContentModules';
 import PcbDesignEditorContentModules from './PcbDesignEditorContentModules';
@@ -179,6 +183,9 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
       } else if (template === 'components_sourcing') {
         const merged = deepMerge(componentsSourcingDefaults as any, safeRaw as any) as JsonValue;
         setContentJson(normalizeComponentsSourcingContentJson(merged));
+      } else if (template === 'pcb_applications') {
+        const merged = deepMerge(pcbApplicationsDefaults as any, safeRaw as any) as JsonValue;
+        setContentJson(normalizePcbApplicationsContentJson(merged));
       } else if (template === 'pcb_board_manufacturing') {
         const merged = deepMerge(pcbBoardManufacturingDefaults as any, safeRaw as any) as JsonValue;
         setContentJson(normalizePcbBoardManufacturingContentJson(merged));
@@ -248,6 +255,7 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
 
   const isEmsHome = templateType === 'ems_home';
   const isComponentsSourcing = templateType === 'components_sourcing';
+  const isPcbApplications = templateType === 'pcb_applications';
   const isPcbBoardManufacturing = templateType === 'pcb_board_manufacturing';
   const isPcbAssembly = templateType === 'pcb_assembly';
   const isPcbDesign = templateType === 'pcb_design';
@@ -257,6 +265,7 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
   const hasSchema =
     isEmsHome ||
     isComponentsSourcing ||
+    isPcbApplications ||
     isPcbBoardManufacturing ||
     isPcbAssembly ||
     isPcbDesign ||
@@ -275,6 +284,10 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
   };
 
   const onComponentsSourcingModuleChange = (key: keyof typeof componentsSourcingSchema, next: JsonValue) => {
+    onContentKeyChange(String(key), next);
+  };
+
+  const onPcbApplicationsModuleChange = (key: keyof typeof pcbApplicationsSchema, next: JsonValue) => {
     onContentKeyChange(String(key), next);
   };
 
@@ -307,6 +320,8 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
         ? normalizeEmsHomeContentJson(contentJson)
         : templateType === 'components_sourcing'
           ? normalizeComponentsSourcingContentJson(contentJson)
+          : templateType === 'pcb_applications'
+            ? normalizePcbApplicationsContentJson(contentJson)
           : templateType === 'pcb_board_manufacturing'
             ? normalizePcbBoardManufacturingContentJson(contentJson)
           : templateType === 'pcb_assembly'
@@ -509,6 +524,7 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
               <option value="ems_home">ems_home</option>
               <option value="ems_service">ems_service</option>
               <option value="components_sourcing">components_sourcing</option>
+              <option value="pcb_applications">pcb_applications</option>
               <option value="pcb_board_manufacturing">pcb_board_manufacturing</option>
               <option value="pcb_assembly">pcb_assembly</option>
               <option value="pcb_design">pcb_design</option>
@@ -562,6 +578,13 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
         <ComponentsSourcingEditorContentModules
           contentJson={contentJson}
           onModuleChange={onComponentsSourcingModuleChange}
+        />
+      );
+    if (isPcbApplications)
+      return (
+        <PcbApplicationsEditorContentModules
+          contentJson={contentJson}
+          onModuleChange={onPcbApplicationsModuleChange}
         />
       );
     if (isPcbBoardManufacturing)

@@ -1,20 +1,8 @@
+import { faqSchema } from './modules/faq';
+import { heroSchema } from './modules/hero';
+
 export const componentsSourcingSchema = {
-  hero: {
-    background_image_url: 'string',
-    title: 'string',
-    benefits: {
-      type: 'array',
-      items: {
-        title: 'string',
-        description: 'string',
-      },
-    },
-    benefit_conclusion: 'string',
-    cta: {
-      label: 'string',
-      href: 'string',
-    },
-  },
+  hero: heroSchema,
   source_capability: {
     title: 'string',
     description: 'string',
@@ -176,51 +164,5 @@ export const componentsSourcingSchema = {
       },
     },
   },
-  faq: {
-    title: 'string',
-    items: {
-      type: 'array',
-      items: {
-        question: 'string',
-        answer: 'string',
-      },
-    },
-  },
-  quote_form: {
-    title: 'string',
-    description: 'string',
-    background_image_url: 'string',
-    name_field: {
-      label: 'string',
-      placeholder: 'string',
-      required: 'boolean',
-    },
-    company_field: {
-      label: 'string',
-      placeholder: 'string',
-      required: 'boolean',
-    },
-    email_field: {
-      label: 'string',
-      placeholder: 'string',
-      required: 'boolean',
-    },
-    phone_field: {
-      label: 'string',
-      placeholder: 'string',
-      required: 'boolean',
-    },
-    message_field: {
-      label: 'string',
-      placeholder: 'string',
-      required: 'boolean',
-    },
-    upload: {
-      label: 'string',
-      optional_text: 'string',
-      button_text: 'string',
-      help_text: 'string',
-    },
-    submit_label: 'string',
-  },
+  faq: faqSchema
 };

@@ -68,7 +68,7 @@ const getStringAt = (value: JsonValue, path: string[]) => {
   return typeof cur === 'string' ? cur : '';
 };
 
-const buildItemSummary = (item: JsonValue, fallback: string) => {
+const buildItemSummary = (item: JsonValue, fallback: string, itemSchema?: any): string => {
   if (!isObject(item)) return fallback;
 
   const label = getStringAt(item, ['label']);
@@ -98,6 +98,40 @@ const buildItemSummary = (item: JsonValue, fallback: string) => {
 
   const platform = getStringAt(item, ['platform']);
   if (platform) return truncateText(platform, 90);
+
+  if (isObject(itemSchema)) {
+    const schemaKeys = Object.keys(itemSchema).filter((key) => !key.startsWith('__'));
+    for (const preferNonMedia of [true, false]) {
+      for (const key of schemaKeys) {
+        if (preferNonMedia && isMediaUrlKey(key)) continue;
+        const value = (item as any)[key] as JsonValue;
+        if (typeof value === 'string') {
+          const text = truncateText(value, 90);
+          if (text) return text;
+        }
+        if (isObject(value)) {
+          const nested = buildItemSummary(value, '', (itemSchema as any)[key]);
+          if (nested) return nested;
+        }
+      }
+    }
+  }
+
+  const itemKeys = Object.keys(item);
+  for (const preferNonMedia of [true, false]) {
+    for (const key of itemKeys) {
+      if (preferNonMedia && isMediaUrlKey(key)) continue;
+      const value = (item as any)[key] as JsonValue;
+      if (typeof value === 'string') {
+        const text = truncateText(value, 90);
+        if (text) return text;
+      }
+      if (isObject(value)) {
+        const nested = buildItemSummary(value, '', undefined);
+        if (nested) return nested;
+      }
+    }
+  }
 
   return fallback;
 };
@@ -222,7 +256,7 @@ function ArrayObjectField(props: {
         {props.arr.length === 0 ? <div className="text-sm text-[var(--admin-fg-muted)]">暂无条目</div> : null}
         {props.arr.map((item, idx) => {
           const isOpen = openIndex === idx;
-          const summary = buildItemSummary(item, `条目 ${idx + 1}`);
+          const summary = buildItemSummary(item, `条目 ${idx + 1}`, props.itemSchema);
           return (
             <div key={idx} className="overflow-hidden rounded-[var(--admin-radius-md)] border border-[var(--admin-border)] bg-[var(--admin-surface)]">
               <div className="flex items-center gap-3 px-3 py-2">

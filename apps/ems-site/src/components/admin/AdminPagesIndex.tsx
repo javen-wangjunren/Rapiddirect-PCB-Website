@@ -10,14 +10,25 @@ import { ListTemplate } from './templates/ListTemplate';
 
 type LoadState = 'loading' | 'ready' | 'error';
 
+const templateTypes: TemplateType[] = [
+  'ems_home',
+  'ems_service',
+  'pcb_assembly',
+  'pcb_design',
+  'pcb_manufacturing',
+  'pcb_board_manufacturing',
+  'pcb_applications',
+  'components_sourcing',
+  'site_footer',
+  'site_header'
+];
+
 const normalizeSlug = (input: string) => {
   const trimmed = input.trim();
   if (!trimmed) return '';
   const withLeading = trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
   return withLeading.endsWith('/') ? withLeading : `${withLeading}/`;
 };
-
-type StatusFilter = 'all' | 'published' | 'draft';
 
 export default function AdminPagesIndex() {
   return (
@@ -44,9 +55,9 @@ function AdminPagesIndexInner() {
   const [creating, setCreating] = useState(false);
 
   const [query, setQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [templateTypeFilter, setTemplateTypeFilter] = useState<TemplateType | 'all'>('all');
   const [page, setPage] = useState(1);
-  const pageSize = 20;
+  const pageSize = 10;
 
   useEffect(() => {
     let cancelled = false;
@@ -65,6 +76,14 @@ function AdminPagesIndexInner() {
       }
 
       const params = new URLSearchParams(window.location.search);
+      const initialPage = Number(params.get('page') ?? '1');
+      if (Number.isFinite(initialPage) && initialPage > 1) {
+        setPage(Math.floor(initialPage));
+      }
+      const templateFromUrl = params.get('template_type') as TemplateType | null;
+      if (templateFromUrl && templateTypes.includes(templateFromUrl)) {
+        setTemplateTypeFilter(templateFromUrl);
+      }
       if (params.get('new') === '1') {
         setShowCreate(true);
       }
@@ -80,8 +99,8 @@ function AdminPagesIndexInner() {
     if (!supabase || !authed) return;
     setLoadState('loading');
     setLoadError(null);
-    const status = statusFilter === 'all' ? undefined : statusFilter;
-    const res = await listPagesForAdminPaged(supabase, { page, pageSize, status, query });
+    const template_type = templateTypeFilter === 'all' ? undefined : templateTypeFilter;
+    const res = await listPagesForAdminPaged(supabase, { page, pageSize, template_type, query });
     if (!res.ok) {
       setLoadState('error');
       setLoadError(res.message);
@@ -103,11 +122,21 @@ function AdminPagesIndexInner() {
   useEffect(() => {
     void refresh();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authed, supabase, page, pageSize, query, statusFilter]);
+  }, [authed, supabase, page, pageSize, query, templateTypeFilter]);
 
   useEffect(() => {
     setPage(1);
-  }, [query, statusFilter]);
+  }, [query, templateTypeFilter]);
+
+  useEffect(() => {
+    if (!authed) return;
+    const url = new URL(window.location.href);
+    if (page <= 1) url.searchParams.delete('page');
+    else url.searchParams.set('page', String(page));
+    if (templateTypeFilter === 'all') url.searchParams.delete('template_type');
+    else url.searchParams.set('template_type', templateTypeFilter);
+    window.history.replaceState({}, '', url.toString());
+  }, [authed, page, templateTypeFilter]);
 
   const pageCount = Math.max(1, Math.ceil(total / pageSize));
   const safePage = Math.min(page, pageCount);
@@ -117,7 +146,7 @@ function AdminPagesIndexInner() {
 
   const empty =
     loadState === 'ready' && total === 0
-      ? !query.trim() && statusFilter === 'all'
+      ? !query.trim() && templateTypeFilter === 'all'
         ? {
             title: '还没有页面',
             description: '先创建一个 draft 页面，然后进入编辑器补全内容与 SEO。',
@@ -129,7 +158,7 @@ function AdminPagesIndexInner() {
           }
         : {
             title: '没有匹配的结果',
-            description: '尝试清空关键词或切换状态筛选。',
+            description: '尝试清空关键词或切换模板筛选。',
             action: (
               <Button variant="secondary" onClick={() => setQuery('')}>
                 清空搜索
@@ -187,11 +216,17 @@ function AdminPagesIndexInner() {
               />
             </label>
             <label className="block">
-              <div className="mb-1 text-xs font-medium text-[var(--admin-fg-muted)]">状态</div>
-              <Select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}>
+              <div className="mb-1 text-xs font-medium text-[var(--admin-fg-muted)]">模板</div>
+              <Select
+                value={templateTypeFilter}
+                onChange={(e) => setTemplateTypeFilter(e.target.value as TemplateType | 'all')}
+              >
                 <option value="all">All</option>
-                <option value="published">Published</option>
-                <option value="draft">Draft</option>
+                {templateTypes.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
               </Select>
             </label>
           </div>

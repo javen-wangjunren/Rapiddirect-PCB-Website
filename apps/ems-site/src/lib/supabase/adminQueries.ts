@@ -24,6 +24,7 @@ export interface AdminPageListQuery {
   page: number;
   pageSize: number;
   status?: PageRecord['status'];
+  template_type?: PageRecord['template_type'];
   query?: string;
 }
 
@@ -44,7 +45,7 @@ export const listPagesForAdminPaged = async (
   input: AdminPageListQuery
 ): Promise<{ ok: true; items: AdminPageListItem[]; total: number } | { ok: false; message: string }> => {
   const safePage = Number.isFinite(input.page) ? Math.max(1, Math.floor(input.page)) : 1;
-  const safePageSize = Number.isFinite(input.pageSize) ? Math.max(1, Math.min(100, Math.floor(input.pageSize))) : 20;
+  const safePageSize = Number.isFinite(input.pageSize) ? Math.max(1, Math.min(100, Math.floor(input.pageSize))) : 10;
   const from = (safePage - 1) * safePageSize;
   const to = from + safePageSize - 1;
 
@@ -56,6 +57,10 @@ export const listPagesForAdminPaged = async (
 
   if (input.status) {
     q = q.eq('status', input.status);
+  }
+
+  if (input.template_type) {
+    q = q.eq('template_type', input.template_type);
   }
 
   const keyword = input.query?.trim();

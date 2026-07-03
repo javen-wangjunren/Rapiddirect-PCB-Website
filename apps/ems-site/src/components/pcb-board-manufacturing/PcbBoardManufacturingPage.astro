@@ -1,0 +1,35 @@
+---
+import HeroBanner from '../common/HeroBanner.astro';
+import EquipmentSection from '../common/EquipmentSection.astro';
+import FaqSection from '../common/FaqSection.astro';
+import PcbMfgTechTableSection from '../common/PcbMfgTechTableSection.astro';
+import QuoteFormSection from '../common/QuoteFormSection.astro';
+import EmsLayout from '../../layouts/EmsLayout.astro';
+import PcbBoardAdvantageSection from './PcbBoardAdvantageSection.astro';
+import PcbBoardIntroductionSection from './PcbBoardIntroductionSection.astro';
+import PcbBoardSliderSection from './PcbBoardSliderSection.astro';
+import PcbBoardStackupSection from './PcbBoardStackupSection.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  canonicalUrl?: string;
+  noindex?: boolean;
+  jsonLd?: Record<string, unknown> | ReadonlyArray<Record<string, unknown>>;
+  data: any;
+}
+
+const { title, description, canonicalUrl, noindex = false, jsonLd, data } = Astro.props;
+---
+
+<EmsLayout title={title} description={description} canonicalUrl={canonicalUrl} noindex={noindex} jsonLd={jsonLd}>
+  <HeroBanner data={data.hero} />
+  <PcbBoardIntroductionSection data={data.introduction} />
+  <PcbBoardStackupSection data={data.stackup} />
+  <PcbBoardAdvantageSection data={data.advantage} />
+  <PcbMfgTechTableSection data={data.tech_table} variant="muted" />
+  <PcbBoardSliderSection data={data.slider} />
+  <EquipmentSection data={data.equipment} variant="muted" />
+  <FaqSection data={data.faq} />
+  <QuoteFormSection data={data.quote_form} />
+</EmsLayout>

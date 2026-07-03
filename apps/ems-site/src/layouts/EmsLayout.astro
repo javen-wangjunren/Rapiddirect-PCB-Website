@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import SiteFooter from '../components/common/SiteFooter.astro';
 import SiteHeader from '../components/common/SiteHeader.astro';
+import JsonLd from '../components/seo/JsonLd.astro';
 import { siteFooterDefaults } from '../content/defaults/site-footer';
 import { siteHeaderDefaults } from '../content/defaults/site-header';
 import { normalizeSiteFooterContentJson } from '../content/normalize/site-footer';
@@ -13,15 +14,23 @@ import { deepMerge } from '../utils/jsonTree';
 export interface Props {
   title?: string;
   description?: string;
+  canonicalUrl?: string;
+  noindex?: boolean;
+  jsonLd?: Record<string, unknown> | ReadonlyArray<Record<string, unknown>>;
 }
 
 const {
   title = 'RapidDirect EMS',
-  description = 'EMS subsite under /ems built with Astro, React, Tailwind, and Supabase.'
+  description = 'EMS subsite under /ems built with Astro, React, Tailwind, and Supabase.',
+  canonicalUrl: canonicalUrlInput,
+  noindex = false,
+  jsonLd
 } = Astro.props;
 
-const robots = 'index, follow';
-const canonicalUrl = `https://rapiddirect.com${Astro.url.pathname}`;
+const siteUrl = Astro.site ?? new URL('https://www.rapiddirect.com');
+const canonicalFallback = new URL(Astro.url.pathname, siteUrl).toString();
+const canonicalUrl = canonicalUrlInput?.trim() ? canonicalUrlInput.trim() : canonicalFallback;
+const robots = noindex ? 'noindex, follow' : 'index, follow';
 
 const footerSlug = '/ems/_global/footer/';
 const supabase = createSupabaseClient();
@@ -45,6 +54,7 @@ const headerData = normalizeSiteHeaderContentJson(deepMerge(siteHeaderDefaults a
     <meta name="robots" content={robots} />
     <meta name="googlebot" content={robots} />
     <link rel="canonical" href={canonicalUrl} />
+    {jsonLd ? <JsonLd data={jsonLd as any} /> : null}
   </head>
   <body class="bg-slate-50 text-slate-950 antialiased">
     <div class="min-h-screen">

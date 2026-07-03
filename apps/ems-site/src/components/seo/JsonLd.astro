@@ -1,0 +1,12 @@
+---
+export type Props = {
+  data: Record<string, unknown> | ReadonlyArray<Record<string, unknown>>;
+};
+
+const { data } = Astro.props;
+
+const jsonLd = JSON.stringify(data).replace(/</g, '\\u003c');
+---
+
+<script type="application/ld+json" set:html={jsonLd}></script>
+

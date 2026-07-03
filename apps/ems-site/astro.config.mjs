@@ -9,7 +9,7 @@ import tailwindcss from '@tailwindcss/vite';
 const isDev = process.argv.includes('dev');
 
 export default defineConfig({
-  site: 'https://rapiddirect.com',
+  site: 'https://www.rapiddirect.com',
   base: '/ems',
   trailingSlash: 'always',
   build: {

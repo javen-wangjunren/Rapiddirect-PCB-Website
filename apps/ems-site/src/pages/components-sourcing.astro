@@ -16,6 +16,7 @@ import { normalizeComponentsSourcingContentJson } from '../content/normalize/com
 import { createSupabaseClient } from '../lib/supabase/client';
 import { mergeSectionFallback } from '../lib/supabase/mappers';
 import { getPublishedPageBundleBySlug } from '../lib/supabase/queries';
+import { buildServicePageJsonLd } from '../utils/schemaOrg';
 
 const slug = Astro.url.pathname;
 
@@ -31,9 +32,25 @@ const title = bundle?.seo?.meta_title ?? 'Electronic Component Sourcing | RapidD
 const description =
   bundle?.seo?.meta_description ??
   'Reliable component sourcing with BOM validation, alternates management, and traceability support for prototyping and production.';
+const canonicalUrl = bundle?.seo?.canonical_url ?? null;
+const noindex = Boolean(bundle?.seo?.noindex);
+const jsonLd = buildServicePageJsonLd({
+  pathname: Astro.url.pathname,
+  title,
+  description,
+  canonicalUrl,
+  faqItems: data?.faq?.items ?? [],
+  service: bundle?.seo?.service_schema ?? null,
+  includeBreadcrumbList: true,
+  breadcrumbs: [
+    { name: 'Home', path: '/' },
+    { name: 'EMS', path: '/ems/' },
+    { name: 'Component Sourcing', path: Astro.url.pathname }
+  ]
+});
 ---
 
-<EmsLayout title={title} description={description}>
+<EmsLayout title={title} description={description} canonicalUrl={canonicalUrl ?? undefined} noindex={noindex} jsonLd={jsonLd}>
   <HeroBanner data={data.hero} />
   <SourceCapabilitySection data={data.source_capability} />
   <SourceProcessSection data={data.source_process} />

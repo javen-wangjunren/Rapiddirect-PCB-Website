@@ -1,7 +1,8 @@
 export type AdminNavItem = {
   label: string;
   href: string;
-  icon?: string;
+  icon?: 'pages' | 'media' | 'layout' | 'external';
+  external?: boolean;
   /** If true, do not highlight based on `activePath.startsWith(href)` */
   exact?: boolean;
 };
@@ -27,19 +28,19 @@ export const adminNavGroups: AdminNavGroup[] = [
   {
     title: 'Content',
     items: [
-      { label: 'Pages', href: '/admin/pages/', icon: '▦' },
-      { label: 'Media', href: '/admin/media/', icon: '▣' }
+      { label: 'Pages', href: '/admin/pages/', icon: 'pages' },
+      { label: 'Media', href: '/admin/media/', icon: 'media' }
     ]
   },
   {
     title: 'Global Settings',
     items: [
-      { label: 'Header', href: '/admin/global-settings/header/', icon: '⚙' },
-      { label: 'Footer', href: '/admin/global-settings/footer/', icon: '⚙' }
+      { label: 'Header', href: '/admin/global-settings/header/', icon: 'layout' },
+      { label: 'Footer', href: '/admin/global-settings/footer/', icon: 'layout' }
     ]
   },
   {
     title: 'Shortcuts',
-    items: [{ label: 'View Site', href: '/', icon: '↗', exact: true }]
+    items: [{ label: 'View Site', href: '/', icon: 'external', external: true, exact: true }]
   }
 ];

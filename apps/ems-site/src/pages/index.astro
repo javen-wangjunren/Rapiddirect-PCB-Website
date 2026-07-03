@@ -17,6 +17,7 @@ import { normalizeEmsHomeContentJson } from '../content/normalize/ems';
 import { createSupabaseClient } from '../lib/supabase/client';
 import { mergeSectionFallback } from '../lib/supabase/mappers';
 import { getPublishedPageBundleBySlug } from '../lib/supabase/queries';
+import { buildEmsHomeJsonLd, getPublicPageUrl } from '../utils/schemaOrg';
 
 const slug = Astro.url.pathname;
 
@@ -28,9 +29,25 @@ const data = normalizeEmsHomeContentJson(mergeSectionFallback(emsHomeDefaults as
 
 const title = bundle?.seo?.meta_title ?? 'EMS Home | RapidDirect';
 const description = bundle?.seo?.meta_description ?? 'RapidDirect EMS landing page under /ems/.';
+const canonicalUrl = bundle?.seo?.canonical_url ?? null;
+const noindex = Boolean(bundle?.seo?.noindex);
+const servicesForSchema = (data?.services?.items ?? [])
+  .map((item: any) => ({
+    name: item?.name ?? '',
+    url: item?.cta?.href ? getPublicPageUrl(item.cta.href) : ''
+  }))
+  .filter((item: any) => item.name && item.url);
+const jsonLd = buildEmsHomeJsonLd({
+  pathname: Astro.url.pathname,
+  title,
+  description,
+  canonicalUrl,
+  services: servicesForSchema,
+  includeBreadcrumbList: true
+});
 ---
 
-<EmsLayout title={title} description={description}>
+<EmsLayout title={title} description={description} canonicalUrl={canonicalUrl ?? undefined} noindex={noindex} jsonLd={jsonLd}>
   <HeroBanner data={data.hero} />
   <ServicesSection data={data.services} />
   <QualityControlSection data={data.quality} />

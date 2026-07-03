@@ -39,7 +39,7 @@ export const getPublishedPageBundleBySlug = async (
     supabase.from('page_content').select('content_json').eq('page_id', page.id).maybeSingle(),
     supabase
       .from('seo_meta')
-      .select('meta_title,meta_description,canonical_url,og_title,og_description,og_image,noindex')
+      .select('meta_title,meta_description,canonical_url,og_title,og_description,og_image,noindex,service_schema')
       .eq('page_id', page.id)
       .maybeSingle()
   ]);

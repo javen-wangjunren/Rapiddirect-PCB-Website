@@ -16,6 +16,7 @@ import { normalizePcbAssemblyContentJson } from '../content/normalize/pcb-assemb
 import { createSupabaseClient } from '../lib/supabase/client';
 import { mergeSectionFallback } from '../lib/supabase/mappers';
 import { getPublishedPageBundleBySlug } from '../lib/supabase/queries';
+import { buildServicePageJsonLd } from '../utils/schemaOrg';
 
 const slug = Astro.url.pathname;
 
@@ -27,9 +28,25 @@ const data = normalizePcbAssemblyContentJson(mergeSectionFallback(pcbAssemblyDef
 
 const title = bundle?.seo?.meta_title ?? 'PCB Assembly | RapidDirect';
 const description = bundle?.seo?.meta_description ?? 'PCB assembly service page under /ems/pcb-assembly/.';
+const canonicalUrl = bundle?.seo?.canonical_url ?? null;
+const noindex = Boolean(bundle?.seo?.noindex);
+const jsonLd = buildServicePageJsonLd({
+  pathname: Astro.url.pathname,
+  title,
+  description,
+  canonicalUrl,
+  faqItems: data?.faq?.items ?? [],
+  service: bundle?.seo?.service_schema ?? null,
+  includeBreadcrumbList: true,
+  breadcrumbs: [
+    { name: 'Home', path: '/' },
+    { name: 'EMS', path: '/ems/' },
+    { name: 'PCB Assembly Service', path: Astro.url.pathname }
+  ]
+});
 ---
 
-<EmsLayout title={title} description={description}>
+<EmsLayout title={title} description={description} canonicalUrl={canonicalUrl ?? undefined} noindex={noindex} jsonLd={jsonLd}>
   <HeroBanner data={data.hero} />
   <PcbaCapabilitySection data={data.capability} />
   <PcbaQualityControlSection data={data.quality} />

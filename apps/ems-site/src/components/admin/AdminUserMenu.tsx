@@ -25,7 +25,7 @@ export default function AdminUserMenu() {
   return (
     <div className="flex items-center gap-2">
       {email ? <span className="hidden text-sm text-[var(--admin-fg-muted)] md:inline">{email}</span> : null}
-      <a href={getHref('/')} className="hidden md:inline">
+      <a href={getHref('/')} className="hidden md:inline" target="_blank" rel="noopener noreferrer">
         <Button variant="ghost" size="sm" type="button">
           View site
         </Button>

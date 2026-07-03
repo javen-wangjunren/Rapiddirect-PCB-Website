@@ -1,3 +1,5 @@
+import type { ServiceSchema } from '../utils/schemaOrg';
+
 export interface SeoMeta {
   meta_title: string;
   meta_description: string;
@@ -6,4 +8,5 @@ export interface SeoMeta {
   og_description?: string;
   og_image?: string;
   noindex?: boolean;
+  service_schema?: ServiceSchema;
 }

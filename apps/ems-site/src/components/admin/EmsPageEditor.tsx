@@ -41,7 +41,8 @@ export default function EmsPageEditor() {
     og_title: '',
     og_description: '',
     og_image: '',
-    noindex: false
+    noindex: false,
+    service_schema: {}
   });
 
   const [contentJson, setContentJson] = useState<JsonValue>(deepMerge(emsHomeDefaults as any, {} as any) as JsonValue);
@@ -86,7 +87,8 @@ export default function EmsPageEditor() {
         og_title: bundle.seo?.og_title ?? '',
         og_description: bundle.seo?.og_description ?? '',
         og_image: bundle.seo?.og_image ?? '',
-        noindex: Boolean((bundle.seo as any)?.noindex)
+        noindex: Boolean((bundle.seo as any)?.noindex),
+        service_schema: (bundle.seo as any)?.service_schema ?? {}
       });
 
       const raw = (bundle.content?.content_json ?? {}) as any;
@@ -160,7 +162,8 @@ export default function EmsPageEditor() {
         og_title: seo.og_title,
         og_description: seo.og_description,
         og_image: seo.og_image,
-        noindex: seo.noindex
+        noindex: seo.noindex,
+        service_schema: seo.service_schema
       },
       contentJson: normalizeEmsHomeContentJson(contentJson)
     });

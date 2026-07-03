@@ -24,17 +24,19 @@ const sidebarDialogId = 'admin-sidebar-dialog';
     <meta name="googlebot" content="noindex, nofollow" />
   </head>
   <body class="admin-shell">
-    <div class="h-screen overflow-hidden min-[1200px]:flex">
+    <div class="h-screen overflow-hidden min-[1200px]:flex" data-admin-shell>
       {showSidebar ? (
         <>
-          <div class="hidden h-full min-[1200px]:block">
+          <div class="admin-sidebar-slot hidden h-full min-[1200px]:block" data-admin-sidebar-slot>
             <AdminSidebar activePath={activePath} />
           </div>
           <dialog
             id={sidebarDialogId}
-            class="m-0 h-screen w-[min(320px,85vw)] border-0 bg-transparent p-0 backdrop:bg-black/30 min-[1200px]:hidden"
+            class="admin-sidebar-dialog m-0 h-screen w-[min(320px,85vw)] max-w-none overflow-hidden border-0 bg-transparent p-0 backdrop:bg-black/30 min-[1200px]:hidden"
+            aria-label="Sidebar menu"
+            data-admin-sidebar-dialog
           >
-            <div class="h-full">
+            <div class="admin-sidebar-drawer-shell h-full">
               <AdminSidebar activePath={activePath} variant="drawer" />
             </div>
           </dialog>
@@ -52,58 +54,176 @@ const sidebarDialogId = 'admin-sidebar-dialog';
     <script is:inline>
       {String.raw`
       (() => {
+        const desktopMedia = window.matchMedia('(min-width: 1200px)');
         const key = 'admin.sidebarCollapsed';
         const body = document.body;
         const sidebar = document.querySelector('.admin-sidebar[data-variant="static"]');
+        const drawerSidebar = document.querySelector('.admin-sidebar[data-variant="drawer"]');
         const toggleBtn = document.querySelector('[data-admin-toggle-sidebar]');
-        const apply = (collapsed) => {
-          body.classList.toggle('is-sidebar-collapsed', collapsed);
-          if (sidebar instanceof HTMLElement) {
-            sidebar.classList.toggle('is-collapsed', collapsed);
-          }
-          if (toggleBtn instanceof HTMLElement) toggleBtn.setAttribute('aria-pressed', collapsed ? 'true' : 'false');
+        const openBtn = document.querySelector('[data-admin-open-sidebar]');
+        const dialogId = openBtn?.getAttribute('data-admin-open-sidebar');
+        const dialog = dialogId ? document.getElementById(dialogId) : null;
+        const dialogEl = dialog instanceof HTMLElement ? dialog : null;
+        const DialogCtor = window.HTMLDialogElement;
+        const dialogDialog = DialogCtor && dialog ? (dialog instanceof DialogCtor ? dialog : null) : null;
+        const supportsDialog =
+          !!dialogDialog && typeof dialogDialog.showModal === 'function' && typeof dialogDialog.close === 'function';
+        let lastFocusedTrigger = null;
+        let desktopCollapsed = false;
 
+        const updateToggleLabel = (collapsed) => {
           const icon = sidebar instanceof HTMLElement ? sidebar.querySelector('.admin-sidebar-toggle-icon') : null;
           const label = sidebar instanceof HTMLElement ? sidebar.querySelector('.admin-sidebar-toggle-label') : null;
           if (icon instanceof HTMLElement) icon.textContent = collapsed ? '▶' : '◀';
           if (label instanceof HTMLElement) label.textContent = collapsed ? 'Expand Menu' : 'Collapse Menu';
+          if (toggleBtn instanceof HTMLElement) {
+            toggleBtn.setAttribute('aria-pressed', collapsed ? 'true' : 'false');
+            toggleBtn.setAttribute('aria-label', collapsed ? 'Expand sidebar' : 'Collapse sidebar');
+            toggleBtn.setAttribute('title', collapsed ? 'Expand Menu' : 'Collapse Menu');
+          }
         };
+
+        const applyDesktopState = () => {
+          const shouldCollapse = desktopMedia.matches && desktopCollapsed;
+          body.classList.toggle('is-sidebar-collapsed', shouldCollapse);
+          if (sidebar instanceof HTMLElement) {
+            sidebar.classList.toggle('is-collapsed', shouldCollapse);
+            sidebar.dataset.state = shouldCollapse ? 'collapsed' : 'expanded';
+          }
+          updateToggleLabel(shouldCollapse);
+        };
+
+        const syncDrawerState = (open) => {
+          body.classList.toggle('is-admin-drawer-open', open);
+          if (dialogEl) dialogEl.dataset.state = open ? 'open' : 'closed';
+          if (openBtn instanceof HTMLElement) {
+            openBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+            openBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+            openBtn.setAttribute('title', open ? 'Close menu' : 'Open menu');
+          }
+        };
+
+        const focusDrawer = () => {
+          if (!(drawerSidebar instanceof HTMLElement)) return;
+          const firstFocusable = drawerSidebar.querySelector(
+            'button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
+          );
+          if (firstFocusable instanceof HTMLElement) firstFocusable.focus();
+        };
+
+        const closeDrawer = ({ restoreFocus = true } = {}) => {
+          if (!dialogEl) return;
+          if (supportsDialog) {
+            if (dialogDialog.open) dialogDialog.close();
+          } else {
+            dialogEl.removeAttribute('open');
+          }
+          syncDrawerState(false);
+          if (restoreFocus && lastFocusedTrigger instanceof HTMLElement) {
+            lastFocusedTrigger.focus();
+          }
+        };
+
+        const openDrawer = () => {
+          if (desktopMedia.matches || !dialogEl) return;
+          if (openBtn instanceof HTMLElement) lastFocusedTrigger = openBtn;
+          if (supportsDialog) {
+            if (!dialogDialog.open) dialogDialog.showModal();
+          } else {
+            dialogEl.setAttribute('open', '');
+          }
+          syncDrawerState(true);
+          window.requestAnimationFrame(() => {
+            focusDrawer();
+          });
+        };
+
         try {
-          apply(localStorage.getItem(key) === '1');
+          desktopCollapsed = localStorage.getItem(key) === '1';
         } catch {}
+        applyDesktopState();
 
-        toggleBtn?.addEventListener('click', () => {
-          const next = !body.classList.contains('is-sidebar-collapsed');
-          apply(next);
+        const toggleDrawer = () => {
+          if (!dialogEl || desktopMedia.matches) return;
+          const isOpen = supportsDialog ? dialogDialog.open : dialogEl.hasAttribute('open');
+          if (isOpen) {
+            closeDrawer();
+          } else {
+            openDrawer();
+          }
+        };
+
+        const toggleDesktop = () => {
+          desktopCollapsed = !desktopCollapsed;
+          applyDesktopState();
           try {
-            localStorage.setItem(key, next ? '1' : '0');
+            localStorage.setItem(key, desktopCollapsed ? '1' : '0');
           } catch {}
-        });
-
-        const openBtn = document.querySelector('[data-admin-open-sidebar]');
-        const dialogId = openBtn?.getAttribute('data-admin-open-sidebar');
-        const dialog = dialogId ? document.getElementById(dialogId) : null;
-        if (!dialog || !(dialog instanceof HTMLDialogElement)) return;
-
-        const open = () => {
-          if (dialog.open) return;
-          dialog.showModal();
-        };
-        const close = () => {
-          if (!dialog.open) return;
-          dialog.close();
         };
 
-        openBtn?.addEventListener('click', open);
+        document.addEventListener(
+          'click',
+          (e) => {
+            const target = e.target;
+            if (!(target instanceof HTMLElement)) return;
 
-        dialog.addEventListener('click', (e) => {
+            if (target.closest('[data-admin-toggle-sidebar]')) {
+              e.preventDefault();
+              toggleDesktop();
+              return;
+            }
+
+            if (target.closest('[data-admin-open-sidebar]')) {
+              e.preventDefault();
+              toggleDrawer();
+              return;
+            }
+          },
+          { capture: true }
+        );
+
+        dialogEl?.addEventListener('click', (e) => {
           const target = e.target;
           if (!(target instanceof HTMLElement)) return;
-          // click on backdrop area closes the dialog
-          if (target === dialog) close();
-          // any nav click marked with data-admin-close-sidebar closes as well
-          if (target.closest('[data-admin-close-sidebar]')) close();
+          if (target === dialogEl) {
+            closeDrawer();
+            return;
+          }
+          if (target.closest('[data-admin-close-sidebar]')) {
+            closeDrawer({ restoreFocus: false });
+          }
         });
+
+        if (supportsDialog) {
+          dialogDialog.addEventListener('close', () => {
+            syncDrawerState(false);
+          });
+          dialogDialog.addEventListener('cancel', (e) => {
+            e.preventDefault();
+            closeDrawer();
+          });
+        } else {
+          dialogEl?.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+              e.preventDefault();
+              closeDrawer();
+            }
+          });
+        }
+
+        const handleBreakpointChange = () => {
+          if (desktopMedia.matches) {
+            closeDrawer({ restoreFocus: false });
+          }
+          applyDesktopState();
+        };
+        handleBreakpointChange();
+
+        if (typeof desktopMedia.addEventListener === 'function') {
+          desktopMedia.addEventListener('change', handleBreakpointChange);
+        } else if (typeof desktopMedia.addListener === 'function') {
+          desktopMedia.addListener(handleBreakpointChange);
+        }
       })();
       `}
     </script>

@@ -101,7 +101,7 @@ export const getPageBundleBySlugForAdmin = async (
     supabase.from('page_content').select('content_json').eq('page_id', page.id).maybeSingle(),
     supabase
       .from('seo_meta')
-      .select('meta_title,meta_description,canonical_url,og_title,og_description,og_image,noindex')
+      .select('meta_title,meta_description,canonical_url,og_title,og_description,og_image,noindex,service_schema')
       .eq('page_id', page.id)
       .maybeSingle()
   ]);
@@ -118,6 +118,7 @@ export interface SaveAdminBundleInput {
   page: Pick<PageRecord, 'title' | 'slug' | 'template_type' | 'status'>;
   seo: Pick<SeoMeta, 'meta_title' | 'meta_description' | 'canonical_url' | 'og_title' | 'og_description' | 'og_image'> & {
     noindex?: boolean;
+    service_schema?: SeoMeta['service_schema'];
   };
   contentJson: unknown;
 }
@@ -163,6 +164,7 @@ export const createPageForAdmin = async (
       og_description: '',
       og_image: '',
       noindex: false,
+      service_schema: {},
       updated_at: nowIso
     })
   ]);
@@ -213,6 +215,7 @@ export const saveAdminBundle = async (
     og_description: input.seo.og_description,
     og_image: input.seo.og_image,
     noindex: input.seo.noindex ?? false,
+    service_schema: input.seo.service_schema ?? {},
     updated_at: nowIso
   }, { onConflict: 'page_id' });
 

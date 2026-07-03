@@ -18,6 +18,7 @@ import { normalizePcbDesignContentJson } from '../content/normalize/pcb-design';
 import { createSupabaseClient } from '../lib/supabase/client';
 import { mergeSectionFallback } from '../lib/supabase/mappers';
 import { getPublishedPageBundleBySlug } from '../lib/supabase/queries';
+import { buildServicePageJsonLd } from '../utils/schemaOrg';
 
 const slug = Astro.url.pathname;
 
@@ -29,9 +30,25 @@ const data = normalizePcbDesignContentJson(mergeSectionFallback(pcbDesignDefault
 
 const title = bundle?.seo?.meta_title ?? 'PCB Design Services | RapidDirect';
 const description = bundle?.seo?.meta_description ?? 'Professional PCB design and layout services. From schematic capture to DFM verification.';
+const canonicalUrl = bundle?.seo?.canonical_url ?? null;
+const noindex = Boolean(bundle?.seo?.noindex);
+const jsonLd = buildServicePageJsonLd({
+  pathname: Astro.url.pathname,
+  title,
+  description,
+  canonicalUrl,
+  faqItems: data?.faq?.items ?? [],
+  service: bundle?.seo?.service_schema ?? null,
+  includeBreadcrumbList: true,
+  breadcrumbs: [
+    { name: 'Home', path: '/' },
+    { name: 'EMS', path: '/ems/' },
+    { name: 'PCB Design Service', path: Astro.url.pathname }
+  ]
+});
 ---
 
-<EmsLayout title={title} description={description}>
+<EmsLayout title={title} description={description} canonicalUrl={canonicalUrl ?? undefined} noindex={noindex} jsonLd={jsonLd}>
   <HeroBanner data={data.hero} />
   <ServicesSection data={data.services} />
   <PcbDesignCapabilitySection data={data.capability} />

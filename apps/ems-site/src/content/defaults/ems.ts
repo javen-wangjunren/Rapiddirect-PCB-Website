@@ -433,39 +433,39 @@ export const emsHomeDefaults = {
       'Advanced production equipment supporting stable quality, capacity, and reliable delivery.',
     items: [
       {
-        image_url: '/images/equipment/mocddrz4-wo06njo.png',
+        image_url: 'https://chmclazqmmikwpdfuqwy.supabase.co/storage/v1/object/public/media/pcb-assembly-machine--s5s65d.png',
         title: 'SMT Line',
-        description: 'Surface Mount Technology',
+        description: 'High-speed SMT assembly for fine-pitch components',
         parameter_label: 'Capacity',
         parameter_value: '45K CPH'
       },
       {
-        image_url: '/images/equipment/mocddrz4-ndqh1rn.png',
+        image_url: 'https://chmclazqmmikwpdfuqwy.supabase.co/storage/v1/object/public/media/pcb-aoi-test-machine--ixbpfk.png',
         title: 'AOI System',
-        description: 'Automated Optical Inspection',
+        description: 'Automated visual inspection for defects',
         parameter_label: 'Capacity',
         parameter_value: '99.9% Accuracy'
       },
       {
-        image_url: '/images/equipment/mocddrz4-16z93ck.png',
+        image_url: 'https://chmclazqmmikwpdfuqwy.supabase.co/storage/v1/object/public/media/pcb-x-ray-machine--3wxmgs.png',
         title: 'X-Ray Inspector',
-        description: 'Advanced Quality Control',
+        description: 'Non-destructive inspection for hidden solder joints',
         parameter_label: 'Capacity',
         parameter_value: '10μm Resolution'
       },
       {
-        image_url: '/images/equipment/mocddrz4-hrono3t.png',
-        title: 'Reflow Oven',
-        description: 'Precision Soldering System',
-        parameter_label: 'Capacity',
-        parameter_value: '10 Zones'
+        image_url: 'https://chmclazqmmikwpdfuqwy.supabase.co/storage/v1/object/public/media/ldi-machine--6tczgg.png',
+        title: 'LDI Machine',
+        description: 'Laser direct imaging for high-precision PCB inner layer patterning',
+        parameter_label: 'Resolution',
+        parameter_value: '25 μm / 12 μm'
       },
       {
-        image_url: '/images/equipment/mocddrz4-wo06njo.png',
-        title: 'Warehouse',
-        description: 'Automated Storage System',
-        parameter_label: 'Capacity',
-        parameter_value: '50K Units/Day'
+        image_url: 'https://chmclazqmmikwpdfuqwy.supabase.co/storage/v1/object/public/media/pcb-laminating-press-machine--9pbbt7.png',
+        title: 'Laminating Press Machine',
+        description: 'Multilayer PCB lamination press for bonding inner cores and prepregs under heat and pressure',
+        parameter_label: 'Max. Layer',
+        parameter_value: '24 Layers'
       }
     ]
   },

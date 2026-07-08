@@ -131,7 +131,7 @@ export function PcbBoardAdvantageSection({ data }: Props) {
             })}
           </div>
 
-          <div className="relative overflow-hidden rounded-[20px] border border-slate-200 bg-slate-200 shadow-[0_20px_40px_rgba(15,23,42,0.06)] aspect-4/3 lg:aspect-auto lg:min-h-[520px]">
+          <div className="relative overflow-hidden rounded-[20px] border border-slate-200 bg-slate-200 shadow-[0_20px_40px_rgba(15,23,42,0.06)] aspect-4/3">
             {items.map((item, index) => {
               const itemId = getItemId(item, index);
               const isActive = itemId === activeItemId;

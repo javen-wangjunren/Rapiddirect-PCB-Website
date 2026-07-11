@@ -1,13 +1,13 @@
 ---
 export const prerender = false;
 
-import { pcbBoardManufacturingDefaults } from '../../content/defaults/pcb-board-manufacturing';
-import PcbBoardManufacturingPage from '../../components/pcb-board-manufacturing/PcbBoardManufacturingPage.astro';
-import EmsLayout from '../../layouts/EmsLayout.astro';
-import { mergeSectionFallback } from '../../lib/supabase/mappers';
-import { createSupabaseClient } from '../../lib/supabase/client';
-import { getPublishedPageBundleBySlug } from '../../lib/supabase/queries';
-import { buildServicePageJsonLd } from '../../utils/schemaOrg';
+import { pcbBoardManufacturingDefaults } from '../content/defaults/pcb-board-manufacturing';
+import PcbBoardManufacturingPage from '../components/pcb-board-manufacturing/PcbBoardManufacturingPage.astro';
+import EmsLayout from '../layouts/EmsLayout.astro';
+import { mergeSectionFallback } from '../lib/supabase/mappers';
+import { createSupabaseClient } from '../lib/supabase/client';
+import { getPublishedPageBundleBySlug } from '../lib/supabase/queries';
+import { buildServicePageJsonLd } from '../utils/schemaOrg';
 
 const slug = Astro.url.pathname;
 const supabase = createSupabaseClient();
@@ -24,7 +24,7 @@ const data = mergeSectionFallback(pcbBoardManufacturingDefaults as any, contentJ
 
 const title = isFound ? (bundle?.seo?.meta_title ?? 'PCB Board Manufacturing | RapidDirect') : 'Page Not Found | RapidDirect';
 const description = isFound
-  ? (bundle?.seo?.meta_description ?? 'PCB manufacturing detail page under /ems/pcb-manufacturing/.')
+  ? (bundle?.seo?.meta_description ?? 'PCB board manufacturing detail page under /ems/.')
   : 'The requested EMS page could not be found.';
 const canonicalUrl = isFound ? (bundle?.seo?.canonical_url ?? null) : null;
 const noindex = isFound ? Boolean(bundle?.seo?.noindex) : true;

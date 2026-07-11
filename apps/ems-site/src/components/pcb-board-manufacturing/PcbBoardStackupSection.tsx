@@ -43,6 +43,16 @@ export function PcbBoardStackupSection({ data }: Props) {
   const items = Array.isArray(data.items) ? data.items : [];
   if (items.length === 0) return null;
 
+  const isFourUpLayout = items.length <= 4;
+  const galleryClassName = [
+    'grid gap-5 max-sm:grid-cols-2 max-sm:gap-3',
+    isFourUpLayout ? 'mx-auto max-w-[640px] grid-cols-2' : 'grid-cols-3'
+  ].join(' ');
+  const imageClassName = [
+    'relative z-10 h-full w-full object-contain',
+    isFourUpLayout ? 'p-5 sm:p-6' : 'p-4'
+  ].join(' ');
+
   const defaultItemId = getItemId(items[0] ?? { title: '', tag: '', structural_features: '', target_applications: '' }, 0);
   const [activeItemId, setActiveItemId] = React.useState(defaultItemId);
 
@@ -69,7 +79,7 @@ export function PcbBoardStackupSection({ data }: Props) {
         </div>
 
         <div className="mt-14 grid gap-10 lg:grid-cols-[minmax(0,55%)_minmax(0,1fr)] lg:items-stretch">
-          <div role="tablist" aria-label="HDI Stackup Gallery" className="grid grid-cols-3 gap-5 max-sm:grid-cols-2 max-sm:gap-3">
+          <div role="tablist" aria-label="HDI Stackup Gallery" className={galleryClassName}>
             {items.map((item, index) => {
               const itemId = getItemId(item, index);
               const isActive = itemId === activeItemId;
@@ -105,7 +115,7 @@ export function PcbBoardStackupSection({ data }: Props) {
                     <img
                       src={item.thumb_image_url}
                       alt={item.thumb_image_alt ?? ''}
-                      className="relative z-10 h-full w-full object-contain p-4"
+                      className={imageClassName}
                       loading="lazy"
                       decoding="async"
                     />

@@ -7,7 +7,6 @@ import QuoteFormSection from '../common/QuoteFormSection.astro';
 import EmsLayout from '../../layouts/EmsLayout.astro';
 import PcbBoardAdvantageSection from './PcbBoardAdvantageSection.astro';
 import PcbBoardIntroductionSection from './PcbBoardIntroductionSection.astro';
-import PcbBoardSliderSection from './PcbBoardSliderSection.astro';
 import PcbBoardStackupSection from './PcbBoardStackupSection.astro';
 
 interface Props {
@@ -28,7 +27,7 @@ const { title, description, canonicalUrl, noindex = false, jsonLd, data } = Astr
   <PcbBoardStackupSection data={data.stackup} />
   <PcbBoardAdvantageSection data={data.advantage} />
   <PcbMfgTechTableSection data={data.tech_table} variant="muted" />
-  <PcbBoardSliderSection data={data.slider} />
+  <!-- Temporarily hidden on frontend until slider images are ready. -->
   <EquipmentSection data={data.equipment} variant="muted" />
   <FaqSection data={data.faq} />
   <QuoteFormSection data={data.quote_form} />

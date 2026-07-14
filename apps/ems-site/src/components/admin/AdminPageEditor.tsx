@@ -412,13 +412,18 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
       return;
     }
 
-    const previewWindow = window.open('', '_blank', 'noopener');
-    if (!previewWindow) {
+    const previewWindow = window.open('', '_blank');
+    if (!previewWindow || previewWindow.closed) {
       push({ kind: 'error', message: '浏览器拦截了新窗口，请允许弹窗后重试' });
       return;
     }
 
-    previewWindow.document.write('<title>Opening preview...</title><p style="font-family: sans-serif; padding: 24px;">Preparing preview...</p>');
+    try {
+      previewWindow.opener = null;
+    } catch {}
+    previewWindow.document.title = 'Opening preview...';
+    previewWindow.document.body.innerHTML =
+      '<p style="font-family: sans-serif; padding: 24px;">Preparing preview...</p>';
 
     try {
       const sessionRes = await supabase.auth.getSession();

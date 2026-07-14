@@ -1,4 +1,3 @@
-import { getAssetPath } from '../../lib/assets';
 import type { TemplateType } from '../../types/page';
 
 export interface EmsEditorPublishSidebarProps {
@@ -6,12 +5,12 @@ export interface EmsEditorPublishSidebarProps {
   onStatusChange: (value: 'draft' | 'published') => void;
   templateType: TemplateType;
   onTemplateTypeChange: (value: TemplateType) => void;
-  previewHref: string;
   saving: boolean;
   canPublish: boolean;
   onSaveDraft: () => void;
   onPublish: () => void;
   onQuickSave: () => void;
+  onPreview: () => void;
 }
 
 export default function EmsEditorPublishSidebar({
@@ -19,26 +18,24 @@ export default function EmsEditorPublishSidebar({
   onStatusChange,
   templateType,
   onTemplateTypeChange,
-  previewHref,
   saving,
   canPublish,
   onSaveDraft,
   onPublish,
-  onQuickSave
+  onQuickSave,
+  onPreview
 }: EmsEditorPublishSidebarProps) {
-  const resolvedPreviewHref = previewHref?.startsWith('/') ? previewHref : getAssetPath(previewHref || '/');
   return (
     <div className="rounded-md border border-[#dcdcde] bg-white">
       <div className="flex items-center justify-between border-b border-[#dcdcde] px-4 py-2">
         <div className="text-sm font-semibold">Publish</div>
-        <a
+        <button
+          type="button"
           className="rounded-md border border-[#2271b1] bg-white px-2 py-1 text-xs font-medium text-[#2271b1] hover:bg-[#f6f7f7]"
-          href={resolvedPreviewHref}
-          target="_blank"
-          rel="noreferrer"
+          onClick={onPreview}
         >
           Preview
-        </a>
+        </button>
       </div>
       <div className="space-y-3 px-4 py-3 text-sm">
         <div className="flex items-center justify-between">

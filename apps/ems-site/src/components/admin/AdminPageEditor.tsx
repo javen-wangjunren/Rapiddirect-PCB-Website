@@ -29,6 +29,7 @@ import { siteFooterSchema } from '../../content/schemas/site-footer';
 import { siteHeaderSchema } from '../../content/schemas/site-header';
 import { getAssetPath } from '../../lib/assets';
 import { createAdminSupabaseClient } from '../../lib/supabase/adminClient';
+import { EMS_PREVIEW_QUERY_PARAM } from '../../lib/supabase/preview';
 import { createPageForAdmin, deletePageForAdmin, getPageBundleBySlugForAdmin, saveAdminBundle } from '../../lib/supabase/adminQueries';
 import type { TemplateType } from '../../types/page';
 import type { JsonValue } from '../../utils/jsonTree';
@@ -405,6 +406,53 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
     window.location.assign(getAssetPath('/admin/pages/'));
   };
 
+  const onPreview = async () => {
+    if (!supabase) {
+      push({ kind: 'error', message: '预览不可用：Supabase 未初始化' });
+      return;
+    }
+
+    const previewWindow = window.open('', '_blank', 'noopener');
+    if (!previewWindow) {
+      push({ kind: 'error', message: '浏览器拦截了新窗口，请允许弹窗后重试' });
+      return;
+    }
+
+    previewWindow.document.write('<title>Opening preview...</title><p style="font-family: sans-serif; padding: 24px;">Preparing preview...</p>');
+
+    try {
+      const sessionRes = await supabase.auth.getSession();
+      const accessToken = sessionRes.data.session?.access_token?.trim();
+      if (!accessToken) {
+        previewWindow.close();
+        push({ kind: 'error', message: '预览失败：请重新登录后台后再试' });
+        return;
+      }
+
+      const sessionRes2 = await fetch(getAssetPath('/api/admin/preview-session/'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'same-origin',
+        body: JSON.stringify({ accessToken })
+      });
+
+      if (!sessionRes2.ok) {
+        previewWindow.close();
+        push({ kind: 'error', message: '预览失败：无法建立预览会话' });
+        return;
+      }
+
+      const targetUrl = new URL(previewHref, window.location.origin);
+      targetUrl.searchParams.set(EMS_PREVIEW_QUERY_PARAM, '1');
+      previewWindow.location.href = targetUrl.toString();
+    } catch {
+      previewWindow.close();
+      push({ kind: 'error', message: '预览失败：请稍后重试' });
+    }
+  };
+
   if (loadState === 'loading') {
     return (
       <Card>
@@ -461,7 +509,7 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
           <Button variant="secondary" onClick={onBack}>
             Back
           </Button>
-          <Button variant="secondary" onClick={() => window.open(previewHref, '_blank', 'noreferrer')}>
+          <Button variant="secondary" onClick={() => void onPreview()}>
             Preview
           </Button>
           <Button variant="danger" loading={deleting} disabled={!pageId || saving} onClick={() => setDeleteConfirmOpen(true)}>

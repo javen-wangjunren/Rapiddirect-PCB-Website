@@ -5,11 +5,16 @@ import PcbApplicationsRenderer from '../components/page-renderers/PcbApplication
 import PcbBoardManufacturingRenderer from '../components/page-renderers/PcbBoardManufacturingRenderer.astro';
 import EmsLayout from '../layouts/EmsLayout.astro';
 import { createSupabaseClient } from '../lib/supabase/client';
+import { EMS_PREVIEW_COOKIE_NAME, isPreviewRequest } from '../lib/supabase/preview';
 import { getPublishedPageBundleBySlug } from '../lib/supabase/queries';
 
 const pathname = Astro.url.pathname;
-const supabase = createSupabaseClient();
-const bundle = supabase ? await getPublishedPageBundleBySlug(supabase, pathname) : null;
+const isPreview = isPreviewRequest(Astro.url);
+const previewAccessToken = isPreview ? Astro.cookies.get(EMS_PREVIEW_COOKIE_NAME)?.value?.trim() : '';
+const supabase = createSupabaseClient(previewAccessToken || undefined);
+const bundle = supabase
+  ? await getPublishedPageBundleBySlug(supabase, pathname, { includeDraft: Boolean(previewAccessToken) })
+  : null;
 const templateType = bundle?.page?.template_type ?? null;
 const isPcbBoardManufacturing = templateType === 'pcb_board_manufacturing';
 const isPcbApplications = templateType === 'pcb_applications';

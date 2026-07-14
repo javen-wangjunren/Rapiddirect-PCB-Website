@@ -15,13 +15,18 @@ import { componentsSourcingDefaults } from '../content/defaults/components-sourc
 import { normalizeComponentsSourcingContentJson } from '../content/normalize/components-sourcing';
 import { createSupabaseClient } from '../lib/supabase/client';
 import { mergeSectionFallback } from '../lib/supabase/mappers';
+import { EMS_PREVIEW_COOKIE_NAME, isPreviewRequest } from '../lib/supabase/preview';
 import { getPublishedPageBundleBySlug } from '../lib/supabase/queries';
 import { buildServicePageJsonLd } from '../utils/schemaOrg';
 
 const slug = Astro.url.pathname;
 
-const supabase = createSupabaseClient();
-const bundle = supabase ? await getPublishedPageBundleBySlug(supabase, slug) : null;
+const isPreview = isPreviewRequest(Astro.url);
+const previewAccessToken = isPreview ? Astro.cookies.get(EMS_PREVIEW_COOKIE_NAME)?.value?.trim() : '';
+const supabase = createSupabaseClient(previewAccessToken || undefined);
+const bundle = supabase
+  ? await getPublishedPageBundleBySlug(supabase, slug, { includeDraft: Boolean(previewAccessToken) })
+  : null;
 
 const contentJson = bundle?.content?.content_json ?? null;
 const data = normalizeComponentsSourcingContentJson(

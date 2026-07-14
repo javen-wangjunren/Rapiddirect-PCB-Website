@@ -5,6 +5,7 @@ import { emsHomeSchema } from '../../content/schemas/ems';
 import { normalizeEmsHomeContentJson } from '../../content/normalize/ems';
 import { getAssetPath } from '../../lib/assets';
 import { createAdminSupabaseClient } from '../../lib/supabase/adminClient';
+import { EMS_PREVIEW_QUERY_PARAM } from '../../lib/supabase/preview';
 import { getPageBundleBySlugForAdmin, saveAdminBundle } from '../../lib/supabase/adminQueries';
 import type { TemplateType } from '../../types/page';
 import type { JsonValue } from '../../utils/jsonTree';
@@ -177,6 +178,53 @@ export default function EmsPageEditor() {
     setToast({ kind: 'success', message: '已保存' });
   };
 
+  const onPreview = async () => {
+    if (!supabase) {
+      setToast({ kind: 'error', message: '预览不可用：Supabase 未初始化' });
+      return;
+    }
+
+    const previewWindow = window.open('', '_blank', 'noopener');
+    if (!previewWindow) {
+      setToast({ kind: 'error', message: '浏览器拦截了新窗口，请允许弹窗后重试' });
+      return;
+    }
+
+    previewWindow.document.write('<title>Opening preview...</title><p style="font-family: sans-serif; padding: 24px;">Preparing preview...</p>');
+
+    try {
+      const sessionRes = await supabase.auth.getSession();
+      const accessToken = sessionRes.data.session?.access_token?.trim();
+      if (!accessToken) {
+        previewWindow.close();
+        setToast({ kind: 'error', message: '预览失败：请重新登录后台后再试' });
+        return;
+      }
+
+      const res = await fetch(getAssetPath('/api/admin/preview-session/'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'same-origin',
+        body: JSON.stringify({ accessToken })
+      });
+
+      if (!res.ok) {
+        previewWindow.close();
+        setToast({ kind: 'error', message: '预览失败：无法建立预览会话' });
+        return;
+      }
+
+      const targetUrl = new URL(previewHref, window.location.origin);
+      targetUrl.searchParams.set(EMS_PREVIEW_QUERY_PARAM, '1');
+      previewWindow.location.href = targetUrl.toString();
+    } catch {
+      previewWindow.close();
+      setToast({ kind: 'error', message: '预览失败：请稍后重试' });
+    }
+  };
+
   if (loadState === 'loading') {
     return (
       <div className="rounded-md border border-[#dcdcde] bg-white p-6">
@@ -223,12 +271,12 @@ export default function EmsPageEditor() {
             onStatusChange={onStatusChange}
             templateType={templateType}
             onTemplateTypeChange={onTemplateTypeChange}
-            previewHref={previewHref}
             saving={saving}
             canPublish={canPublish}
             onSaveDraft={() => void doSave('draft')}
             onPublish={() => void doSave('published')}
             onQuickSave={() => void doSave()}
+            onPreview={() => void onPreview()}
           />
 
           {toast ? (

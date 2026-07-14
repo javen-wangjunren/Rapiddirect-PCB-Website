@@ -10,9 +10,14 @@ export interface PageBundle {
   seo: SeoMeta | null;
 }
 
+export interface PageBundleQueryOptions {
+  includeDraft?: boolean;
+}
+
 export const getPublishedPageBundleBySlug = async (
   supabase: SupabaseClient,
-  slug: string
+  slug: string,
+  options: PageBundleQueryOptions = {}
 ): Promise<PageBundle | null> => {
   const trimmed = slug.trim();
   const candidates = Array.from(
@@ -21,13 +26,17 @@ export const getPublishedPageBundleBySlug = async (
       trimmed.endsWith('/') ? trimmed.slice(0, -1) : `${trimmed}/`
     ].filter(Boolean))
   );
-  const pageRes = await supabase
+  let pageQuery = supabase
     .from('pages')
     .select('id,slug,title,template_type,status')
     .in('slug', candidates)
-    .eq('status', 'published')
-    .limit(1)
-    .maybeSingle();
+    .limit(1);
+
+  if (!options.includeDraft) {
+    pageQuery = pageQuery.eq('status', 'published');
+  }
+
+  const pageRes = await pageQuery.maybeSingle();
 
   if (pageRes.error || !pageRes.data) {
     return null;

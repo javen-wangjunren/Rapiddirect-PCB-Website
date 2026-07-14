@@ -5,6 +5,24 @@ import {
   EMS_PREVIEW_COOKIE_NAME
 } from '../../../lib/supabase/preview';
 
+const json = (body: Record<string, unknown>, status = 200) =>
+  new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+export const GET: APIRoute = async () => {
+  return json(
+    {
+      ok: false,
+      message: 'Use POST to create preview session.'
+    },
+    405
+  );
+};
+
 export const POST: APIRoute = async ({ request, cookies }) => {
   let accessToken = '';
 
@@ -16,12 +34,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   }
 
   if (!accessToken) {
-    return new Response(JSON.stringify({ ok: false, message: '缺少 access token' }), {
-      status: 400,
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
+    return json({ ok: false, message: '缺少 access token' }, 400);
   }
 
   const basePath = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '') || '/';
@@ -33,10 +46,5 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     maxAge: EMS_PREVIEW_COOKIE_MAX_AGE_SECONDS
   });
 
-  return new Response(JSON.stringify({ ok: true }), {
-    status: 200,
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  });
+  return json({ ok: true }, 200);
 };

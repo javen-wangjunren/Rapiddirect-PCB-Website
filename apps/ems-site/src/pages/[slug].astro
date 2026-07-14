@@ -3,7 +3,16 @@ export const prerender = false;
 
 import { pcbBoardManufacturingDefaults } from '../content/defaults/pcb-board-manufacturing';
 import PcbBoardManufacturingPage from '../components/pcb-board-manufacturing/PcbBoardManufacturingPage.astro';
+import HeroBanner from '../components/common/HeroBanner.astro';
+import PcbMfgCapabilitySection from '../components/common/PcbMfgCapabilitySection.astro';
+import PcbMfgTechTableSection from '../components/common/PcbMfgTechTableSection.astro';
+import FaqSection from '../components/common/FaqSection.astro';
+import QuoteFormSection from '../components/common/QuoteFormSection.astro';
+import ApplicationAdvantageSection from '../components/pcb-applications/ApplicationAdvantageSection.astro';
+import ApplicationDescSection from '../components/pcb-applications/ApplicationDescSection.astro';
 import EmsLayout from '../layouts/EmsLayout.astro';
+import { pcbApplicationsDefaults } from '../content/defaults/pcb-applications';
+import { normalizePcbApplicationsContentJson } from '../content/normalize/pcb-applications';
 import { mergeSectionFallback } from '../lib/supabase/mappers';
 import { createSupabaseClient } from '../lib/supabase/client';
 import { getPublishedPageBundleBySlug } from '../lib/supabase/queries';
@@ -12,36 +21,53 @@ import { buildServicePageJsonLd } from '../utils/schemaOrg';
 const slug = Astro.url.pathname;
 const supabase = createSupabaseClient();
 const bundle = supabase ? await getPublishedPageBundleBySlug(supabase, slug) : null;
-const isPcbBoardManufacturing = bundle?.page?.template_type === 'pcb_board_manufacturing';
-const isFound = Boolean(bundle?.page) && isPcbBoardManufacturing;
+const templateType = bundle?.page?.template_type ?? null;
+const isPcbBoardManufacturing = templateType === 'pcb_board_manufacturing';
+const isPcbApplications = templateType === 'pcb_applications';
+const isFound = Boolean(bundle?.page) && (isPcbBoardManufacturing || isPcbApplications);
 
 if (!isFound) {
   Astro.response.status = 404;
 }
 
 const contentJson = isFound ? bundle?.content?.content_json ?? null : null;
-const data = mergeSectionFallback(pcbBoardManufacturingDefaults as any, contentJson) as typeof pcbBoardManufacturingDefaults;
+const boardData = isPcbBoardManufacturing
+  ? (mergeSectionFallback(pcbBoardManufacturingDefaults as any, contentJson) as typeof pcbBoardManufacturingDefaults)
+  : null;
+const applicationsData = isPcbApplications
+  ? (normalizePcbApplicationsContentJson(mergeSectionFallback(pcbApplicationsDefaults as any, contentJson) as any) as any)
+  : null;
 
-const title = isFound ? (bundle?.seo?.meta_title ?? 'PCB Board Manufacturing | RapidDirect') : 'Page Not Found | RapidDirect';
+const title = isFound
+  ? isPcbApplications
+    ? (bundle?.seo?.meta_title ?? `${applicationsData?.hero?.title ?? 'PCB Applications'} | RapidDirect`)
+    : (bundle?.seo?.meta_title ?? 'PCB Board Manufacturing | RapidDirect')
+  : 'Page Not Found | RapidDirect';
 const description = isFound
-  ? (bundle?.seo?.meta_description ?? 'PCB board manufacturing detail page under /ems/.')
+  ? (bundle?.seo?.meta_description ??
+      (isPcbApplications
+        ? (applicationsData?.overview?.description ?? 'PCB application-focused manufacturing and engineering support.')
+        : 'PCB board manufacturing detail page under /ems/.'))
   : 'The requested EMS page could not be found.';
 const canonicalUrl = isFound ? (bundle?.seo?.canonical_url ?? null) : null;
 const noindex = isFound ? Boolean(bundle?.seo?.noindex) : true;
-const detailTitle = data?.hero?.title ?? title.replace(/\s*\|\s*RapidDirect\s*$/u, '');
+const detailTitle = isFound
+  ? (isPcbApplications
+      ? (applicationsData?.hero?.title ?? title.replace(/\s*\|\s*RapidDirect\s*$/u, ''))
+      : (boardData?.hero?.title ?? title.replace(/\s*\|\s*RapidDirect\s*$/u, '')))
+  : title;
 const jsonLd = isFound
   ? buildServicePageJsonLd({
       pathname: Astro.url.pathname,
       title,
       description,
       canonicalUrl,
-      faqItems: data?.faq?.items ?? [],
+      faqItems: isPcbApplications ? (applicationsData?.faq?.items ?? []) : (boardData?.faq?.items ?? []),
       service: bundle?.seo?.service_schema ?? null,
       includeBreadcrumbList: true,
       breadcrumbs: [
         { name: 'Home', path: '/' },
         { name: 'EMS', path: '/ems/' },
-        { name: 'PCB Manufacturing', path: '/ems/pcb-manufacturing/' },
         { name: detailTitle, path: Astro.url.pathname }
       ]
     })
@@ -50,14 +76,26 @@ const jsonLd = isFound
 
 {
   isFound ? (
-    <PcbBoardManufacturingPage
-      title={title}
-      description={description}
-      canonicalUrl={canonicalUrl ?? undefined}
-      noindex={noindex}
-      jsonLd={jsonLd}
-      data={data}
-    />
+    isPcbApplications ? (
+      <EmsLayout title={title} description={description} canonicalUrl={canonicalUrl ?? undefined} noindex={noindex} jsonLd={jsonLd}>
+        <HeroBanner data={applicationsData?.hero} />
+        {applicationsData?.description && <ApplicationDescSection data={applicationsData.description} />}
+        {applicationsData?.capability && <PcbMfgCapabilitySection data={applicationsData.capability} />}
+        {applicationsData?.advantage && <ApplicationAdvantageSection data={applicationsData.advantage} />}
+        {applicationsData?.tech_table && <PcbMfgTechTableSection data={applicationsData.tech_table} variant="muted" />}
+        {applicationsData?.faq && <FaqSection data={applicationsData.faq} variant="white" />}
+        {applicationsData?.quote_form && <QuoteFormSection data={applicationsData.quote_form} />}
+      </EmsLayout>
+    ) : (
+      <PcbBoardManufacturingPage
+        title={title}
+        description={description}
+        canonicalUrl={canonicalUrl ?? undefined}
+        noindex={noindex}
+        jsonLd={jsonLd}
+        data={boardData}
+      />
+    )
   ) : (
     <EmsLayout title={title} description={description} noindex={true}>
       <section class="mx-auto max-w-4xl px-6 py-24 text-center">

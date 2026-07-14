@@ -48,12 +48,30 @@ const navItems = (data?.nav_items?.length ? data.nav_items : siteHeaderDefaults.
       {navItems.map((item) => {
         const hasChildren = item.children && item.children.length > 0;
         if (hasChildren) {
+          const parentHref = item.href?.trim();
+          const parentIsLink = Boolean(parentHref && parentHref !== '#');
           return (
-            <div class="nav-item has-dropdown relative flex cursor-pointer items-center gap-1 py-7 text-base font-bold text-[#0f172a] transition-colors hover:text-[#f25537]">
-              {item.label}
-              <svg class="dropdown-icon h-4 w-4 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
+            <div class="nav-item has-dropdown relative flex items-center">
+              {parentIsLink ? (
+                <a
+                  href={getHref(parentHref!)}
+                  target={item.openInNewTab ? '_blank' : undefined}
+                  rel={item.openInNewTab ? 'noopener noreferrer' : undefined}
+                  class="nav-item-link flex items-center gap-1 py-7 text-base font-bold text-[#0f172a] no-underline transition-colors hover:text-[#f25537]"
+                >
+                  {item.label}
+                  <svg class="dropdown-icon h-4 w-4 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </a>
+              ) : (
+                <div class="flex cursor-pointer items-center gap-1 py-7 text-base font-bold text-[#0f172a] transition-colors hover:text-[#f25537]">
+                  {item.label}
+                  <svg class="dropdown-icon h-4 w-4 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </div>
+              )}
               <div class="dropdown-menu absolute left-[-20px] top-full min-w-[240px] rounded-lg border border-slate-100 bg-white px-0 py-3 opacity-0 shadow-[0_10px_30px_rgba(0,0,0,0.08)] transition-all duration-300 invisible translate-y-2.5 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0">
                 {item.children!.map((child) => (
                   <a
@@ -170,6 +188,9 @@ const navItems = (data?.nav_items?.length ? data.nav_items : siteHeaderDefaults.
 <style>
   .has-dropdown:hover .dropdown-icon {
     transform: rotate(180deg);
+    color: #f25537;
+  }
+  .has-dropdown:hover .nav-item-link {
     color: #f25537;
   }
   .has-dropdown:hover .dropdown-menu {

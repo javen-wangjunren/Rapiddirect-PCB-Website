@@ -1,0 +1,45 @@
+---
+import type { PageBundle } from '../../lib/supabase/queries';
+import { pcbBoardManufacturingDefaults } from '../../content/defaults/pcb-board-manufacturing';
+import PcbBoardManufacturingPage from '../pcb-board-manufacturing/PcbBoardManufacturingPage.astro';
+import { mergeSectionFallback } from '../../lib/supabase/mappers';
+import { buildServicePageJsonLd } from '../../utils/schemaOrg';
+
+interface Props {
+  bundle: PageBundle;
+  pathname: string;
+}
+
+const { bundle, pathname } = Astro.props;
+const contentJson = bundle.content?.content_json ?? null;
+const data = mergeSectionFallback(pcbBoardManufacturingDefaults as any, contentJson) as typeof pcbBoardManufacturingDefaults;
+
+const title = bundle.seo?.meta_title ?? 'PCB Board Manufacturing | RapidDirect';
+const description = bundle.seo?.meta_description ?? 'PCB board manufacturing detail page under /ems/.';
+const canonicalUrl = bundle.seo?.canonical_url ?? null;
+const noindex = Boolean(bundle.seo?.noindex);
+const detailTitle = data?.hero?.title ?? title.replace(/\s*\|\s*RapidDirect\s*$/u, '');
+const jsonLd = buildServicePageJsonLd({
+  pathname,
+  title,
+  description,
+  canonicalUrl,
+  faqItems: data?.faq?.items ?? [],
+  service: bundle.seo?.service_schema ?? null,
+  includeBreadcrumbList: true,
+  breadcrumbs: [
+    { name: 'Home', path: '/' },
+    { name: 'EMS', path: '/ems/' },
+    { name: detailTitle, path: pathname }
+  ]
+});
+---
+
+<PcbBoardManufacturingPage
+  title={title}
+  description={description}
+  canonicalUrl={canonicalUrl ?? undefined}
+  noindex={noindex}
+  jsonLd={jsonLd}
+  data={data}
+/>

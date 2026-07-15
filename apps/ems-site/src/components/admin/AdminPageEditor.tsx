@@ -30,7 +30,7 @@ import { siteHeaderSchema } from '../../content/schemas/site-header';
 import { getAssetPath } from '../../lib/assets';
 import { createAdminSupabaseClient } from '../../lib/supabase/adminClient';
 import { buildPreviewHref, isPreviewableTemplateType } from '../../lib/supabase/preview';
-import { createPageForAdmin, deletePageForAdmin, getPageBundleBySlugForAdmin, saveAdminBundle } from '../../lib/supabase/adminQueries';
+import { createPageForAdmin, deletePageForAdmin, duplicatePageForAdmin, getPageBundleBySlugForAdmin, saveAdminBundle } from '../../lib/supabase/adminQueries';
 import type { TemplateType } from '../../types/page';
 import type { JsonValue } from '../../utils/jsonTree';
 import { deepMerge, isObject, pruneEmpty } from '../../utils/jsonTree';
@@ -44,7 +44,7 @@ import PcbManufacturingEditorContentModules from './PcbManufacturingEditorConten
 import EmsEditorSeoCard, { type SeoDraft } from './EmsEditorSeoCard';
 import SchemaForm from './SchemaForm';
 import { EditorTemplate } from './templates/EditorTemplate';
-import { Badge, Button, Card, CardBody, CardFooter, CardHeader, CardTitle, ConfirmDialog, Input, Select, Tabs, ToastProvider, useToast } from './ui';
+import { Badge, Button, Card, CardBody, CardHeader, CardTitle, ConfirmDialog, Input, Select, Tabs, ToastProvider, useToast } from './ui';
 
 type LoadState = 'loading' | 'ready' | 'error';
 
@@ -61,6 +61,21 @@ const normalizeSlug = (input: string) => {
   if (!trimmed) return '';
   const withLeading = trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
   return withLeading.endsWith('/') ? withLeading : `${withLeading}/`;
+};
+
+const buildDuplicateTitle = (title: string, attempt: number) => {
+  const baseTitle = title.trim() || 'Untitled';
+  return attempt === 1 ? `${baseTitle} Copy` : `${baseTitle} Copy ${attempt}`;
+};
+
+const buildDuplicateSlug = (slug: string, attempt: number) => {
+  const normalized = normalizeSlug(slug) || '/page/';
+  const trimmed = normalized.slice(0, -1);
+  const lastSlashIndex = trimmed.lastIndexOf('/');
+  const parentPath = lastSlashIndex >= 0 ? trimmed.slice(0, lastSlashIndex + 1) : '/';
+  const basename = trimmed.slice(lastSlashIndex + 1) || 'page';
+  const suffix = attempt === 1 ? '-copy' : `-copy-${attempt}`;
+  return normalizeSlug(`${parentPath}${basename}${suffix}`);
 };
 
 export default function AdminPageEditor(props: AdminPageEditorProps) {
@@ -104,6 +119,8 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [duplicating, setDuplicating] = useState(false);
+  const [lastSavedMessage, setLastSavedMessage] = useState('');
 
   const [leaveConfirmOpen, setLeaveConfirmOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
@@ -213,6 +230,7 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
       }
 
       setDirty(false);
+      setLastSavedMessage(bundle.page.status === 'published' ? '已发布并同步' : '草稿已保存');
       setLoadState('ready');
     };
     void run();
@@ -254,9 +272,20 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
 
   const normalizedSlug = normalizeSlug(slug);
   const canPublish = title.trim().length > 0 && normalizedSlug.length > 0;
-  const previewHref = normalizedSlug || normalizeSlug(initialSlug) || '/ems/';
+  const permalink = normalizedSlug || normalizeSlug(initialSlug) || '/ems/';
   const previewEnabled = isPreviewableTemplateType(templateType);
   const previewHelpText = previewEnabled ? '' : '当前模板暂不支持独立整页预览';
+  const headerStatusText = duplicating
+    ? '正在复制页面...'
+    : deleting
+      ? '正在删除页面...'
+      : saving
+        ? '正在保存...'
+        : dirty
+          ? '未保存更改'
+          : lastSavedMessage || (status === 'published' ? '已发布并同步' : '草稿已保存');
+  const saveDraftLabel = status === 'published' ? 'Move to Draft' : 'Save Draft';
+  const publishLabel = status === 'published' ? 'Update Published' : 'Publish';
 
   const isEmsHome = templateType === 'ems_home';
   const isComponentsSourcing = templateType === 'components_sourcing';
@@ -371,7 +400,9 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
     }
     if (nextStatus) setStatus(nextStatus);
     setDirty(false);
-    push({ kind: 'success', message: nextStatus === 'published' ? '已发布' : '已保存' });
+    const savedMessage = nextStatus === 'published' ? '已发布并同步' : nextStatus === 'draft' ? '草稿已保存' : '更改已保存';
+    setLastSavedMessage(savedMessage);
+    push({ kind: 'success', message: savedMessage });
   };
 
   const doDelete = async () => {
@@ -386,12 +417,83 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
     }
     disableBeforeUnload();
     setDirty(false);
+    setLastSavedMessage('');
     push({ kind: 'success', message: '已删除页面' });
     window.location.assign(getAssetPath('/admin/pages/'));
   };
 
+  const doDuplicate = async () => {
+    if (!supabase || !pageId) return;
+
+    setDuplicating(true);
+    const normalizedContent =
+      templateType === 'ems_home'
+        ? normalizeEmsHomeContentJson(contentJson)
+        : templateType === 'components_sourcing'
+          ? normalizeComponentsSourcingContentJson(contentJson)
+          : templateType === 'pcb_applications'
+            ? normalizePcbApplicationsContentJson(contentJson)
+            : templateType === 'pcb_board_manufacturing'
+              ? normalizePcbBoardManufacturingContentJson(contentJson)
+              : templateType === 'pcb_assembly'
+                ? normalizePcbAssemblyContentJson(contentJson)
+                : templateType === 'pcb_design'
+                  ? normalizePcbDesignContentJson(contentJson)
+                  : templateType === 'pcb_manufacturing'
+                    ? normalizePcbManufacturingContentJson(contentJson)
+                    : templateType === 'site_footer'
+                      ? normalizeSiteFooterContentJson(contentJson)
+                      : templateType === 'site_header'
+                        ? normalizeSiteHeaderContentJson(contentJson)
+                        : contentJson;
+    const cleanedContent = pruneEmpty(normalizedContent);
+    const safeContent = isObject(cleanedContent) ? cleanedContent : {};
+
+    let targetSlug = '';
+    let targetTitle = '';
+    let duplicateResult: Awaited<ReturnType<typeof duplicatePageForAdmin>> | null = null;
+
+    for (let attempt = 1; attempt <= 20; attempt += 1) {
+      targetSlug = buildDuplicateSlug(normalizedSlug || initialSlug || '/page/', attempt);
+      targetTitle = buildDuplicateTitle(title, attempt);
+      const existing = await getPageBundleBySlugForAdmin(supabase, targetSlug);
+      if (existing?.page) continue;
+
+      duplicateResult = await duplicatePageForAdmin(supabase, {
+        title: targetTitle,
+        slug: targetSlug,
+        template_type: templateType,
+        seo: {
+          meta_title: seo.meta_title,
+          meta_description: seo.meta_description,
+          canonical_url: '',
+          og_title: seo.og_title,
+          og_description: seo.og_description,
+          og_image: seo.og_image,
+          noindex: seo.noindex,
+          service_schema: seo.service_schema
+        },
+        contentJson: safeContent
+      });
+
+      if (duplicateResult.ok || !/duplicate|unique/i.test(duplicateResult.message)) break;
+      duplicateResult = null;
+    }
+
+    setDuplicating(false);
+
+    if (!duplicateResult?.ok) {
+      push({ kind: 'error', message: duplicateResult?.message ?? '复制页面失败，请稍后重试' });
+      return;
+    }
+
+    push({ kind: 'success', message: `已创建副本：${targetTitle}` });
+    disableBeforeUnload();
+    setDirty(false);
+    window.location.assign(getAssetPath(`/admin/pages/edit/?slug=${encodeURIComponent(targetSlug)}`));
+  };
+
   const onCopyPermalink = async () => {
-    const permalink = previewHref;
     try {
       await navigator.clipboard.writeText(permalink);
       push({ kind: 'success', message: '已复制 Permalink' });
@@ -491,12 +593,12 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
 
   const header = (
     <Card>
-      <CardHeader>
-        <div className="min-w-0">
+      <CardHeader className="flex-col gap-4 min-[960px]:flex-row">
+        <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <CardTitle>Editing</CardTitle>
             <Badge variant={status === 'published' ? 'published' : 'draft'}>{status}</Badge>
-            {dirty ? <span className="text-xs text-[var(--admin-fg-muted)]">未保存更改</span> : null}
+            <span className="text-xs text-[var(--admin-fg-muted)]">{headerStatusText}</span>
           </div>
           <div className="mt-3">
             <Input
@@ -512,29 +614,55 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
           <div className="mt-3 space-y-2">
             <div className="text-xs font-medium text-[var(--admin-fg-muted)]">Permalink</div>
             <div className="grid grid-cols-1 gap-2 md:grid-cols-[minmax(0,1fr)_auto]">
-              <Input value={previewHref} readOnly />
+              <Input value={permalink} readOnly />
               <Button variant="secondary" onClick={() => void onCopyPermalink()}>
                 Copy
               </Button>
             </div>
           </div>
         </div>
-        <div className="flex flex-wrap items-center justify-end gap-2">
-          <Button variant="secondary" onClick={onBack}>
+        <div className="flex flex-wrap items-center justify-end gap-2 self-stretch min-[960px]:self-start">
+          <Button variant="ghost" onClick={onBack}>
             Back
           </Button>
           <Button variant="secondary" disabled={!previewEnabled} onClick={() => void onPreview()}>
             Preview
           </Button>
-          <Button variant="danger" loading={deleting} disabled={!pageId || saving} onClick={() => setDeleteConfirmOpen(true)}>
-            Delete
-          </Button>
           <Button variant="secondary" loading={saving} disabled={!canPublish} onClick={() => void doSave('draft')}>
-            Save Draft
+            {saveDraftLabel}
           </Button>
           <Button variant="primary" loading={saving} disabled={!canPublish} onClick={() => void doSave('published')}>
-            {status === 'published' ? 'Update' : 'Publish'}
+            {publishLabel}
           </Button>
+          <details className="relative">
+            <summary className="inline-flex h-[var(--admin-control-md)] cursor-pointer list-none items-center justify-center rounded-[var(--admin-radius-sm)] border border-[var(--admin-border)] bg-[var(--admin-surface)] px-4 text-sm font-medium text-[var(--admin-fg)] shadow-[var(--admin-shadow-sm)] transition hover:bg-[var(--admin-surface-muted)] [&::-webkit-details-marker]:hidden">
+              More
+            </summary>
+            <div className="absolute right-0 z-10 mt-2 w-48 overflow-hidden rounded-[var(--admin-radius-md)] border border-[var(--admin-border)] bg-[var(--admin-surface)] py-1 shadow-[var(--admin-shadow-md)]">
+              <button
+                type="button"
+                className="block w-full px-3 py-2 text-left text-sm text-[var(--admin-fg)] hover:bg-[var(--admin-surface-muted)] disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={!pageId || saving || deleting || duplicating}
+                onClick={(e) => {
+                  (e.currentTarget.closest('details') as HTMLDetailsElement | null)?.removeAttribute('open');
+                  void doDuplicate();
+                }}
+              >
+                {duplicating ? 'Duplicating...' : 'Duplicate Page'}
+              </button>
+              <button
+                type="button"
+                className="block w-full px-3 py-2 text-left text-sm text-[var(--admin-danger)] hover:bg-[var(--admin-surface-muted)] disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={!pageId || saving || deleting || duplicating}
+                onClick={(e) => {
+                  (e.currentTarget.closest('details') as HTMLDetailsElement | null)?.removeAttribute('open');
+                  setDeleteConfirmOpen(true);
+                }}
+              >
+                Delete Page
+              </button>
+            </div>
+          </details>
         </div>
         {!previewEnabled ? <div className="mt-2 text-xs text-[var(--admin-fg-muted)]">{previewHelpText}</div> : null}
       </CardHeader>
@@ -599,12 +727,10 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
               <option value="site_header">site_header</option>
             </Select>
           </label>
+          <div className="rounded-[var(--admin-radius-sm)] bg-[var(--admin-primary-soft)] px-3 py-2 text-xs text-[var(--admin-fg-muted)]">
+            所有更改统一通过顶部操作栏保存与发布，不再提供局部保存入口。
+          </div>
         </CardBody>
-        <CardFooter className="flex-col items-stretch justify-start gap-2">
-          <Button variant="secondary" onClick={() => void doSave()} disabled={!canPublish} loading={saving}>
-            Quick Save
-          </Button>
-        </CardFooter>
       </Card>
     </div>
   );
@@ -750,7 +876,7 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
         open={deleteConfirmOpen}
         onOpenChange={setDeleteConfirmOpen}
         title="删除页面？"
-        description={`将永久删除 “${title || 'Untitled'}” (${previewHref})，并同步删除内容与 SEO。该操作不可撤销。`}
+        description={`将永久删除 “${title || 'Untitled'}” (${permalink})，并同步删除内容与 SEO。该操作不可撤销。`}
         confirmText="删除"
         cancelText="取消"
         intent="danger"

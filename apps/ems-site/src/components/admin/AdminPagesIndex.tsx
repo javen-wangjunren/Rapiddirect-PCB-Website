@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { getAssetPath } from '../../lib/assets';
 import { createAdminSupabaseClient } from '../../lib/supabase/adminClient';
+import { buildPreviewHref, isPreviewableTemplateType } from '../../lib/supabase/preview';
 import { createPageForAdmin, listPagesForAdminPaged, type AdminPageListItem } from '../../lib/supabase/adminQueries';
 import type { TemplateType } from '../../types/page';
 import { Badge, Button, Card, CardBody, Input, Modal, Pagination, Select, ToastProvider, useToast } from './ui';
@@ -53,6 +54,7 @@ function AdminPagesIndexInner() {
   const [createSlug, setCreateSlug] = useState('');
   const [createTemplateType, setCreateTemplateType] = useState<TemplateType>('ems_service');
   const [creating, setCreating] = useState(false);
+  const [previewingPageId, setPreviewingPageId] = useState('');
 
   const [query, setQuery] = useState('');
   const [templateTypeFilter, setTemplateTypeFilter] = useState<TemplateType | 'all'>('all');
@@ -193,6 +195,65 @@ function AdminPagesIndexInner() {
     window.location.assign(getAssetPath(`/admin/pages/edit/?slug=${encodeURIComponent(normalized)}`));
   };
 
+  const onPreview = async (item: AdminPageListItem) => {
+    if (!supabase) {
+      push({ kind: 'error', message: '预览不可用：Supabase 未初始化' });
+      return;
+    }
+    if (!isPreviewableTemplateType(item.template_type)) {
+      push({ kind: 'error', message: '当前模板暂不支持独立整页预览' });
+      return;
+    }
+
+    const previewWindow = window.open('', '_blank');
+    if (!previewWindow || previewWindow.closed) {
+      push({ kind: 'error', message: '浏览器拦截了新窗口，请允许弹窗后重试' });
+      return;
+    }
+
+    try {
+      previewWindow.opener = null;
+    } catch {}
+    previewWindow.document.title = 'Opening preview...';
+    previewWindow.document.body.innerHTML =
+      '<p style="font-family: sans-serif; padding: 24px;">Preparing preview...</p>';
+
+    setPreviewingPageId(item.id);
+
+    try {
+      const sessionRes = await supabase.auth.getSession();
+      const accessToken = sessionRes.data.session?.access_token?.trim();
+      if (!accessToken) {
+        previewWindow.close();
+        push({ kind: 'error', message: '预览失败：请重新登录后台后再试' });
+        return;
+      }
+
+      const res = await fetch(getAssetPath('/api/admin/preview-access/'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'same-origin',
+        body: JSON.stringify({ pageId: item.id, accessToken })
+      });
+
+      if (!res.ok) {
+        previewWindow.close();
+        push({ kind: 'error', message: '预览失败：无法建立预览授权' });
+        return;
+      }
+
+      const targetUrl = new URL(buildPreviewHref(item.id), window.location.origin);
+      previewWindow.location.href = targetUrl.toString();
+    } catch {
+      previewWindow.close();
+      push({ kind: 'error', message: '预览失败：请稍后重试' });
+    } finally {
+      setPreviewingPageId('');
+    }
+  };
+
   return (
     <>
       <ListTemplate
@@ -248,6 +309,12 @@ function AdminPagesIndexInner() {
       >
         <div className="space-y-3">
           {pageItems.map((item) => (
+            (() => {
+              const isDraft = item.status !== 'published';
+              const canPreviewDraft = isDraft && isPreviewableTemplateType(item.template_type);
+              const isPreviewing = previewingPageId === item.id;
+
+              return (
             <Card
               key={item.id}
               className={cn(
@@ -278,7 +345,7 @@ function AdminPagesIndexInner() {
                   <div className="flex items-center gap-2">
                     <div
                       className={cn(
-                        'hidden min-[1200px]:flex min-w-[170px] items-center justify-end gap-3 text-xs font-medium',
+                        'hidden min-[1200px]:flex min-w-[200px] items-center justify-end gap-3 text-xs font-medium',
                         'opacity-0 pointer-events-none transition',
                         'group-hover:opacity-100 group-hover:pointer-events-auto',
                         'group-focus-within:opacity-100 group-focus-within:pointer-events-auto'
@@ -290,14 +357,26 @@ function AdminPagesIndexInner() {
                       >
                         Edit
                       </a>
-                      <a
-                        className="text-[var(--admin-fg-muted)] hover:text-[var(--admin-fg)] hover:underline"
-                        href={item.slug}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        View
-                      </a>
+                      {isDraft ? (
+                        <button
+                          type="button"
+                          className="text-[var(--admin-primary)] hover:underline disabled:cursor-not-allowed disabled:opacity-50"
+                          disabled={!canPreviewDraft || isPreviewing}
+                          onClick={() => void onPreview(item)}
+                          title={canPreviewDraft ? undefined : '当前模板暂不支持独立整页预览'}
+                        >
+                          {isPreviewing ? 'Opening...' : 'Preview'}
+                        </button>
+                      ) : (
+                        <a
+                          className="text-[var(--admin-fg-muted)] hover:text-[var(--admin-fg)] hover:underline"
+                          href={item.slug}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          View
+                        </a>
+                      )}
                       <button
                         type="button"
                         className="text-[var(--admin-fg-muted)] hover:text-[var(--admin-fg)] hover:underline"
@@ -331,15 +410,30 @@ function AdminPagesIndexInner() {
                         >
                           Edit
                         </a>
-                        <a
-                          className="block px-3 py-2 text-sm text-[var(--admin-fg)] hover:bg-[var(--admin-surface-muted)]"
-                          href={item.slug}
-                          target="_blank"
-                          rel="noreferrer"
-                          onClick={(e) => (e.currentTarget.closest('details') as HTMLDetailsElement | null)?.removeAttribute('open')}
-                        >
-                          View
-                        </a>
+                        {isDraft ? (
+                          <button
+                            type="button"
+                            className="block w-full px-3 py-2 text-left text-sm text-[var(--admin-fg)] hover:bg-[var(--admin-surface-muted)] disabled:cursor-not-allowed disabled:opacity-50"
+                            disabled={!canPreviewDraft || isPreviewing}
+                            onClick={(e) => {
+                              (e.currentTarget.closest('details') as HTMLDetailsElement | null)?.removeAttribute('open');
+                              void onPreview(item);
+                            }}
+                            title={canPreviewDraft ? undefined : '当前模板暂不支持独立整页预览'}
+                          >
+                            {isPreviewing ? 'Opening Preview...' : 'Preview'}
+                          </button>
+                        ) : (
+                          <a
+                            className="block px-3 py-2 text-sm text-[var(--admin-fg)] hover:bg-[var(--admin-surface-muted)]"
+                            href={item.slug}
+                            target="_blank"
+                            rel="noreferrer"
+                            onClick={(e) => (e.currentTarget.closest('details') as HTMLDetailsElement | null)?.removeAttribute('open')}
+                          >
+                            View
+                          </a>
+                        )}
                         <button
                           type="button"
                           className="block w-full px-3 py-2 text-left text-sm text-[var(--admin-fg)] hover:bg-[var(--admin-surface-muted)]"
@@ -359,6 +453,8 @@ function AdminPagesIndexInner() {
                 </div>
               </CardBody>
             </Card>
+              );
+            })()
           ))}
         </div>
       </ListTemplate>

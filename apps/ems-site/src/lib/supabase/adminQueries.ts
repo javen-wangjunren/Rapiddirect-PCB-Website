@@ -162,6 +162,17 @@ export interface CreateAdminPageInput {
   template_type: PageRecord['template_type'];
 }
 
+export interface DuplicateAdminPageInput {
+  title: string;
+  slug: string;
+  template_type: PageRecord['template_type'];
+  seo: Pick<SeoMeta, 'meta_title' | 'meta_description' | 'canonical_url' | 'og_title' | 'og_description' | 'og_image'> & {
+    noindex?: boolean;
+    service_schema?: SeoMeta['service_schema'];
+  };
+  contentJson: unknown;
+}
+
 export const createPageForAdmin = async (
   supabase: SupabaseClient,
   input: CreateAdminPageInput
@@ -257,6 +268,49 @@ export const saveAdminBundle = async (
   }
 
   return { ok: true };
+};
+
+export const duplicatePageForAdmin = async (
+  supabase: SupabaseClient,
+  input: DuplicateAdminPageInput
+): Promise<{ ok: true; pageId: string } | { ok: false; message: string }> => {
+  const createRes = await createPageForAdmin(supabase, {
+    title: input.title,
+    slug: input.slug,
+    template_type: input.template_type
+  });
+
+  if (!createRes.ok) {
+    return createRes;
+  }
+
+  const saveRes = await saveAdminBundle(supabase, {
+    pageId: createRes.pageId,
+    page: {
+      title: input.title,
+      slug: input.slug,
+      template_type: input.template_type,
+      status: 'draft'
+    },
+    seo: {
+      meta_title: input.seo.meta_title,
+      meta_description: input.seo.meta_description,
+      canonical_url: input.seo.canonical_url,
+      og_title: input.seo.og_title,
+      og_description: input.seo.og_description,
+      og_image: input.seo.og_image,
+      noindex: input.seo.noindex ?? false,
+      service_schema: input.seo.service_schema ?? {}
+    },
+    contentJson: input.contentJson
+  });
+
+  if (!saveRes.ok) {
+    await deletePageForAdmin(supabase, createRes.pageId);
+    return saveRes;
+  }
+
+  return { ok: true, pageId: createRes.pageId };
 };
 
 export const deletePageForAdmin = async (

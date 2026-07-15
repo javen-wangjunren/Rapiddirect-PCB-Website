@@ -1,0 +1,16 @@
+---
+export const prerender = false;
+
+import AdminPageEditor from '../../../../components/admin/AdminPageEditor';
+import AdminLayout from '../../../../layouts/AdminLayout.astro';
+
+const inquiryFormSlug = '/ems/_global/inquiry-form/';
+---
+
+<AdminLayout title="Global Settings - Inquiry Form">
+  <AdminPageEditor
+    initialSlug={inquiryFormSlug}
+    createIfMissing={{ title: 'Global Inquiry Form', template_type: 'site_inquiry_form' }}
+    client:load
+  />
+</AdminLayout>

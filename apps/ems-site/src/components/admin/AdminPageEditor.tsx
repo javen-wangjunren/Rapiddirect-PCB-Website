@@ -9,6 +9,7 @@ import { pcbDesignDefaults } from '../../content/defaults/pcb-design';
 import { pcbManufacturingDefaults } from '../../content/defaults/pcb-manufacturing';
 import { siteFooterDefaults } from '../../content/defaults/site-footer';
 import { siteHeaderDefaults } from '../../content/defaults/site-header';
+import { siteInquiryFormDefaults } from '../../content/defaults/site-inquiry-form';
 import { normalizeEmsHomeContentJson } from '../../content/normalize/ems';
 import { normalizeComponentsSourcingContentJson } from '../../content/normalize/components-sourcing';
 import { normalizePcbBoardManufacturingContentJson } from '../../content/normalize/pcb-board-manufacturing';
@@ -18,6 +19,7 @@ import { normalizePcbDesignContentJson } from '../../content/normalize/pcb-desig
 import { normalizePcbManufacturingContentJson } from '../../content/normalize/pcb-manufacturing';
 import { normalizeSiteFooterContentJson } from '../../content/normalize/site-footer';
 import { normalizeSiteHeaderContentJson } from '../../content/normalize/site-header';
+import { normalizeSiteInquiryFormContentJson } from '../../content/normalize/site-inquiry-form';
 import { emsHomeSchema } from '../../content/schemas/ems';
 import { componentsSourcingSchema } from '../../content/schemas/components-sourcing';
 import { pcbBoardManufacturingSchema } from '../../content/schemas/pcb-board-manufacturing';
@@ -27,6 +29,7 @@ import { pcbDesignSchema } from '../../content/schemas/pcb-design';
 import { pcbManufacturingSchema } from '../../content/schemas/pcb-manufacturing';
 import { siteFooterSchema } from '../../content/schemas/site-footer';
 import { siteHeaderSchema } from '../../content/schemas/site-header';
+import { siteInquiryFormSchema } from '../../content/schemas/site-inquiry-form';
 import { getAssetPath } from '../../lib/assets';
 import { createAdminSupabaseClient } from '../../lib/supabase/adminClient';
 import { buildPreviewHref, isPreviewableTemplateType } from '../../lib/supabase/preview';
@@ -224,6 +227,9 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
       } else if (template === 'site_header') {
         const merged = deepMerge(siteHeaderDefaults as any, safeRaw as any) as JsonValue;
         setContentJson(normalizeSiteHeaderContentJson(merged));
+      } else if (template === 'site_inquiry_form') {
+        const merged = deepMerge(siteInquiryFormDefaults as any, safeRaw as any) as JsonValue;
+        setContentJson(normalizeSiteInquiryFormContentJson(merged));
       } else {
         const safeObj = safeRaw ?? {};
         setContentJson(safeObj as any);
@@ -296,6 +302,7 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
   const isPcbManufacturing = templateType === 'pcb_manufacturing';
   const isSiteFooter = templateType === 'site_footer';
   const isSiteHeader = templateType === 'site_header';
+  const isSiteInquiryForm = templateType === 'site_inquiry_form';
   const hasSchema =
     isEmsHome ||
     isComponentsSourcing ||
@@ -305,7 +312,8 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
     isPcbDesign ||
     isPcbManufacturing ||
     isSiteFooter ||
-    isSiteHeader;
+    isSiteHeader ||
+    isSiteInquiryForm;
 
   const onContentKeyChange = (key: string, next: JsonValue) => {
     const obj = (isObject(contentJson) ? (contentJson as any) : {}) as Record<string, JsonValue>;
@@ -368,6 +376,8 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
               ? normalizeSiteFooterContentJson(contentJson)
               : templateType === 'site_header'
                 ? normalizeSiteHeaderContentJson(contentJson)
+                : templateType === 'site_inquiry_form'
+                  ? normalizeSiteInquiryFormContentJson(contentJson)
             : contentJson;
 
     const cleanedContent = pruneEmpty(normalizedContent);
@@ -445,6 +455,8 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
                       ? normalizeSiteFooterContentJson(contentJson)
                       : templateType === 'site_header'
                         ? normalizeSiteHeaderContentJson(contentJson)
+                        : templateType === 'site_inquiry_form'
+                          ? normalizeSiteInquiryFormContentJson(contentJson)
                         : contentJson;
     const cleanedContent = pruneEmpty(normalizedContent);
     const safeContent = isObject(cleanedContent) ? cleanedContent : {};
@@ -723,6 +735,7 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
               <option value="pcb_assembly">pcb_assembly</option>
               <option value="pcb_design">pcb_design</option>
               <option value="pcb_manufacturing">pcb_manufacturing</option>
+              <option value="site_inquiry_form">site_inquiry_form</option>
               <option value="site_footer">site_footer</option>
               <option value="site_header">site_header</option>
             </Select>
@@ -830,6 +843,26 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
         </Card>
       );
     }
+    if (isSiteInquiryForm) {
+      return (
+        <Card>
+          <CardHeader>
+            <CardTitle>Inquiry Form</CardTitle>
+          </CardHeader>
+          <CardBody className="space-y-3 pt-0">
+            <SchemaForm
+              schema={siteInquiryFormSchema as any}
+              value={contentJson}
+              onChange={(next) => {
+                setContentJson(next);
+                setDirty(true);
+              }}
+              pathLabel="Inquiry Form"
+            />
+          </CardBody>
+        </Card>
+      );
+    }
     return (
       <Card>
         <CardHeader>
@@ -849,7 +882,7 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
           {content}
           <Card>
             <CardBody className="pt-[var(--admin-card-p)] text-sm text-[var(--admin-fg-muted)]">
-              原型阶段：`ems_home`、`components_sourcing`、`pcb_board_manufacturing`、`pcb_assembly`、`pcb_design`、`pcb_manufacturing`、`site_footer`、`site_header` 支持
+              原型阶段：`ems_home`、`components_sourcing`、`pcb_board_manufacturing`、`pcb_assembly`、`pcb_design`、`pcb_manufacturing`、`site_inquiry_form`、`site_footer`、`site_header` 支持
               schema 表单；其他模板仍使用 JSON 编辑占位。
               {!hasSchema ? '（当前模板无 schema）' : null}
             </CardBody>

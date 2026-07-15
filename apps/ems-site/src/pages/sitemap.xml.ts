@@ -27,7 +27,7 @@ export const GET: APIRoute = async () => {
     '/ems/components-sourcing/'
   ];
 
-  const disallowedTemplateTypes = new Set<TemplateType>(['site_footer', 'site_header']);
+  const disallowedTemplateTypes = new Set<TemplateType>(['site_footer', 'site_header', 'site_inquiry_form']);
   const slugs = new Set(fallbackSlugs.map(ensureTrailingSlash));
 
   const supabase = createSupabaseClient();
@@ -58,4 +58,3 @@ export const GET: APIRoute = async () => {
     }
   });
 };
-

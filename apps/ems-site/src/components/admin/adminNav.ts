@@ -36,7 +36,8 @@ export const adminNavGroups: AdminNavGroup[] = [
     title: 'Global Settings',
     items: [
       { label: 'Header', href: '/admin/global-settings/header/', icon: 'layout' },
-      { label: 'Footer', href: '/admin/global-settings/footer/', icon: 'layout' }
+      { label: 'Footer', href: '/admin/global-settings/footer/', icon: 'layout' },
+      { label: 'Inquiry Form', href: '/admin/global-settings/inquiry-form/', icon: 'layout' }
     ]
   },
   {

@@ -1,11 +1,24 @@
 ---
 import { QuoteFormSection as QuoteFormSectionReact } from './QuoteFormSection';
+import { siteInquiryFormDefaults } from '../../content/defaults/site-inquiry-form';
+import { normalizeSiteInquiryFormContentJson } from '../../content/normalize/site-inquiry-form';
+import { createSupabaseClient } from '../../lib/supabase/client';
+import { getPublishedPageBundleBySlug } from '../../lib/supabase/queries';
+import { deepMerge, isObject } from '../../utils/jsonTree';
 
 export interface Props {
   data: unknown;
 }
 
 const { data } = Astro.props;
+const inquiryFormSlug = '/ems/_global/inquiry-form/';
+const supabase = createSupabaseClient();
+const inquiryFormBundle = supabase ? await getPublishedPageBundleBySlug(supabase, inquiryFormSlug) : null;
+const inquiryFormRaw = (inquiryFormBundle?.content?.content_json ?? {}) as any;
+const globalInquiryFormData = normalizeSiteInquiryFormContentJson(
+  deepMerge(siteInquiryFormDefaults as any, inquiryFormRaw as any) as any
+) as any;
+const mergedData = deepMerge(isObject(data) ? (data as any) : ({} as any), globalInquiryFormData as any);
 ---
 
-<QuoteFormSectionReact data={data as any} client:load />
+<QuoteFormSectionReact data={mergedData as any} client:load />

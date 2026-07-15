@@ -1,63 +1,13 @@
 ---
 export const prerender = false;
 
-import EmsLayout from '../../layouts/EmsLayout.astro';
-import HeroBanner from '../../components/common/HeroBanner.astro';
-import PcbMfgCapabilitySection from '../../components/common/PcbMfgCapabilitySection.astro';
-import PcbMfgTechTableSection from '../../components/common/PcbMfgTechTableSection.astro';
-import QualityControlSection from '../../components/ems/QualityControlSection.astro';
-import IndustrySection from '../../components/common/IndustrySection.astro';
-import WhyChooseUsSection from '../../components/common/WhyChooseUsSection.astro';
-import ProductGallerySection from '../../components/common/ProductGallerySection.astro';
-import FaqSection from '../../components/common/FaqSection.astro';
-import QuoteFormSection from '../../components/common/QuoteFormSection.astro';
-import { pcbManufacturingDefaults } from '../../content/defaults/pcb-manufacturing';
-import { normalizePcbManufacturingContentJson } from '../../content/normalize/pcb-manufacturing';
+import PcbManufacturingRenderer from '../../components/page-renderers/PcbManufacturingRenderer.astro';
 import { createSupabaseClient } from '../../lib/supabase/client';
-import { mergeSectionFallback } from '../../lib/supabase/mappers';
-import { EMS_PREVIEW_COOKIE_NAME, isPreviewRequest } from '../../lib/supabase/preview';
 import { getPublishedPageBundleBySlug } from '../../lib/supabase/queries';
-import { buildServicePageJsonLd } from '../../utils/schemaOrg';
 
 const slug = Astro.url.pathname;
-const isPreview = isPreviewRequest(Astro.url);
-const previewAccessToken = isPreview ? Astro.cookies.get(EMS_PREVIEW_COOKIE_NAME)?.value?.trim() : '';
-const supabase = createSupabaseClient(previewAccessToken || undefined);
-const bundle = supabase
-  ? await getPublishedPageBundleBySlug(supabase, slug, { includeDraft: Boolean(previewAccessToken) })
-  : null;
-
-const contentJson = bundle?.content?.content_json ?? null;
-const data = normalizePcbManufacturingContentJson(mergeSectionFallback(pcbManufacturingDefaults as any, contentJson) as any) as any;
-
-const title = bundle?.seo?.meta_title ?? 'PCB Manufacturing | RapidDirect';
-const description = bundle?.seo?.meta_description ?? 'PCB manufacturing service page under /ems/pcb-manufacturing/.';
-const canonicalUrl = bundle?.seo?.canonical_url ?? null;
-const noindex = Boolean(bundle?.seo?.noindex);
-const jsonLd = buildServicePageJsonLd({
-  pathname: Astro.url.pathname,
-  title,
-  description,
-  canonicalUrl,
-  faqItems: data?.faq?.items ?? [],
-  service: bundle?.seo?.service_schema ?? null,
-  includeBreadcrumbList: true,
-  breadcrumbs: [
-    { name: 'Home', path: '/' },
-    { name: 'EMS', path: '/ems/' },
-    { name: 'PCB Manufacturing', path: Astro.url.pathname }
-  ]
-});
+const supabase = createSupabaseClient();
+const bundle = supabase ? await getPublishedPageBundleBySlug(supabase, slug) : null;
 ---
 
-<EmsLayout title={title} description={description} canonicalUrl={canonicalUrl ?? undefined} noindex={noindex} jsonLd={jsonLd}>
-  <HeroBanner data={data.hero} />
-  <PcbMfgCapabilitySection data={data.capability} />
-  <PcbMfgTechTableSection data={data.tech_table} />
-  <QualityControlSection data={data.quality} />
-  <IndustrySection data={data.industry} />
-  <WhyChooseUsSection data={data.why_choose_us} />
-  <ProductGallerySection data={data.product_gallery} />
-  <FaqSection data={data.faq} />
-  <QuoteFormSection data={data.quote_form} />
-</EmsLayout>
+<PcbManufacturingRenderer bundle={bundle} pathname={slug} />

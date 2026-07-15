@@ -1,64 +1,13 @@
 ---
 export const prerender = false;
 
-import EmsLayout from '../layouts/EmsLayout.astro';
-import HeroBanner from '../components/common/HeroBanner.astro';
-import IndustrySection from '../components/common/IndustrySection.astro';
-import PcbaCapabilitySection from '../components/pcb-assembly/PcbaCapabilitySection.astro';
-import WhyChooseUsSection from '../components/common/WhyChooseUsSection.astro';
-import PcbProcessSection from '../components/common/PcbProcessSection.astro';
-import PcbaQualityControlSection from '../components/pcb-assembly/PcbaQualityControlSection.astro';
-import ReviewsSection from '../components/common/ReviewsSection.astro';
-import FaqSection from '../components/common/FaqSection.astro';
-import QuoteFormSection from '../components/common/QuoteFormSection.astro';
-import { pcbAssemblyDefaults } from '../content/defaults/pcb-assembly';
-import { normalizePcbAssemblyContentJson } from '../content/normalize/pcb-assembly';
+import PcbAssemblyRenderer from '../components/page-renderers/PcbAssemblyRenderer.astro';
 import { createSupabaseClient } from '../lib/supabase/client';
-import { mergeSectionFallback } from '../lib/supabase/mappers';
-import { EMS_PREVIEW_COOKIE_NAME, isPreviewRequest } from '../lib/supabase/preview';
 import { getPublishedPageBundleBySlug } from '../lib/supabase/queries';
-import { buildServicePageJsonLd } from '../utils/schemaOrg';
 
 const slug = Astro.url.pathname;
-
-const isPreview = isPreviewRequest(Astro.url);
-const previewAccessToken = isPreview ? Astro.cookies.get(EMS_PREVIEW_COOKIE_NAME)?.value?.trim() : '';
-const supabase = createSupabaseClient(previewAccessToken || undefined);
-const bundle = supabase
-  ? await getPublishedPageBundleBySlug(supabase, slug, { includeDraft: Boolean(previewAccessToken) })
-  : null;
-
-const contentJson = bundle?.content?.content_json ?? null;
-const data = normalizePcbAssemblyContentJson(mergeSectionFallback(pcbAssemblyDefaults as any, contentJson) as any) as any;
-
-const title = bundle?.seo?.meta_title ?? 'PCB Assembly | RapidDirect';
-const description = bundle?.seo?.meta_description ?? 'PCB assembly service page under /ems/pcb-assembly/.';
-const canonicalUrl = bundle?.seo?.canonical_url ?? null;
-const noindex = Boolean(bundle?.seo?.noindex);
-const jsonLd = buildServicePageJsonLd({
-  pathname: Astro.url.pathname,
-  title,
-  description,
-  canonicalUrl,
-  faqItems: data?.faq?.items ?? [],
-  service: bundle?.seo?.service_schema ?? null,
-  includeBreadcrumbList: true,
-  breadcrumbs: [
-    { name: 'Home', path: '/' },
-    { name: 'EMS', path: '/ems/' },
-    { name: 'PCB Assembly Service', path: Astro.url.pathname }
-  ]
-});
+const supabase = createSupabaseClient();
+const bundle = supabase ? await getPublishedPageBundleBySlug(supabase, slug) : null;
 ---
 
-<EmsLayout title={title} description={description} canonicalUrl={canonicalUrl ?? undefined} noindex={noindex} jsonLd={jsonLd}>
-  <HeroBanner data={data.hero} />
-  <PcbaCapabilitySection data={data.capability} />
-  <PcbaQualityControlSection data={data.quality} />
-  <PcbProcessSection data={data.process} />
-  <WhyChooseUsSection data={data.why_choose_us} />
-  <IndustrySection data={data.industry} />
-  <ReviewsSection data={data.reviews} />
-  <FaqSection data={data.faq} />
-  <QuoteFormSection data={data.quote_form} />
-</EmsLayout>
+<PcbAssemblyRenderer bundle={bundle} pathname={slug} />

@@ -1,0 +1,57 @@
+---
+import type { PageBundle } from '../../lib/supabase/queries';
+import EmsLayout from '../../layouts/EmsLayout.astro';
+import HeroBanner from '../common/HeroBanner.astro';
+import ServicesSection from '../common/ServicesSection.astro';
+import QualityControlSection from '../ems/QualityControlSection.astro';
+import CertificationSection from '../ems/CertificationSection.astro';
+import IndustrySection from '../common/IndustrySection.astro';
+import EquipmentSection from '../common/EquipmentSection.astro';
+import WhyChooseUsSection from '../ems/WhyChooseUsSection.astro';
+import FaqSection from '../common/FaqSection.astro';
+import QuoteFormSection from '../common/QuoteFormSection.astro';
+import { emsHomeDefaults } from '../../content/defaults/ems';
+import { normalizeEmsHomeContentJson } from '../../content/normalize/ems';
+import { mergeSectionFallback } from '../../lib/supabase/mappers';
+import { buildEmsHomeJsonLd, getPublicPageUrl } from '../../utils/schemaOrg';
+
+interface Props {
+  bundle: PageBundle | null;
+  pathname: string;
+}
+
+const { bundle, pathname } = Astro.props;
+const contentJson = bundle?.content?.content_json ?? null;
+const data = normalizeEmsHomeContentJson(mergeSectionFallback(emsHomeDefaults as any, contentJson) as any) as any;
+
+const title = bundle?.seo?.meta_title ?? 'EMS Home | RapidDirect';
+const description = bundle?.seo?.meta_description ?? 'RapidDirect EMS landing page under /ems/.';
+const canonicalUrl = bundle?.seo?.canonical_url ?? null;
+const noindex = Boolean(bundle?.seo?.noindex);
+const servicesForSchema = (data?.services?.items ?? [])
+  .map((item: any) => ({
+    name: item?.name ?? '',
+    url: item?.cta?.href ? getPublicPageUrl(item.cta.href) : ''
+  }))
+  .filter((item: any) => item.name && item.url);
+const jsonLd = buildEmsHomeJsonLd({
+  pathname,
+  title,
+  description,
+  canonicalUrl,
+  services: servicesForSchema,
+  includeBreadcrumbList: true
+});
+---
+
+<EmsLayout title={title} description={description} canonicalUrl={canonicalUrl ?? undefined} noindex={noindex} jsonLd={jsonLd}>
+  <HeroBanner data={data.hero} />
+  <ServicesSection data={data.services} />
+  <QualityControlSection data={data.quality} />
+  <CertificationSection data={data.certification} />
+  <IndustrySection data={data.industry} />
+  <EquipmentSection data={data.equipment} />
+  <WhyChooseUsSection data={data.why_choose_us} />
+  <FaqSection data={data.faq} />
+  <QuoteFormSection data={data.quote_form} />
+</EmsLayout>

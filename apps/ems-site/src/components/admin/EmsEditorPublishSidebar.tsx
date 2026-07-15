@@ -11,6 +11,8 @@ export interface EmsEditorPublishSidebarProps {
   onPublish: () => void;
   onQuickSave: () => void;
   onPreview: () => void;
+  previewEnabled: boolean;
+  previewHelpText?: string;
 }
 
 export default function EmsEditorPublishSidebar({
@@ -23,7 +25,9 @@ export default function EmsEditorPublishSidebar({
   onSaveDraft,
   onPublish,
   onQuickSave,
-  onPreview
+  onPreview,
+  previewEnabled,
+  previewHelpText
 }: EmsEditorPublishSidebarProps) {
   return (
     <div className="rounded-md border border-[#dcdcde] bg-white">
@@ -31,7 +35,8 @@ export default function EmsEditorPublishSidebar({
         <div className="text-sm font-semibold">Publish</div>
         <button
           type="button"
-          className="rounded-md border border-[#2271b1] bg-white px-2 py-1 text-xs font-medium text-[#2271b1] hover:bg-[#f6f7f7]"
+          className="rounded-md border border-[#2271b1] bg-white px-2 py-1 text-xs font-medium text-[#2271b1] hover:bg-[#f6f7f7] disabled:cursor-not-allowed disabled:opacity-50"
+          disabled={!previewEnabled}
           onClick={onPreview}
         >
           Preview
@@ -90,6 +95,9 @@ export default function EmsEditorPublishSidebar({
         </div>
 
       </div>
+      {!previewEnabled && previewHelpText ? (
+        <div className="border-t border-[#dcdcde] px-4 py-3 text-xs text-[#646970]">{previewHelpText}</div>
+      ) : null}
     </div>
   );
 }

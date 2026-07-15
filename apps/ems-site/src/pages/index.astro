@@ -1,66 +1,13 @@
 ---
 export const prerender = false;
 
-import EmsLayout from '../layouts/EmsLayout.astro';
-import HeroBanner from '../components/common/HeroBanner.astro';
-import ServicesSection from '../components/common/ServicesSection.astro';
-import QualityControlSection from '../components/ems/QualityControlSection.astro';
-import CertificationSection from '../components/ems/CertificationSection.astro';
-import IndustrySection from '../components/common/IndustrySection.astro';
-import EquipmentSection from '../components/common/EquipmentSection.astro';
-import WhyChooseUsSection from '../components/ems/WhyChooseUsSection.astro';
-// import OrderProcessSection from '../components/ems/OrderProcessSection.astro';
-import FaqSection from '../components/common/FaqSection.astro';
-import QuoteFormSection from '../components/common/QuoteFormSection.astro';
-import { emsHomeDefaults } from '../content/defaults/ems';
-import { normalizeEmsHomeContentJson } from '../content/normalize/ems';
+import EmsHomeRenderer from '../components/page-renderers/EmsHomeRenderer.astro';
 import { createSupabaseClient } from '../lib/supabase/client';
-import { mergeSectionFallback } from '../lib/supabase/mappers';
-import { EMS_PREVIEW_COOKIE_NAME, isPreviewRequest } from '../lib/supabase/preview';
 import { getPublishedPageBundleBySlug } from '../lib/supabase/queries';
-import { buildEmsHomeJsonLd, getPublicPageUrl } from '../utils/schemaOrg';
 
 const slug = Astro.url.pathname;
-
-const isPreview = isPreviewRequest(Astro.url);
-const previewAccessToken = isPreview ? Astro.cookies.get(EMS_PREVIEW_COOKIE_NAME)?.value?.trim() : '';
-const supabase = createSupabaseClient(previewAccessToken || undefined);
-const bundle = supabase
-  ? await getPublishedPageBundleBySlug(supabase, slug, { includeDraft: Boolean(previewAccessToken) })
-  : null;
-
-const contentJson = bundle?.content?.content_json ?? null;
-const data = normalizeEmsHomeContentJson(mergeSectionFallback(emsHomeDefaults as any, contentJson) as any) as any;
-
-const title = bundle?.seo?.meta_title ?? 'EMS Home | RapidDirect';
-const description = bundle?.seo?.meta_description ?? 'RapidDirect EMS landing page under /ems/.';
-const canonicalUrl = bundle?.seo?.canonical_url ?? null;
-const noindex = Boolean(bundle?.seo?.noindex);
-const servicesForSchema = (data?.services?.items ?? [])
-  .map((item: any) => ({
-    name: item?.name ?? '',
-    url: item?.cta?.href ? getPublicPageUrl(item.cta.href) : ''
-  }))
-  .filter((item: any) => item.name && item.url);
-const jsonLd = buildEmsHomeJsonLd({
-  pathname: Astro.url.pathname,
-  title,
-  description,
-  canonicalUrl,
-  services: servicesForSchema,
-  includeBreadcrumbList: true
-});
+const supabase = createSupabaseClient();
+const bundle = supabase ? await getPublishedPageBundleBySlug(supabase, slug) : null;
 ---
 
-<EmsLayout title={title} description={description} canonicalUrl={canonicalUrl ?? undefined} noindex={noindex} jsonLd={jsonLd}>
-  <HeroBanner data={data.hero} />
-  <ServicesSection data={data.services} />
-  <QualityControlSection data={data.quality} />
-  <CertificationSection data={data.certification} />
-  <IndustrySection data={data.industry} />
-  <EquipmentSection data={data.equipment} />
-  <WhyChooseUsSection data={data.why_choose_us} />
-  {/* <OrderProcessSection data={data.order_process} /> */}
-  <FaqSection data={data.faq} />
-  <QuoteFormSection data={data.quote_form} />
-</EmsLayout>
+<EmsHomeRenderer bundle={bundle!} pathname={slug} />

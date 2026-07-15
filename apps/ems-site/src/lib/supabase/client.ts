@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { env } from '../env';
 
-export const createSupabaseClient = (accessToken?: string) => {
+export const createSupabaseClient = () => {
   if (!env.supabaseUrl || !env.supabaseAnonKey) {
     return null;
   }
@@ -11,13 +11,6 @@ export const createSupabaseClient = (accessToken?: string) => {
       persistSession: false,
       autoRefreshToken: false,
       detectSessionInUrl: false
-    },
-    global: accessToken
-      ? {
-          headers: {
-            Authorization: `Bearer ${accessToken}`
-          }
-        }
-      : undefined
+    }
   });
 };

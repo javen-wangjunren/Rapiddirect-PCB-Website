@@ -1,0 +1,61 @@
+---
+import type { PageBundle } from '../../lib/supabase/queries';
+import EmsLayout from '../../layouts/EmsLayout.astro';
+import HeroBanner from '../common/HeroBanner.astro';
+import SourceCapabilitySection from '../components-sourcing/SourceCapabilitySection.astro';
+import SourceProcessSection from '../components-sourcing/SourceProcessSection.astro';
+import SourceQualityControlSection from '../components-sourcing/SourceQualityControlSection.astro';
+import SourceSolutionsSection from '../components-sourcing/SourceSolutionsSection.astro';
+import IndustrySection from '../common/IndustrySection.astro';
+import WhyChooseUsSection from '../common/WhyChooseUsSection.astro';
+import FaqSection from '../common/FaqSection.astro';
+import QuoteFormSection from '../common/QuoteFormSection.astro';
+import { componentsSourcingDefaults } from '../../content/defaults/components-sourcing';
+import { normalizeComponentsSourcingContentJson } from '../../content/normalize/components-sourcing';
+import { mergeSectionFallback } from '../../lib/supabase/mappers';
+import { buildServicePageJsonLd } from '../../utils/schemaOrg';
+
+interface Props {
+  bundle: PageBundle | null;
+  pathname: string;
+}
+
+const { bundle, pathname } = Astro.props;
+const contentJson = bundle?.content?.content_json ?? null;
+const data = normalizeComponentsSourcingContentJson(
+  mergeSectionFallback(componentsSourcingDefaults as any, contentJson) as any
+) as any;
+
+const title = bundle?.seo?.meta_title ?? 'Electronic Component Sourcing | RapidDirect';
+const description =
+  bundle?.seo?.meta_description ??
+  'Reliable component sourcing with BOM validation, alternates management, and traceability support for prototyping and production.';
+const canonicalUrl = bundle?.seo?.canonical_url ?? null;
+const noindex = Boolean(bundle?.seo?.noindex);
+const jsonLd = buildServicePageJsonLd({
+  pathname,
+  title,
+  description,
+  canonicalUrl,
+  faqItems: data?.faq?.items ?? [],
+  service: bundle?.seo?.service_schema ?? null,
+  includeBreadcrumbList: true,
+  breadcrumbs: [
+    { name: 'Home', path: '/' },
+    { name: 'EMS', path: '/ems/' },
+    { name: 'Component Sourcing', path: pathname }
+  ]
+});
+---
+
+<EmsLayout title={title} description={description} canonicalUrl={canonicalUrl ?? undefined} noindex={noindex} jsonLd={jsonLd}>
+  <HeroBanner data={data.hero} />
+  <SourceCapabilitySection data={data.source_capability} />
+  <SourceProcessSection data={data.source_process} />
+  <SourceQualityControlSection data={data.source_quality_control} />
+  <SourceSolutionsSection data={data.source_solutions} />
+  <IndustrySection data={data.industry} />
+  <WhyChooseUsSection data={data.why_choose_us} />
+  <FaqSection data={data.faq} />
+  <QuoteFormSection data={data.quote_form} />
+</EmsLayout>

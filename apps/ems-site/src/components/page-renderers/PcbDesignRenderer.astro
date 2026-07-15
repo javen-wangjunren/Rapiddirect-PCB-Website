@@ -1,0 +1,61 @@
+---
+import type { PageBundle } from '../../lib/supabase/queries';
+import EmsLayout from '../../layouts/EmsLayout.astro';
+import HeroBanner from '../common/HeroBanner.astro';
+import ServicesSection from '../common/ServicesSection.astro';
+import PcbDesignCapabilitySection from '../pcb-design/PcbDesignCapabilitySection.astro';
+import PcbDesignWorkflowSection from '../pcb-design/PcbDesignWorkflowSection.astro';
+import PcbDesignSimulationSection from '../pcb-design/PcbDesignSimulationSection.astro';
+import PcbDesignProcessSection from '../pcb-design/PcbDesignProcessSection.astro';
+import PcbDesignDeliverablesSection from '../pcb-design/PcbDesignDeliverablesSection.astro';
+import IndustrySection from '../common/IndustrySection.astro';
+import WhyChooseUsSection from '../common/WhyChooseUsSection.astro';
+import FaqSection from '../common/FaqSection.astro';
+import PcbDesignCtaSection from '../pcb-design/PcbDesignCtaSection.astro';
+import { pcbDesignDefaults } from '../../content/defaults/pcb-design';
+import { normalizePcbDesignContentJson } from '../../content/normalize/pcb-design';
+import { mergeSectionFallback } from '../../lib/supabase/mappers';
+import { buildServicePageJsonLd } from '../../utils/schemaOrg';
+
+interface Props {
+  bundle: PageBundle | null;
+  pathname: string;
+}
+
+const { bundle, pathname } = Astro.props;
+const contentJson = bundle?.content?.content_json ?? null;
+const data = normalizePcbDesignContentJson(mergeSectionFallback(pcbDesignDefaults as any, contentJson) as any) as any;
+
+const title = bundle?.seo?.meta_title ?? 'PCB Design Services | RapidDirect';
+const description = bundle?.seo?.meta_description ?? 'Professional PCB design and layout services. From schematic capture to DFM verification.';
+const canonicalUrl = bundle?.seo?.canonical_url ?? null;
+const noindex = Boolean(bundle?.seo?.noindex);
+const jsonLd = buildServicePageJsonLd({
+  pathname,
+  title,
+  description,
+  canonicalUrl,
+  faqItems: data?.faq?.items ?? [],
+  service: bundle?.seo?.service_schema ?? null,
+  includeBreadcrumbList: true,
+  breadcrumbs: [
+    { name: 'Home', path: '/' },
+    { name: 'EMS', path: '/ems/' },
+    { name: 'PCB Design Service', path: pathname }
+  ]
+});
+---
+
+<EmsLayout title={title} description={description} canonicalUrl={canonicalUrl ?? undefined} noindex={noindex} jsonLd={jsonLd}>
+  <HeroBanner data={data.hero} />
+  <ServicesSection data={data.services} />
+  <PcbDesignCapabilitySection data={data.capability} />
+  <PcbDesignWorkflowSection data={data.workflow} />
+  <PcbDesignSimulationSection data={data.simulation} />
+  <PcbDesignProcessSection data={data.process} />
+  <PcbDesignDeliverablesSection data={data.deliverables} />
+  {data.industry && <IndustrySection data={data.industry} />}
+  {data.why_choose_us && <WhyChooseUsSection data={data.why_choose_us} />}
+  {data.faq && <FaqSection data={data.faq} />}
+  <PcbDesignCtaSection data={data.cta} />
+</EmsLayout>

@@ -5,7 +5,7 @@ import { emsHomeSchema } from '../../content/schemas/ems';
 import { normalizeEmsHomeContentJson } from '../../content/normalize/ems';
 import { getAssetPath } from '../../lib/assets';
 import { createAdminSupabaseClient } from '../../lib/supabase/adminClient';
-import { EMS_PREVIEW_QUERY_PARAM } from '../../lib/supabase/preview';
+import { buildPreviewHref, isPreviewableTemplateType } from '../../lib/supabase/preview';
 import { getPageBundleBySlugForAdmin, saveAdminBundle } from '../../lib/supabase/adminQueries';
 import type { TemplateType } from '../../types/page';
 import type { JsonValue } from '../../utils/jsonTree';
@@ -106,7 +106,8 @@ export default function EmsPageEditor() {
   }, [supabase]);
 
   const canPublish = title.trim().length > 0 && normalizeSlug(slug).length > 0;
-  const previewHref = normalizeSlug(slug) || '/ems/';
+  const previewEnabled = isPreviewableTemplateType(templateType);
+  const previewHelpText = previewEnabled ? '' : '当前模板暂不支持独立整页预览';
 
   const onTitleChange = (value: string) => {
     setTitle(value);
@@ -183,6 +184,14 @@ export default function EmsPageEditor() {
       setToast({ kind: 'error', message: '预览不可用：Supabase 未初始化' });
       return;
     }
+    if (!previewEnabled) {
+      setToast({ kind: 'error', message: previewHelpText });
+      return;
+    }
+    if (!pageId) {
+      setToast({ kind: 'error', message: '预览失败：页面尚未初始化' });
+      return;
+    }
 
     const previewWindow = window.open('', '_blank');
     if (!previewWindow || previewWindow.closed) {
@@ -206,23 +215,22 @@ export default function EmsPageEditor() {
         return;
       }
 
-      const res = await fetch(getAssetPath('/api/admin/preview-session/'), {
+      const res = await fetch(getAssetPath('/api/admin/preview-access/'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         credentials: 'same-origin',
-        body: JSON.stringify({ accessToken })
+        body: JSON.stringify({ pageId, accessToken })
       });
 
       if (!res.ok) {
         previewWindow.close();
-        setToast({ kind: 'error', message: '预览失败：无法建立预览会话' });
+        setToast({ kind: 'error', message: '预览失败：无法建立预览授权' });
         return;
       }
 
-      const targetUrl = new URL(previewHref, window.location.origin);
-      targetUrl.searchParams.set(EMS_PREVIEW_QUERY_PARAM, '1');
+      const targetUrl = new URL(buildPreviewHref(pageId), window.location.origin);
       previewWindow.location.href = targetUrl.toString();
     } catch {
       previewWindow.close();
@@ -282,6 +290,8 @@ export default function EmsPageEditor() {
             onPublish={() => void doSave('published')}
             onQuickSave={() => void doSave()}
             onPreview={() => void onPreview()}
+            previewEnabled={previewEnabled}
+            previewHelpText={previewHelpText}
           />
 
           {toast ? (

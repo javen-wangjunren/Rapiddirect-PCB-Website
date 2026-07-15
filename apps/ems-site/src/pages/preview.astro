@@ -1,0 +1,67 @@
+---
+export const prerender = false;
+
+import ComponentsSourcingRenderer from '../components/page-renderers/ComponentsSourcingRenderer.astro';
+import EmsHomeRenderer from '../components/page-renderers/EmsHomeRenderer.astro';
+import PcbApplicationsRenderer from '../components/page-renderers/PcbApplicationsRenderer.astro';
+import PcbAssemblyRenderer from '../components/page-renderers/PcbAssemblyRenderer.astro';
+import PcbBoardManufacturingRenderer from '../components/page-renderers/PcbBoardManufacturingRenderer.astro';
+import PcbDesignRenderer from '../components/page-renderers/PcbDesignRenderer.astro';
+import PcbManufacturingRenderer from '../components/page-renderers/PcbManufacturingRenderer.astro';
+import { verifyPreviewGrantToken } from '../lib/preview-auth';
+import EmsLayout from '../layouts/EmsLayout.astro';
+import { getPageBundleByIdForAdmin } from '../lib/supabase/adminQueries';
+import {
+  EMS_PREVIEW_COOKIE_NAME,
+  getPreviewPageId,
+  isPreviewRequest,
+  isPreviewableTemplateType
+} from '../lib/supabase/preview';
+import { createServerAdminSupabaseClient } from '../lib/supabase/serverAdmin';
+
+const isPreview = isPreviewRequest(Astro.url);
+const pageId = getPreviewPageId(Astro.url);
+const previewGrant = verifyPreviewGrantToken(Astro.cookies.get(EMS_PREVIEW_COOKIE_NAME)?.value);
+const supabase = createServerAdminSupabaseClient();
+const bundle =
+  isPreview && pageId && previewGrant?.pageId === pageId && supabase
+    ? await getPageBundleByIdForAdmin(supabase, pageId)
+    : null;
+
+const templateType = bundle?.page?.template_type ?? null;
+const pathname = bundle?.page?.slug ?? '/';
+const isFound = Boolean(bundle?.page) && isPreviewableTemplateType(templateType);
+
+if (!isFound) {
+  Astro.response.status = 403;
+}
+---
+
+{
+  isFound ? (
+    templateType === 'ems_home' ? (
+      <EmsHomeRenderer bundle={bundle!} pathname={pathname} />
+    ) : templateType === 'components_sourcing' ? (
+      <ComponentsSourcingRenderer bundle={bundle!} pathname={pathname} />
+    ) : templateType === 'pcb_assembly' ? (
+      <PcbAssemblyRenderer bundle={bundle!} pathname={pathname} />
+    ) : templateType === 'pcb_design' ? (
+      <PcbDesignRenderer bundle={bundle!} pathname={pathname} />
+    ) : templateType === 'pcb_manufacturing' ? (
+      <PcbManufacturingRenderer bundle={bundle!} pathname={pathname} />
+    ) : templateType === 'pcb_board_manufacturing' ? (
+      <PcbBoardManufacturingRenderer bundle={bundle!} pathname={pathname} />
+    ) : (
+      <PcbApplicationsRenderer bundle={bundle!} pathname={pathname} />
+    )
+  ) : (
+    <EmsLayout title="Preview Access Denied | RapidDirect" description="This preview link is invalid, expired, or not authorized." noindex={true}>
+      <section class="mx-auto max-w-4xl px-6 py-24 text-center">
+        <h1 class="text-3xl font-semibold tracking-tight text-slate-900">Preview Access Denied</h1>
+        <p class="mt-4 text-base text-slate-600">
+          This preview link is invalid, expired, or not authorized.
+        </p>
+      </section>
+    </EmsLayout>
+  )
+}

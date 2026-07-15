@@ -113,6 +113,39 @@ export const getPageBundleBySlugForAdmin = async (
   };
 };
 
+export const getPageBundleByIdForAdmin = async (
+  supabase: SupabaseClient,
+  pageId: string
+): Promise<AdminPageBundle | null> => {
+  const trimmed = pageId.trim();
+  if (!trimmed) return null;
+
+  const pageRes = await supabase
+    .from('pages')
+    .select('id,slug,title,template_type,status')
+    .eq('id', trimmed)
+    .maybeSingle();
+
+  if (pageRes.error || !pageRes.data) return null;
+
+  const page = pageRes.data as PageRecord & { id: string };
+
+  const [contentRes, seoRes] = await Promise.all([
+    supabase.from('page_content').select('content_json').eq('page_id', page.id).maybeSingle(),
+    supabase
+      .from('seo_meta')
+      .select('meta_title,meta_description,canonical_url,og_title,og_description,og_image,noindex,service_schema')
+      .eq('page_id', page.id)
+      .maybeSingle()
+  ]);
+
+  return {
+    page,
+    content: contentRes.error ? null : (contentRes.data as PageContentRecord | null),
+    seo: seoRes.error ? null : (seoRes.data as (SeoMeta & { noindex?: boolean }) | null)
+  };
+};
+
 export interface SaveAdminBundleInput {
   pageId: string;
   page: Pick<PageRecord, 'title' | 'slug' | 'template_type' | 'status'>;

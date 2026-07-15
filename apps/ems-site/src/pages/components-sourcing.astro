@@ -1,68 +1,13 @@
 ---
 export const prerender = false;
 
-import EmsLayout from '../layouts/EmsLayout.astro';
-import HeroBanner from '../components/common/HeroBanner.astro';
-import SourceCapabilitySection from '../components/components-sourcing/SourceCapabilitySection.astro';
-import SourceProcessSection from '../components/components-sourcing/SourceProcessSection.astro';
-import SourceQualityControlSection from '../components/components-sourcing/SourceQualityControlSection.astro';
-import SourceSolutionsSection from '../components/components-sourcing/SourceSolutionsSection.astro';
-import IndustrySection from '../components/common/IndustrySection.astro';
-import WhyChooseUsSection from '../components/common/WhyChooseUsSection.astro';
-import FaqSection from '../components/common/FaqSection.astro';
-import QuoteFormSection from '../components/common/QuoteFormSection.astro';
-import { componentsSourcingDefaults } from '../content/defaults/components-sourcing';
-import { normalizeComponentsSourcingContentJson } from '../content/normalize/components-sourcing';
+import ComponentsSourcingRenderer from '../components/page-renderers/ComponentsSourcingRenderer.astro';
 import { createSupabaseClient } from '../lib/supabase/client';
-import { mergeSectionFallback } from '../lib/supabase/mappers';
-import { EMS_PREVIEW_COOKIE_NAME, isPreviewRequest } from '../lib/supabase/preview';
 import { getPublishedPageBundleBySlug } from '../lib/supabase/queries';
-import { buildServicePageJsonLd } from '../utils/schemaOrg';
 
 const slug = Astro.url.pathname;
-
-const isPreview = isPreviewRequest(Astro.url);
-const previewAccessToken = isPreview ? Astro.cookies.get(EMS_PREVIEW_COOKIE_NAME)?.value?.trim() : '';
-const supabase = createSupabaseClient(previewAccessToken || undefined);
-const bundle = supabase
-  ? await getPublishedPageBundleBySlug(supabase, slug, { includeDraft: Boolean(previewAccessToken) })
-  : null;
-
-const contentJson = bundle?.content?.content_json ?? null;
-const data = normalizeComponentsSourcingContentJson(
-  mergeSectionFallback(componentsSourcingDefaults as any, contentJson) as any
-) as any;
-
-const title = bundle?.seo?.meta_title ?? 'Electronic Component Sourcing | RapidDirect';
-const description =
-  bundle?.seo?.meta_description ??
-  'Reliable component sourcing with BOM validation, alternates management, and traceability support for prototyping and production.';
-const canonicalUrl = bundle?.seo?.canonical_url ?? null;
-const noindex = Boolean(bundle?.seo?.noindex);
-const jsonLd = buildServicePageJsonLd({
-  pathname: Astro.url.pathname,
-  title,
-  description,
-  canonicalUrl,
-  faqItems: data?.faq?.items ?? [],
-  service: bundle?.seo?.service_schema ?? null,
-  includeBreadcrumbList: true,
-  breadcrumbs: [
-    { name: 'Home', path: '/' },
-    { name: 'EMS', path: '/ems/' },
-    { name: 'Component Sourcing', path: Astro.url.pathname }
-  ]
-});
+const supabase = createSupabaseClient();
+const bundle = supabase ? await getPublishedPageBundleBySlug(supabase, slug) : null;
 ---
 
-<EmsLayout title={title} description={description} canonicalUrl={canonicalUrl ?? undefined} noindex={noindex} jsonLd={jsonLd}>
-  <HeroBanner data={data.hero} />
-  <SourceCapabilitySection data={data.source_capability} />
-  <SourceProcessSection data={data.source_process} />
-  <SourceQualityControlSection data={data.source_quality_control} />
-  <SourceSolutionsSection data={data.source_solutions} />
-  <IndustrySection data={data.industry} />
-  <WhyChooseUsSection data={data.why_choose_us} />
-  <FaqSection data={data.faq} />
-  <QuoteFormSection data={data.quote_form} />
-</EmsLayout>
+<ComponentsSourcingRenderer bundle={bundle} pathname={slug} />

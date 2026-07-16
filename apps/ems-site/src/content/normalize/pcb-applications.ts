@@ -137,13 +137,44 @@ export function normalizePcbApplicationsContentJson(data: any) {
       },
       definition: {
         ...data.description?.definition,
-        lead_desc: typeof data.description?.definition?.lead_desc === 'string' ? data.description.definition.lead_desc : '',
-        benefits: (Array.isArray(data.description?.definition?.benefits) ? data.description.definition.benefits : []).map(
-          (item: any) => ({
-            title: typeof item?.title === 'string' ? item.title : '',
-            description: typeof item?.description === 'string' ? item.description : '',
-          })
-        ),
+        lead_desc:
+          typeof data.description?.definition?.lead_desc === 'string'
+            ? data.description.definition.lead_desc
+            : typeof data.description?.definition?.text === 'string'
+              ? data.description.definition.text
+              : '',
+        benefits: (
+          Array.isArray(data.description?.definition?.benefits)
+            ? data.description.definition.benefits
+            : Array.isArray(data.description?.definition?.highlights)
+              ? data.description.definition.highlights
+              : []
+        ).map((item: any) => ({
+          title:
+            typeof item?.title === 'string'
+              ? item.title
+              : typeof item?.strong === 'string'
+                ? item.strong
+                : '',
+          description:
+            typeof item?.description === 'string'
+              ? item.description
+              : typeof item?.detail === 'string'
+                ? item.detail
+                : '',
+        })),
+        image_url:
+          typeof data.description?.definition?.image_url === 'string'
+            ? data.description.definition.image_url
+            : typeof data.description?.definition?.image?.url === 'string'
+              ? data.description.definition.image.url
+              : '',
+        image_alt:
+          typeof data.description?.definition?.image_alt === 'string'
+            ? data.description.definition.image_alt
+            : typeof data.description?.definition?.image?.alt === 'string'
+              ? data.description.definition.image.alt
+              : '',
       },
       standards: {
         ...data.description?.standards,
@@ -157,14 +188,28 @@ export function normalizePcbApplicationsContentJson(data: any) {
         ),
       },
       categories: {
-        ...data.description?.categories,
-        title: typeof data.description?.categories?.title === 'string' ? data.description.categories.title : '',
-        items: (Array.isArray(data.description?.categories?.items) ? data.description.categories.items : []).map(
-          (item: any) => ({
-            title: typeof item?.title === 'string' ? item.title : '',
-            image_url: typeof item?.image_url === 'string' ? item.image_url : '',
-          })
-        ),
+        ...(data.description?.categories ?? data.description?.gallery),
+        title:
+          typeof data.description?.categories?.title === 'string'
+            ? data.description.categories.title
+            : typeof data.description?.gallery?.title === 'string'
+              ? data.description.gallery.title
+              : '',
+        items: (
+          Array.isArray(data.description?.categories?.items)
+            ? data.description.categories.items
+            : Array.isArray(data.description?.gallery?.items)
+              ? data.description.gallery.items
+              : []
+        ).map((item: any) => ({
+          title: typeof item?.title === 'string' ? item.title : '',
+          image_url:
+            typeof item?.image_url === 'string'
+              ? item.image_url
+              : typeof item?.image?.url === 'string'
+                ? item.image.url
+                : '',
+        })),
       },
     },
   };

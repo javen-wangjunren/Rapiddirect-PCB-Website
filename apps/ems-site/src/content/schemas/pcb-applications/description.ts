@@ -3,40 +3,35 @@ export const pcbApplicationsDescriptionSchema = {
     title: 'string'
   },
   definition: {
-    text: 'string',
-    highlights: {
+    lead_desc: 'string',
+    benefits: {
       type: 'array',
       items: {
-        strong: 'string',
-        detail: 'string'
+        title: 'string',
+        description: 'string'
       }
     },
-    image: {
-      url: 'string',
-      alt: 'string'
-    }
+    image_url: 'string',
+    image_alt: 'string'
   },
   standards: {
     title: 'string',
     items: {
       type: 'array',
       items: {
-        icon_key: 'string',
+        icon_svg: 'string',
         title: 'string',
         description: 'string'
       }
     }
   },
-  gallery: {
+  categories: {
     title: 'string',
     items: {
       type: 'array',
       items: {
         title: 'string',
-        image: {
-          url: 'string',
-          alt: 'string'
-        }
+        image_url: 'string'
       }
     }
   }

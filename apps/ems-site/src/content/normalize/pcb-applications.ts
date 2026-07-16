@@ -188,27 +188,11 @@ export function normalizePcbApplicationsContentJson(data: any) {
         ),
       },
       categories: {
-        ...(data.description?.categories ?? data.description?.gallery),
-        title:
-          typeof data.description?.categories?.title === 'string'
-            ? data.description.categories.title
-            : typeof data.description?.gallery?.title === 'string'
-              ? data.description.gallery.title
-              : '',
-        items: (
-          Array.isArray(data.description?.categories?.items)
-            ? data.description.categories.items
-            : Array.isArray(data.description?.gallery?.items)
-              ? data.description.gallery.items
-              : []
-        ).map((item: any) => ({
+        ...data.description?.categories,
+        title: typeof data.description?.categories?.title === 'string' ? data.description.categories.title : '',
+        items: (Array.isArray(data.description?.categories?.items) ? data.description.categories.items : []).map((item: any) => ({
           title: typeof item?.title === 'string' ? item.title : '',
-          image_url:
-            typeof item?.image_url === 'string'
-              ? item.image_url
-              : typeof item?.image?.url === 'string'
-                ? item.image.url
-                : '',
+          image_url: typeof item?.image_url === 'string' ? item.image_url : '',
         })),
       },
     },

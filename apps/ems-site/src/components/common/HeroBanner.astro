@@ -1,5 +1,5 @@
 ---
-import { getAssetPath, getSupabaseImageUrl } from '../../lib/assets';
+import { getAssetPath } from '../../lib/assets';
 
 export interface Props {
   data: {
@@ -14,21 +14,13 @@ export interface Props {
 const { data } = Astro.props;
 
 const backgroundImageUrl = data.background_image_url ? getAssetPath(data.background_image_url) : undefined;
-const backgroundImageSrc = data.background_image_url ?? '';
-
-const heroSrc600 = backgroundImageSrc ? getSupabaseImageUrl(backgroundImageSrc, { width: 600, quality: 75 }) : '';
-const heroSrc900 = backgroundImageSrc ? getSupabaseImageUrl(backgroundImageSrc, { width: 900, quality: 75 }) : '';
-const heroSrc1200 = backgroundImageSrc ? getSupabaseImageUrl(backgroundImageSrc, { width: 1200, quality: 75 }) : '';
-const heroSrc1600 = backgroundImageSrc ? getSupabaseImageUrl(backgroundImageSrc, { width: 1600, quality: 80 }) : '';
 ---
 
 <section class="relative overflow-hidden min-h-[440px] sm:min-h-[520px] lg:h-[clamp(680px,55vw,820px)] lg:min-h-0">
   <div class="absolute inset-0 bg-slate-100" />
   {backgroundImageUrl && (
     <img
-      src={heroSrc900}
-      srcset={`${heroSrc600} 600w, ${heroSrc900} 900w, ${heroSrc1200} 1200w, ${heroSrc1600} 1600w`}
-      sizes="100vw"
+      src={backgroundImageUrl}
       alt=""
       class="absolute inset-0 h-full w-full object-cover object-[72%_center]"
       loading="eager"

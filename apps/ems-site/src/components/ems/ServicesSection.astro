@@ -8,6 +8,9 @@ export interface Props {
 
 const { data } = Astro.props;
 const items = Array.isArray((data as any)?.items) ? ((data as any).items as any[]) : [];
+
+const buildImageUrl = (src: string, width: number, quality: number) =>
+  getSupabaseImageUrl(src, { width, height: Math.round(width / 2), quality, resize: 'cover' });
 ---
 
 <section class="bg-slate-950 py-16 sm:py-20">
@@ -26,8 +29,8 @@ const items = Array.isArray((data as any)?.items) ? ((data as any).items as any[
         <article class="flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-[0_18px_50px_-30px_rgba(0,0,0,0.7)] ring-1 ring-black/5">
           {item.image_url ? (
             <img
-              src={getSupabaseImageUrl(item.image_url, { width: 600, quality: 75 })}
-              srcset={`${getSupabaseImageUrl(item.image_url, { width: 400, quality: 75 })} 400w, ${getSupabaseImageUrl(item.image_url, { width: 600, quality: 75 })} 600w, ${getSupabaseImageUrl(item.image_url, { width: 800, quality: 80 })} 800w`}
+              src={buildImageUrl(item.image_url, 600, 75)}
+              srcset={`${buildImageUrl(item.image_url, 400, 75)} 400w, ${buildImageUrl(item.image_url, 600, 75)} 600w, ${buildImageUrl(item.image_url, 800, 80)} 800w`}
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
               alt=""
               class="h-36 w-full object-cover"

@@ -15,6 +15,9 @@ export interface Props {
 
 const { data } = Astro.props;
 const items = Array.isArray(data.items) ? data.items : [];
+
+const buildImageUrl = (src: string, width: number, quality: number) =>
+  getSupabaseImageUrl(src, { width, height: Math.round((width * 3) / 4), quality, resize: 'cover' });
 ---
 
 <section class="bg-white py-20 sm:py-24" data-pcb-advantage-root>
@@ -43,8 +46,8 @@ const items = Array.isArray(data.items) ? data.items : [];
             <div class="pcb-advantage-media">
               {item.image_url ? (
                 <img
-                  src={getSupabaseImageUrl(item.image_url, { width: 900, quality: 75 })}
-                  srcset={`${getSupabaseImageUrl(item.image_url, { width: 600, quality: 75 })} 600w, ${getSupabaseImageUrl(item.image_url, { width: 900, quality: 75 })} 900w, ${getSupabaseImageUrl(item.image_url, { width: 1200, quality: 80 })} 1200w, ${getSupabaseImageUrl(item.image_url, { width: 1600, quality: 80 })} 1600w`}
+                  src={buildImageUrl(item.image_url, 900, 75)}
+                  srcset={`${buildImageUrl(item.image_url, 600, 75)} 600w, ${buildImageUrl(item.image_url, 900, 75)} 900w, ${buildImageUrl(item.image_url, 1200, 80)} 1200w, ${buildImageUrl(item.image_url, 1600, 80)} 1600w`}
                   sizes="(max-width: 576px) 100vw, (max-width: 992px) 50vw, 33vw"
                   alt=""
                   class="h-full w-full object-cover"

@@ -1,6 +1,6 @@
 ---
 import type { PcbDesignSimulationContent } from '../../types/pcb-design';
-import { getSupabaseImageUrl } from '../../lib/assets';
+import { getAssetPath } from '../../lib/assets';
 
 export interface Props {
   data: PcbDesignSimulationContent;
@@ -65,9 +65,7 @@ const tabs = (Array.isArray(data?.tabs) ? data.tabs : []) as Props['data']['tabs
             <div class="relative mb-[30px] flex aspect-video w-full items-center justify-center overflow-hidden rounded-2xl bg-[#111111]" style="background-image: linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px); background-size: 20px 20px;">
               {tab.panel.image_url ? (
                 <img
-                  src={getSupabaseImageUrl(tab.panel.image_url, { width: 900, quality: 75 })}
-                  srcset={`${getSupabaseImageUrl(tab.panel.image_url, { width: 600, quality: 75 })} 600w, ${getSupabaseImageUrl(tab.panel.image_url, { width: 900, quality: 75 })} 900w, ${getSupabaseImageUrl(tab.panel.image_url, { width: 1200, quality: 80 })} 1200w`}
-                  sizes="(max-width: 1024px) 100vw, 65vw"
+                  src={getAssetPath(tab.panel.image_url)}
                   alt={tab.panel.title}
                   class="absolute inset-0 h-full w-full object-cover opacity-85"
                   loading="lazy"

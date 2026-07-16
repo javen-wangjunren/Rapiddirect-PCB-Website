@@ -17,6 +17,9 @@ export interface Props {
 }
 
 const { data } = Astro.props;
+
+const buildImageUrl = (src: string, width: number, quality: number) =>
+  getSupabaseImageUrl(src, { width, height: Math.round((width * 10) / 16), quality, resize: 'cover' });
 ---
 
 <section class="pcb-mfg-capability-section bg-[#f8f9fa]">
@@ -42,8 +45,8 @@ const { data } = Astro.props;
               <div class="pcb-mfg-capability-image">
                 {item.image_url ? (
                   <img
-                    src={getSupabaseImageUrl(item.image_url, { width: 900, quality: 75 })}
-                    srcset={`${getSupabaseImageUrl(item.image_url, { width: 600, quality: 75 })} 600w, ${getSupabaseImageUrl(item.image_url, { width: 900, quality: 75 })} 900w, ${getSupabaseImageUrl(item.image_url, { width: 1200, quality: 80 })} 1200w, ${getSupabaseImageUrl(item.image_url, { width: 1600, quality: 80 })} 1600w`}
+                    src={buildImageUrl(item.image_url, 900, 75)}
+                    srcset={`${buildImageUrl(item.image_url, 600, 75)} 600w, ${buildImageUrl(item.image_url, 900, 75)} 900w, ${buildImageUrl(item.image_url, 1200, 80)} 1200w, ${buildImageUrl(item.image_url, 1600, 80)} 1600w`}
                     sizes="(max-width: 1024px) 100vw, 62vw"
                     alt=""
                     class="pcb-mfg-capability-image-el"

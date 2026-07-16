@@ -47,6 +47,9 @@ const derivedTabs = tabsInput
   .filter((t) => t.key);
 
 const cards = derivedTabs.flatMap((tab) => tab.items.map((item) => ({ ...item, category: tab.key })));
+
+const buildImageUrl = (src: string, width: number, quality: number) =>
+  getSupabaseImageUrl(src, { width, height: Math.round((width * 3) / 4), quality, resize: 'cover' });
 ---
 
 <section class="product-gallery-section">
@@ -73,8 +76,8 @@ const cards = derivedTabs.flatMap((tab) => tab.items.map((item) => ({ ...item, c
           <div class="product-gallery-media">
             {item.image_url ? (
               <img
-                src={getSupabaseImageUrl(item.image_url, { width: 600, quality: 75 })}
-                srcset={`${getSupabaseImageUrl(item.image_url, { width: 400, quality: 75 })} 400w, ${getSupabaseImageUrl(item.image_url, { width: 600, quality: 75 })} 600w, ${getSupabaseImageUrl(item.image_url, { width: 800, quality: 80 })} 800w`}
+                src={buildImageUrl(item.image_url, 600, 75)}
+                srcset={`${buildImageUrl(item.image_url, 400, 75)} 400w, ${buildImageUrl(item.image_url, 600, 75)} 600w, ${buildImageUrl(item.image_url, 800, 80)} 800w`}
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 alt=""
                 class="product-gallery-img"

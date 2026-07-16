@@ -22,7 +22,7 @@ const heroSrc1200 = backgroundImageSrc ? getSupabaseImageUrl(backgroundImageSrc,
 const heroSrc1600 = backgroundImageSrc ? getSupabaseImageUrl(backgroundImageSrc, { width: 1600, quality: 80 }) : '';
 ---
 
-<section class="relative overflow-hidden">
+<section class="relative overflow-hidden min-h-[440px] sm:min-h-[520px] lg:h-[clamp(680px,55vw,820px)] lg:min-h-0">
   <div class="absolute inset-0 bg-slate-100" />
   {backgroundImageUrl && (
     <img
@@ -30,7 +30,7 @@ const heroSrc1600 = backgroundImageSrc ? getSupabaseImageUrl(backgroundImageSrc,
       srcset={`${heroSrc600} 600w, ${heroSrc900} 900w, ${heroSrc1200} 1200w, ${heroSrc1600} 1600w`}
       sizes="100vw"
       alt=""
-      class="absolute inset-0 h-full w-full object-cover"
+      class="absolute inset-0 h-full w-full object-cover object-[72%_center]"
       loading="eager"
       decoding="async"
       fetchpriority="high"
@@ -40,7 +40,7 @@ const heroSrc1600 = backgroundImageSrc ? getSupabaseImageUrl(backgroundImageSrc,
     <div class="absolute inset-0 bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200" />
   )}
 
-  <div class="relative mx-auto max-w-7xl px-6 py-16 sm:py-20">
+  <div class="relative mx-auto max-w-7xl px-6 py-12 sm:py-16 lg:flex lg:h-full lg:items-center lg:py-0">
     <div class="max-w-xl rounded-3xl border border-white/50 bg-white/95 p-6 shadow-[0_20px_60px_-30px_rgba(0,0,0,0.45)] sm:p-10">
       <h1 class="text-3xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
         {data.title}

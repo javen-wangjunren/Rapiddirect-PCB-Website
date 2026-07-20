@@ -14,10 +14,6 @@ export interface Props {
       }>;
       image_url?: string;
       image_alt?: string;
-      image?: {
-        url?: string;
-        alt?: string;
-      };
     };
     standards: {
       title: string;
@@ -39,7 +35,7 @@ export interface Props {
 
 const { data } = Astro.props;
 
-const defImageSrc = getAssetPath(data.definition.image?.url || '');
+const defImageSrc = getAssetPath(data.definition.image_url || '');
 const categoryItems = Array.isArray(data.categories?.items) ? data.categories.items : [];
 const categoryTitle = data.categories.title;
 const displayItems = categoryItems.map((item) => ({
@@ -85,7 +81,7 @@ const displayItems = categoryItems.map((item) => ({
         {defImageSrc && (
           <img
             src={defImageSrc}
-            alt={data.definition.image?.alt || ''}
+            alt={data.definition.image_alt || ''}
             class="h-full w-full object-cover"
             loading="lazy"
           />

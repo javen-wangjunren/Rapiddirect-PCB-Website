@@ -31,6 +31,7 @@ import { siteFooterSchema } from '../../content/schemas/site-footer';
 import { siteHeaderSchema } from '../../content/schemas/site-header';
 import { siteInquiryFormSchema } from '../../content/schemas/site-inquiry-form';
 import { getAssetPath } from '../../lib/assets';
+import { buildPublishedPageHref, canViewPublishedPage } from '../../lib/page-access';
 import { createAdminSupabaseClient } from '../../lib/supabase/adminClient';
 import { buildPreviewHref, isPreviewableTemplateType } from '../../lib/supabase/preview';
 import { createPageForAdmin, deletePageForAdmin, duplicatePageForAdmin, getPageBundleBySlugForAdmin, saveAdminBundle } from '../../lib/supabase/adminQueries';
@@ -125,7 +126,6 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
   const [duplicating, setDuplicating] = useState(false);
   const [lastSavedMessage, setLastSavedMessage] = useState('');
 
-  const [leaveConfirmOpen, setLeaveConfirmOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const beforeUnloadHandlerRef = useRef<((e: BeforeUnloadEvent) => void) | null>(null);
 
@@ -280,6 +280,12 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
   const canPublish = title.trim().length > 0 && normalizedSlug.length > 0;
   const permalink = normalizedSlug || normalizeSlug(initialSlug) || '/ems/';
   const previewEnabled = isPreviewableTemplateType(templateType);
+  const publishedPageVisible = canViewPublishedPage({
+    slug: permalink,
+    status,
+    templateType
+  });
+  const publishedPageHref = publishedPageVisible ? buildPublishedPageHref(permalink) : '';
   const previewHelpText = previewEnabled ? '' : '当前模板暂不支持独立整页预览';
   const headerStatusText = duplicating
     ? '正在复制页面...'
@@ -514,14 +520,6 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
     }
   };
 
-  const onBack = () => {
-    if (dirty) {
-      setLeaveConfirmOpen(true);
-      return;
-    }
-    window.location.assign(getAssetPath('/admin/pages/'));
-  };
-
   const onPreview = async () => {
     if (!supabase) {
       push({ kind: 'error', message: '预览不可用：Supabase 未初始化' });
@@ -634,9 +632,17 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
           </div>
         </div>
         <div className="flex flex-wrap items-center justify-end gap-2 self-stretch min-[960px]:self-start">
-          <Button variant="ghost" onClick={onBack}>
-            Back
-          </Button>
+          {publishedPageVisible ? (
+            <Button
+              variant="ghost"
+              type="button"
+              onClick={() => {
+                window.open(publishedPageHref, '_blank', 'noopener,noreferrer');
+              }}
+            >
+              View Live
+            </Button>
+          ) : null}
           <Button variant="secondary" disabled={!previewEnabled} onClick={() => void onPreview()}>
             Preview
           </Button>
@@ -889,21 +895,6 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
           </Card>
         </div>
       </EditorTemplate>
-
-      <ConfirmDialog
-        open={leaveConfirmOpen}
-        onOpenChange={setLeaveConfirmOpen}
-        title="离开页面？"
-        description="当前有未保存更改，离开将丢失。"
-        confirmText="仍要离开"
-        cancelText="取消"
-        intent="danger"
-        onConfirm={() => {
-          disableBeforeUnload();
-          setDirty(false);
-          window.location.assign(getAssetPath('/admin/pages/'));
-        }}
-      />
 
       <ConfirmDialog
         open={deleteConfirmOpen}

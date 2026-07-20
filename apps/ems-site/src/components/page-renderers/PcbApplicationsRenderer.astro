@@ -6,7 +6,7 @@ import PcbMfgCapabilitySection from '../common/PcbMfgCapabilitySection.astro';
 import PcbMfgTechTableSection from '../common/PcbMfgTechTableSection.astro';
 import FaqSection from '../common/FaqSection.astro';
 import QuoteFormSection from '../common/QuoteFormSection.astro';
-import ApplicationAdvantageSection from '../pcb-applications/ApplicationAdvantageSection.astro';
+// import ApplicationAdvantageSection from '../pcb-applications/ApplicationAdvantageSection.astro';
 import ApplicationDescSection from '../pcb-applications/ApplicationDescSection.astro';
 import { pcbApplicationsDefaults } from '../../content/defaults/pcb-applications';
 import { normalizePcbApplicationsContentJson } from '../../content/normalize/pcb-applications';
@@ -47,7 +47,9 @@ const jsonLd = buildServicePageJsonLd({
   <HeroBanner data={data.hero} />
   {data.description && <ApplicationDescSection data={data.description} />}
   {data.capability && <PcbMfgCapabilitySection data={data.capability} />}
+  <!-- Advantage module intentionally hidden for now.
   {data.advantage && <ApplicationAdvantageSection data={data.advantage} />}
+  -->
   {data.tech_table && <PcbMfgTechTableSection data={data.tech_table} variant="muted" />}
   {data.faq && <FaqSection data={data.faq} variant="white" />}
   {data.quote_form && <QuoteFormSection data={data.quote_form} />}

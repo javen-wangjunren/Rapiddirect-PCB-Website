@@ -4,13 +4,10 @@ compatibility_date = "2026-04-24"
 workers_dev = true
 
 routes = [
-  { pattern = "pcb.rapiddirect.com/api/contact*", zone_name = "rapiddirect.com" },
-  { pattern = "rapiddirect.com/api/contact*", zone_name = "rapiddirect.com" }
-]
+  { pattern = "www.rapiddirect.com/api/contact*", zone_name = "rapiddirect.com" },
+]0
 
 [vars]
-ALLOWED_ORIGIN = "http://pcb.rapiddirect.com"
+ALLOWED_ORIGIN = "https://www.rapiddirect.com"
 FROM_EMAIL = "quote@rapiddirect.com"
 TO_EMAIL = "pcb@rapiddirect.com"
-
-

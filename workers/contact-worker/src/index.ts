@@ -11,6 +11,27 @@ type Env = {
   TO_EMAIL: string;
 };
 
+const normalizeOriginValue = (value: string): string => {
+  return value.trim().replace(/\/+$/, '');
+};
+
+const isOriginAllowed = (origin: string, allowedValues: string[]): boolean => {
+  let originUrl: URL;
+  try {
+    originUrl = new URL(origin);
+  } catch {
+    return false;
+  }
+
+  const normalizedOrigin = normalizeOriginValue(originUrl.origin);
+  return allowedValues.some((rawValue) => {
+    const value = normalizeOriginValue(rawValue);
+    if (!value) return false;
+    if (value.includes('://')) return normalizeOriginValue(value) === normalizedOrigin;
+    return value === originUrl.host;
+  });
+};
+
 const escapeHtml = (value: string): string => {
   return value
     .replaceAll('&', '&amp;')
@@ -89,14 +110,12 @@ const sendResendEmail = async (apiKey: string, payload: unknown) => {
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-const origin = request.headers.get('origin');
-const allowedOrigins = new Set(
-  String(env.ALLOWED_ORIGIN ?? '')
-    .split(',')
-    .map((v) => v.trim())
-    .filter(Boolean)
-);
-const corsOrigin = origin && allowedOrigins.has(origin) ? origin : null;
+    const origin = request.headers.get('origin');
+    const allowedOrigins = String(env.ALLOWED_ORIGIN ?? '')
+      .split(',')
+      .map((v) => v.trim())
+      .filter(Boolean);
+    const corsOrigin = origin && isOriginAllowed(origin, allowedOrigins) ? origin : null;
 
 
     if (request.method === 'OPTIONS') {

@@ -15,6 +15,8 @@ const normalizeSlug = (input?: string | null) => {
   return withLeading.endsWith('/') ? withLeading : `${withLeading}/`;
 };
 
+const basePath = (import.meta.env.BASE_URL ?? '/').replace(/\/$/, '');
+
 export const canViewPublishedPage = ({ slug, status, templateType }: PublishedPageAccessInput) => {
   const normalizedSlug = normalizeSlug(slug);
   if (!normalizedSlug) return false;
@@ -26,5 +28,7 @@ export const canViewPublishedPage = ({ slug, status, templateType }: PublishedPa
 export const buildPublishedPageHref = (slug?: string | null) => {
   const normalizedSlug = normalizeSlug(slug);
   if (!normalizedSlug) return '';
+  if (basePath && basePath !== '/' && normalizedSlug === `${basePath}/`) return normalizedSlug;
+  if (basePath && basePath !== '/' && normalizedSlug.startsWith(`${basePath}/`)) return normalizedSlug;
   return getHref(normalizedSlug);
 };

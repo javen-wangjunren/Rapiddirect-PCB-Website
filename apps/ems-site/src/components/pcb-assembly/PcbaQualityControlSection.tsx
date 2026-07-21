@@ -1,25 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { getAssetPath, getSupabaseImageUrl } from '../../lib/assets';
+import { getAssetPath, getSupabaseImageUrl, isLikelyImageUrl } from '../../lib/assets';
 import type { PcbaQualityControlContent, QcProcessStep } from '../../types/pcb-assembly';
 
 type Props = {
   data: PcbaQualityControlContent;
-};
-
-const isImageUrl = (value?: string) => {
-  if (!value) return false;
-  const v = value.toLowerCase();
-  return (
-    v.startsWith('data:image/') ||
-    v.endsWith('.png') ||
-    v.endsWith('.jpg') ||
-    v.endsWith('.jpeg') ||
-    v.endsWith('.webp') ||
-    v.endsWith('.gif') ||
-    v.endsWith('.svg') ||
-    v.includes('/storage/v1/object/')
-  );
 };
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
@@ -29,7 +14,7 @@ const StepIcon = (props: { step: QcProcessStep; highlighted: boolean }) => {
 
   if (props.step.icon_url) {
     const src = getAssetPath(props.step.icon_url);
-    if (isImageUrl(src)) return <img src={src} alt="" className="h-[26px] w-[26px] shrink-0" />;
+    if (isLikelyImageUrl(src)) return <img src={src} alt="" className="h-[26px] w-[26px] shrink-0" />;
   }
 
   const key = props.step.short_name.toLowerCase();
@@ -187,7 +172,7 @@ export function PcbaQualityControlSection(props: Props) {
                     className="flex w-[calc(33.333%-16px)] flex-none scroll-snap-start flex-col max-lg:w-[calc(50%-12px)] max-md:w-[85%]"
                   >
                     <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-[#eaeaea] bg-[#f4f6f9]">
-                      {src && isImageUrl(src) ? (
+                      {src && isLikelyImageUrl(src) ? (
                         <img
                           src={src}
                           srcSet={`${getSupabaseImageUrl(rawSrc, { width: 600, quality: 75 })} 600w, ${getSupabaseImageUrl(rawSrc, { width: 900, quality: 75 })} 900w, ${getSupabaseImageUrl(rawSrc, { width: 1200, quality: 80 })} 1200w`}

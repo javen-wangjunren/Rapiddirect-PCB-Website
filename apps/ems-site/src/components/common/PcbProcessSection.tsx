@@ -1,25 +1,10 @@
 import { useMemo, useState } from 'react';
 
-import { getAssetPath, getSupabaseImageUrl } from '../../lib/assets';
+import { getAssetPath, getSupabaseImageUrl, isLikelyImageUrl } from '../../lib/assets';
 import type { PcbProcessContent } from '../../types/pcb-process';
 
 type Props = {
   data: PcbProcessContent;
-};
-
-const isImageUrl = (value?: string) => {
-  if (!value) return false;
-  const v = value.toLowerCase();
-  return (
-    v.startsWith('data:image/') ||
-    v.endsWith('.png') ||
-    v.endsWith('.jpg') ||
-    v.endsWith('.jpeg') ||
-    v.endsWith('.webp') ||
-    v.endsWith('.gif') ||
-    v.endsWith('.svg') ||
-    v.includes('/storage/v1/object/')
-  );
 };
 
 export function PcbProcessSection(props: Props) {
@@ -85,7 +70,7 @@ export function PcbProcessSection(props: Props) {
           <div className="grid gap-10 p-10 lg:grid-cols-[1.2fr_1fr]">
             <div className="relative">
               <div className="relative aspect-[4/3] overflow-hidden rounded-xl border border-[#eaeaea] bg-[#f3f4f6] shadow-[0_18px_40px_rgba(0,0,0,0.10)]">
-                {imageSrc && isImageUrl(imageSrc) ? (
+                {imageSrc && isLikelyImageUrl(imageSrc) ? (
                   <img
                     src={imageSrc}
                     srcSet={`${getSupabaseImageUrl(rawImageSrc, { width: 600, quality: 75 })} 600w, ${getSupabaseImageUrl(rawImageSrc, { width: 900, quality: 75 })} 900w, ${getSupabaseImageUrl(rawImageSrc, { width: 1200, quality: 75 })} 1200w, ${getSupabaseImageUrl(rawImageSrc, { width: 1600, quality: 80 })} 1600w`}

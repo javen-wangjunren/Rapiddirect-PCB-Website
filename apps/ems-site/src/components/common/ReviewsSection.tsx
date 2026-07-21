@@ -1,25 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { getAssetPath, getHref, getSupabaseImageUrl } from '../../lib/assets';
+import { getAssetPath, getHref, getSupabaseImageUrl, isLikelyImageUrl } from '../../lib/assets';
 import type { ReviewsContent } from '../../types/reviews';
 
 type Props = {
   data: ReviewsContent;
-};
-
-const isImageUrl = (value?: string) => {
-  if (!value) return false;
-  const v = value.toLowerCase();
-  return (
-    v.startsWith('data:image/') ||
-    v.endsWith('.png') ||
-    v.endsWith('.jpg') ||
-    v.endsWith('.jpeg') ||
-    v.endsWith('.webp') ||
-    v.endsWith('.gif') ||
-    v.endsWith('.svg') ||
-    v.includes('/storage/v1/object/')
-  );
 };
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
@@ -106,7 +91,7 @@ export function ReviewsSection(props: Props) {
                       Verified Purchase
                     </div>
 
-                    {imgSrc && isImageUrl(imgSrc) ? (
+                    {imgSrc && isLikelyImageUrl(imgSrc) ? (
                       <img
                         src={imgSrc}
                         srcSet={`${getSupabaseImageUrl(rawImgSrc, { width: 600, quality: 75 })} 600w, ${getSupabaseImageUrl(rawImgSrc, { width: 900, quality: 75 })} 900w, ${getSupabaseImageUrl(rawImgSrc, { width: 1200, quality: 80 })} 1200w`}
@@ -127,7 +112,7 @@ export function ReviewsSection(props: Props) {
                     <div className="flex items-center justify-between gap-4 border-b border-[#f1f1f1] px-7 py-5">
                       <div className="flex min-w-0 items-center gap-4">
                         <div className="h-11 w-11 overflow-hidden rounded-full bg-[#f1f5f9]">
-                          {avatarSrc && isImageUrl(avatarSrc) ? (
+                          {avatarSrc && isLikelyImageUrl(avatarSrc) ? (
                             <img
                               src={avatarSrc}
                               srcSet={`${getSupabaseImageUrl(rawAvatarSrc, { width: 64, quality: 80 })} 64w, ${getSupabaseImageUrl(rawAvatarSrc, { width: 96, quality: 80 })} 96w, ${getSupabaseImageUrl(rawAvatarSrc, { width: 128, quality: 80 })} 128w`}

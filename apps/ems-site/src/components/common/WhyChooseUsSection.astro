@@ -1,5 +1,5 @@
 ---
-import { getAssetPath } from '../../lib/assets';
+import { getAssetPath, isLikelyImageUrl } from '../../lib/assets';
 import type { WhyChooseUsContent } from '../../types/why-choose-us';
 
 export interface Props {
@@ -7,21 +7,6 @@ export interface Props {
 }
 
 const { data } = Astro.props;
-
-const isImageUrl = (value?: string) => {
-  if (!value) return false;
-  const v = value.toLowerCase();
-  return (
-    v.startsWith('data:image/') ||
-    v.endsWith('.png') ||
-    v.endsWith('.jpg') ||
-    v.endsWith('.jpeg') ||
-    v.endsWith('.webp') ||
-    v.endsWith('.gif') ||
-    v.endsWith('.svg') ||
-    v.includes('/storage/v1/object/')
-  );
-};
 
 const isSvgUrl = (value?: string) => {
   if (!value) return false;
@@ -52,7 +37,7 @@ const isSvgUrl = (value?: string) => {
                   class="h-6 w-6 bg-current md:h-7 md:w-7"
                   style={`-webkit-mask-image:url(${iconSrc});mask-image:url(${iconSrc});-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;-webkit-mask-size:contain;mask-size:contain;`}
                 />
-              ) : iconSrc && isImageUrl(iconSrc) ? (
+              ) : iconSrc && isLikelyImageUrl(iconSrc) ? (
                 <img src={iconSrc} alt="" class="h-6 w-6 md:h-7 md:w-7" />
               ) : (
                 idx === 0 ? (

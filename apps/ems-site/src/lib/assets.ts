@@ -20,6 +20,21 @@ export const getHref = (href?: string | null): string => {
   return getAssetPath(href);
 };
 
+export const isLikelyImageUrl = (value?: string | null): boolean => {
+  if (typeof value !== 'string' || !value) return false;
+  const normalized = value.toLowerCase();
+
+  if (normalized.startsWith('data:image/')) return true;
+  if (normalized.includes('/storage/v1/object/') || normalized.includes('/storage/v1/render/image/')) return true;
+
+  try {
+    const pathname = new URL(value, 'https://example.com').pathname.toLowerCase();
+    return /\.(png|jpe?g|webp|gif|svg|avif)$/i.test(pathname);
+  } catch {
+    return /\.(png|jpe?g|webp|gif|svg|avif)(\?|$)/i.test(normalized);
+  }
+};
+
 type SupabaseImageTransform = {
   width?: number;
   height?: number;

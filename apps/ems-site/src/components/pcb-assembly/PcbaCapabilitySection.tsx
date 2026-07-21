@@ -1,25 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { getAssetPath, getSupabaseImageUrl } from '../../lib/assets';
+import { getAssetPath, getSupabaseImageUrl, isLikelyImageUrl } from '../../lib/assets';
 import type { PcbaCapabilityContent } from '../../types/pcb-assembly';
 
 type Props = {
   data: PcbaCapabilityContent;
-};
-
-const isImageUrl = (value?: string) => {
-  if (!value) return false;
-  const v = value.toLowerCase();
-  return (
-    v.startsWith('data:image/') ||
-    v.endsWith('.png') ||
-    v.endsWith('.jpg') ||
-    v.endsWith('.jpeg') ||
-    v.endsWith('.webp') ||
-    v.endsWith('.gif') ||
-    v.endsWith('.svg') ||
-    v.includes('/storage/v1/object/')
-  );
 };
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
@@ -131,7 +116,7 @@ export function PcbaCapabilitySection(props: Props) {
                   className="group w-[280px] flex-none overflow-hidden rounded-xl border border-[#eaeaea] bg-white shadow-[0_4px_15px_rgba(0,0,0,0.03)] transition hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)] max-md:w-[85%]"
                 >
                   <div className="flex h-[180px] w-full items-center justify-center bg-[#f0f2f5]">
-                    {src && isImageUrl(src) ? (
+                    {src && isLikelyImageUrl(src) ? (
                       <img
                         src={src}
                         srcSet={`${getSupabaseImageUrl(getAssetPath(item.image_url), { width: 400, quality: 75 })} 400w, ${getSupabaseImageUrl(getAssetPath(item.image_url), { width: 600, quality: 75 })} 600w, ${getSupabaseImageUrl(getAssetPath(item.image_url), { width: 800, quality: 80 })} 800w`}
@@ -207,7 +192,7 @@ export function PcbaCapabilitySection(props: Props) {
                   className="rounded-xl border border-[#333333] bg-[#1f1f1f] p-6 transition hover:border-[#ef533f]"
                 >
                   <div className="mb-4 flex items-center gap-3">
-                    {iconSrc && isImageUrl(iconSrc) ? (
+                    {iconSrc && isLikelyImageUrl(iconSrc) ? (
                       <img src={iconSrc} alt="" className="h-6 w-6" />
                     ) : (
                       <div className="h-6 w-6 text-[#ef533f]">

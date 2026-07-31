@@ -67,10 +67,16 @@ export function QuoteFormSection({ data }: { data: QuoteFormContent }) {
         throw new Error(text || 'Request failed');
       }
 
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ event: 'contact_form_submit', form_type: 'quote_inquiry' });
+
       setStatus('success');
       formRef.current.reset();
       setFileName('');
     } catch (err) {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ event: 'contact_form_error', form_type: 'quote_inquiry', error_message: err instanceof Error ? err.message : 'Request failed' });
+
       setStatus('error');
       setErrorMessage(err instanceof Error ? err.message : 'Request failed');
     } finally {

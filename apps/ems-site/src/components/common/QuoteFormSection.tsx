@@ -68,7 +68,7 @@ export function QuoteFormSection({ data }: { data: QuoteFormContent }) {
       }
 
       window.dataLayer = window.dataLayer || [];
-      window.dataLayer.push({ event: 'contact_form_submit', form_type: 'quote_inquiry' });
+      window.dataLayer.push({ event: 'pcb_contact_form_submit', form_type: 'quote_inquiry' });
 
       setStatus('success');
       formRef.current.reset();

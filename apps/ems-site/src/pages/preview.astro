@@ -2,6 +2,7 @@
 export const prerender = false;
 
 import ComponentsSourcingRenderer from '../components/page-renderers/ComponentsSourcingRenderer.astro';
+import ContactUsRenderer from '../components/page-renderers/ContactUsRenderer.astro';
 import EmsHomeRenderer from '../components/page-renderers/EmsHomeRenderer.astro';
 import PcbApplicationsRenderer from '../components/page-renderers/PcbApplicationsRenderer.astro';
 import PcbAssemblyRenderer from '../components/page-renderers/PcbAssemblyRenderer.astro';
@@ -43,6 +44,8 @@ if (!isFound) {
       <EmsHomeRenderer bundle={bundle!} pathname={pathname} />
     ) : templateType === 'components_sourcing' ? (
       <ComponentsSourcingRenderer bundle={bundle!} pathname={pathname} />
+    ) : templateType === 'contact_us' ? (
+      <ContactUsRenderer bundle={bundle!} pathname={pathname} />
     ) : templateType === 'pcb_assembly' ? (
       <PcbAssemblyRenderer bundle={bundle!} pathname={pathname} />
     ) : templateType === 'pcb_design' ? (

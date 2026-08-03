@@ -3,6 +3,7 @@ export const prerender = false;
 
 import PcbApplicationsRenderer from '../components/page-renderers/PcbApplicationsRenderer.astro';
 import PcbBoardManufacturingRenderer from '../components/page-renderers/PcbBoardManufacturingRenderer.astro';
+import ContactUsRenderer from '../components/page-renderers/ContactUsRenderer.astro';
 import EmsLayout from '../layouts/EmsLayout.astro';
 import { createSupabaseClient } from '../lib/supabase/client';
 import { getPublishedPageBundleBySlug } from '../lib/supabase/queries';
@@ -13,7 +14,8 @@ const bundle = supabase ? await getPublishedPageBundleBySlug(supabase, pathname)
 const templateType = bundle?.page?.template_type ?? null;
 const isPcbBoardManufacturing = templateType === 'pcb_board_manufacturing';
 const isPcbApplications = templateType === 'pcb_applications';
-const isFound = Boolean(bundle?.page) && (isPcbBoardManufacturing || isPcbApplications);
+const isContactUs = templateType === 'contact_us';
+const isFound = Boolean(bundle?.page) && (isPcbBoardManufacturing || isPcbApplications || isContactUs);
 
 if (!isFound) {
   Astro.response.status = 404;
@@ -24,6 +26,8 @@ if (!isFound) {
   isFound ? (
     isPcbApplications ? (
       <PcbApplicationsRenderer bundle={bundle!} pathname={pathname} />
+    ) : isContactUs ? (
+      <ContactUsRenderer bundle={bundle!} pathname={pathname} />
     ) : (
       <PcbBoardManufacturingRenderer bundle={bundle!} pathname={pathname} />
     )

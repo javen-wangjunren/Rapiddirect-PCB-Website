@@ -14,7 +14,8 @@ const PREVIEWABLE_TEMPLATE_TYPES: TemplateType[] = [
   'pcb_design',
   'pcb_manufacturing',
   'pcb_board_manufacturing',
-  'pcb_applications'
+  'pcb_applications',
+  'contact_us'
 ];
 
 export const isPreviewRequest = (url: URL) => {

@@ -1,0 +1,31 @@
+---
+import type { PageBundle } from '../../lib/supabase/queries';
+import EmsLayout from '../../layouts/EmsLayout.astro';
+import HeroBanner1 from '../common/HeroBanner1.astro';
+import QuoteFormSection from '../common/QuoteFormSection.astro';
+import { contactUsDefaults } from '../../content/defaults/contact-us';
+import { normalizeContactUsContentJson } from '../../content/normalize/contact-us';
+import { mergeSectionFallback } from '../../lib/supabase/mappers';
+
+interface Props {
+  bundle: PageBundle | null;
+  pathname: string;
+}
+
+const { bundle } = Astro.props;
+const contentJson = bundle?.content?.content_json ?? null;
+const data = normalizeContactUsContentJson(
+  mergeSectionFallback(contactUsDefaults as any, contentJson) as any
+) as any;
+
+const title = bundle?.seo?.meta_title ?? 'Contact Us | RapidDirect';
+const description =
+  bundle?.seo?.meta_description ?? 'Get in touch with RapidDirect for support, questions, or to learn more about our services.';
+const canonicalUrl = bundle?.seo?.canonical_url ?? null;
+const noindex = Boolean(bundle?.seo?.noindex);
+---
+
+<EmsLayout title={title} description={description} canonicalUrl={canonicalUrl ?? undefined} noindex={noindex}>
+  <HeroBanner1 data={data.hero} />
+  <QuoteFormSection data={{}} />
+</EmsLayout>

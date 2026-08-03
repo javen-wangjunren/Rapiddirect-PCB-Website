@@ -5,25 +5,14 @@ import { createAdminSupabaseClient } from '../../lib/supabase/adminClient';
 import { buildPreviewHref, isPreviewableTemplateType } from '../../lib/supabase/preview';
 import { createPageForAdmin, listPagesForAdminPaged, type AdminPageListItem } from '../../lib/supabase/adminQueries';
 import type { TemplateType } from '../../types/page';
+import { TEMPLATE_OPTIONS } from '../../registry/templateRegistry';
 import { Badge, Button, Card, CardBody, Input, Modal, Pagination, Select, ToastProvider, useToast } from './ui';
 import { cn } from './ui/cn';
 import { ListTemplate } from './templates/ListTemplate';
 
 type LoadState = 'loading' | 'ready' | 'error';
 
-const templateTypes: TemplateType[] = [
-  'ems_home',
-  'ems_service',
-  'pcb_assembly',
-  'pcb_design',
-  'pcb_manufacturing',
-  'pcb_board_manufacturing',
-  'pcb_applications',
-  'components_sourcing',
-  'site_inquiry_form',
-  'site_footer',
-  'site_header'
-];
+const templateTypes: TemplateType[] = TEMPLATE_OPTIONS.map((o) => o.value);
 
 const normalizeSlug = (input: string) => {
   const trimmed = input.trim();
@@ -485,13 +474,9 @@ function AdminPagesIndexInner() {
           <label className="block">
             <div className="mb-1 text-xs font-medium text-[var(--admin-fg-muted)]">Template</div>
             <Select value={createTemplateType} onChange={(e) => setCreateTemplateType(e.target.value as TemplateType)}>
-              <option value="ems_home">ems_home</option>
-              <option value="ems_service">ems_service</option>
-              <option value="pcb_assembly">pcb_assembly</option>
-              <option value="pcb_applications">pcb_applications</option>
-              <option value="pcb_board_manufacturing">pcb_board_manufacturing</option>
-              <option value="pcb_design">pcb_design</option>
-              <option value="pcb_manufacturing">pcb_manufacturing</option>
+              {TEMPLATE_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
             </Select>
           </label>
 

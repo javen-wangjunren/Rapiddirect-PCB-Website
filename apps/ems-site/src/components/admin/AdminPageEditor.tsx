@@ -1,35 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { emsHomeDefaults } from '../../content/defaults/ems';
-import { componentsSourcingDefaults } from '../../content/defaults/components-sourcing';
-import { pcbBoardManufacturingDefaults } from '../../content/defaults/pcb-board-manufacturing';
-import { pcbAssemblyDefaults } from '../../content/defaults/pcb-assembly';
-import { pcbApplicationsDefaults } from '../../content/defaults/pcb-applications';
-import { pcbDesignDefaults } from '../../content/defaults/pcb-design';
-import { pcbManufacturingDefaults } from '../../content/defaults/pcb-manufacturing';
-import { siteFooterDefaults } from '../../content/defaults/site-footer';
-import { siteHeaderDefaults } from '../../content/defaults/site-header';
-import { siteInquiryFormDefaults } from '../../content/defaults/site-inquiry-form';
-import { normalizeEmsHomeContentJson } from '../../content/normalize/ems';
-import { normalizeComponentsSourcingContentJson } from '../../content/normalize/components-sourcing';
-import { normalizePcbBoardManufacturingContentJson } from '../../content/normalize/pcb-board-manufacturing';
-import { normalizePcbAssemblyContentJson } from '../../content/normalize/pcb-assembly';
-import { normalizePcbApplicationsContentJson } from '../../content/normalize/pcb-applications';
-import { normalizePcbDesignContentJson } from '../../content/normalize/pcb-design';
-import { normalizePcbManufacturingContentJson } from '../../content/normalize/pcb-manufacturing';
-import { normalizeSiteFooterContentJson } from '../../content/normalize/site-footer';
-import { normalizeSiteHeaderContentJson } from '../../content/normalize/site-header';
-import { normalizeSiteInquiryFormContentJson } from '../../content/normalize/site-inquiry-form';
-import { emsHomeSchema } from '../../content/schemas/ems';
-import { componentsSourcingSchema } from '../../content/schemas/components-sourcing';
-import { pcbBoardManufacturingSchema } from '../../content/schemas/pcb-board-manufacturing';
-import { pcbAssemblySchema } from '../../content/schemas/pcb-assembly';
-import { pcbApplicationsSchema } from '../../content/schemas/pcb-applications';
-import { pcbDesignSchema } from '../../content/schemas/pcb-design';
-import { pcbManufacturingSchema } from '../../content/schemas/pcb-manufacturing';
-import { siteFooterSchema } from '../../content/schemas/site-footer';
-import { siteHeaderSchema } from '../../content/schemas/site-header';
-import { siteInquiryFormSchema } from '../../content/schemas/site-inquiry-form';
+import { TEMPLATE_REGISTRY, TEMPLATE_OPTIONS, TEMPLATES_WITH_SCHEMA } from '../../registry/templateRegistry';
 import { getAssetPath } from '../../lib/assets';
 import { buildPublishedPageHref, canViewPublishedPage } from '../../lib/page-access';
 import { createAdminSupabaseClient } from '../../lib/supabase/adminClient';
@@ -38,15 +9,7 @@ import { createPageForAdmin, deletePageForAdmin, duplicatePageForAdmin, getPageB
 import type { TemplateType } from '../../types/page';
 import type { JsonValue } from '../../utils/jsonTree';
 import { deepMerge, isObject, pruneEmpty } from '../../utils/jsonTree';
-import EmsEditorContentModules from './EmsEditorContentModules';
-import ComponentsSourcingEditorContentModules from './ComponentsSourcingEditorContentModules';
-import PcbApplicationsEditorContentModules from './PcbApplicationsEditorContentModules';
-import PcbBoardManufacturingEditorContentModules from './PcbBoardManufacturingEditorContentModules';
-import PcbAssemblyEditorContentModules from './PcbAssemblyEditorContentModules';
-import PcbDesignEditorContentModules from './PcbDesignEditorContentModules';
-import PcbManufacturingEditorContentModules from './PcbManufacturingEditorContentModules';
 import EmsEditorSeoCard, { type SeoDraft } from './EmsEditorSeoCard';
-import SchemaForm from './SchemaForm';
 import { EditorTemplate } from './templates/EditorTemplate';
 import { Badge, Button, Card, CardBody, CardHeader, CardTitle, ConfirmDialog, Input, Select, Tabs, ToastProvider, useToast } from './ui';
 
@@ -116,7 +79,7 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
     service_schema: {}
   });
 
-  const [contentJson, setContentJson] = useState<JsonValue>(deepMerge(emsHomeDefaults as any, {} as any) as JsonValue);
+  const [contentJson, setContentJson] = useState<JsonValue>({} as JsonValue);
   const [tab, setTab] = useState<EditorTab>('content');
   const scrollByTabRef = useRef<Record<EditorTab, number>>({ content: 0, seo: 0, settings: 0 });
 
@@ -200,39 +163,12 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
       const cleanedRaw = pruneEmpty(raw);
       const safeRaw = (isObject(cleanedRaw) ? cleanedRaw : {}) as any;
       const template = (bundle.page.template_type ?? 'ems_home') as TemplateType;
-      if (template === 'ems_home') {
-        const merged = deepMerge(emsHomeDefaults as any, safeRaw as any) as JsonValue;
-        setContentJson(normalizeEmsHomeContentJson(merged));
-      } else if (template === 'components_sourcing') {
-        const merged = deepMerge(componentsSourcingDefaults as any, safeRaw as any) as JsonValue;
-        setContentJson(normalizeComponentsSourcingContentJson(merged));
-      } else if (template === 'pcb_applications') {
-        const merged = deepMerge(pcbApplicationsDefaults as any, safeRaw as any) as JsonValue;
-        setContentJson(normalizePcbApplicationsContentJson(merged));
-      } else if (template === 'pcb_board_manufacturing') {
-        const merged = deepMerge(pcbBoardManufacturingDefaults as any, safeRaw as any) as JsonValue;
-        setContentJson(normalizePcbBoardManufacturingContentJson(merged));
-      } else if (template === 'pcb_assembly') {
-        const merged = deepMerge(pcbAssemblyDefaults as any, safeRaw as any) as JsonValue;
-        setContentJson(normalizePcbAssemblyContentJson(merged));
-      } else if (template === 'pcb_design') {
-        const merged = deepMerge(pcbDesignDefaults as any, safeRaw as any) as JsonValue;
-        setContentJson(normalizePcbDesignContentJson(merged));
-      } else if (template === 'pcb_manufacturing') {
-        const merged = deepMerge(pcbManufacturingDefaults as any, safeRaw as any) as JsonValue;
-        setContentJson(normalizePcbManufacturingContentJson(merged));
-      } else if (template === 'site_footer') {
-        const merged = deepMerge(siteFooterDefaults as any, safeRaw as any) as JsonValue;
-        setContentJson(normalizeSiteFooterContentJson(merged));
-      } else if (template === 'site_header') {
-        const merged = deepMerge(siteHeaderDefaults as any, safeRaw as any) as JsonValue;
-        setContentJson(normalizeSiteHeaderContentJson(merged));
-      } else if (template === 'site_inquiry_form') {
-        const merged = deepMerge(siteInquiryFormDefaults as any, safeRaw as any) as JsonValue;
-        setContentJson(normalizeSiteInquiryFormContentJson(merged));
+      const config = TEMPLATE_REGISTRY[template];
+      if (config) {
+        const merged = deepMerge(config.defaults as any, safeRaw as any) as JsonValue;
+        setContentJson(config.normalize(merged));
       } else {
-        const safeObj = safeRaw ?? {};
-        setContentJson(safeObj as any);
+        setContentJson(safeRaw as any);
       }
 
       setDirty(false);
@@ -299,27 +235,7 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
   const saveDraftLabel = status === 'published' ? 'Move to Draft' : 'Save Draft';
   const publishLabel = status === 'published' ? 'Update Published' : 'Publish';
 
-  const isEmsHome = templateType === 'ems_home';
-  const isComponentsSourcing = templateType === 'components_sourcing';
-  const isPcbApplications = templateType === 'pcb_applications';
-  const isPcbBoardManufacturing = templateType === 'pcb_board_manufacturing';
-  const isPcbAssembly = templateType === 'pcb_assembly';
-  const isPcbDesign = templateType === 'pcb_design';
-  const isPcbManufacturing = templateType === 'pcb_manufacturing';
-  const isSiteFooter = templateType === 'site_footer';
-  const isSiteHeader = templateType === 'site_header';
-  const isSiteInquiryForm = templateType === 'site_inquiry_form';
-  const hasSchema =
-    isEmsHome ||
-    isComponentsSourcing ||
-    isPcbApplications ||
-    isPcbBoardManufacturing ||
-    isPcbAssembly ||
-    isPcbDesign ||
-    isPcbManufacturing ||
-    isSiteFooter ||
-    isSiteHeader ||
-    isSiteInquiryForm;
+  const hasSchema = TEMPLATES_WITH_SCHEMA.includes(templateType);
 
   const onContentKeyChange = (key: string, next: JsonValue) => {
     const obj = (isObject(contentJson) ? (contentJson as any) : {}) as Record<string, JsonValue>;
@@ -327,32 +243,13 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
     setDirty(true);
   };
 
-  const onEmsHomeModuleChange = (key: keyof typeof emsHomeSchema, next: JsonValue) => {
-    onContentKeyChange(String(key), next);
+  const onModuleChange = (key: string, next: JsonValue) => {
+    onContentKeyChange(key, next);
   };
 
-  const onComponentsSourcingModuleChange = (key: keyof typeof componentsSourcingSchema, next: JsonValue) => {
-    onContentKeyChange(String(key), next);
-  };
-
-  const onPcbApplicationsModuleChange = (key: keyof typeof pcbApplicationsSchema, next: JsonValue) => {
-    onContentKeyChange(String(key), next);
-  };
-
-  const onPcbBoardManufacturingModuleChange = (key: keyof typeof pcbBoardManufacturingSchema, next: JsonValue) => {
-    onContentKeyChange(String(key), next);
-  };
-
-  const onPcbAssemblyModuleChange = (key: keyof typeof pcbAssemblySchema, next: JsonValue) => {
-    onContentKeyChange(String(key), next);
-  };
-
-  const onPcbDesignModuleChange = (key: keyof typeof pcbDesignSchema, next: JsonValue) => {
-    onContentKeyChange(String(key), next);
-  };
-
-  const onPcbManufacturingModuleChange = (key: keyof typeof pcbManufacturingSchema, next: JsonValue) => {
-    onContentKeyChange(String(key), next);
+  const onContentReplace = (next: JsonValue) => {
+    setContentJson(next);
+    setDirty(true);
   };
 
   const doSave = async (nextStatus?: 'draft' | 'published') => {
@@ -363,28 +260,7 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
       return;
     }
     setSaving(true);
-    const normalizedContent =
-      templateType === 'ems_home'
-        ? normalizeEmsHomeContentJson(contentJson)
-        : templateType === 'components_sourcing'
-          ? normalizeComponentsSourcingContentJson(contentJson)
-          : templateType === 'pcb_applications'
-            ? normalizePcbApplicationsContentJson(contentJson)
-          : templateType === 'pcb_board_manufacturing'
-            ? normalizePcbBoardManufacturingContentJson(contentJson)
-          : templateType === 'pcb_assembly'
-            ? normalizePcbAssemblyContentJson(contentJson)
-            : templateType === 'pcb_design'
-              ? normalizePcbDesignContentJson(contentJson)
-              : templateType === 'pcb_manufacturing'
-                ? normalizePcbManufacturingContentJson(contentJson)
-            : templateType === 'site_footer'
-              ? normalizeSiteFooterContentJson(contentJson)
-              : templateType === 'site_header'
-                ? normalizeSiteHeaderContentJson(contentJson)
-                : templateType === 'site_inquiry_form'
-                  ? normalizeSiteInquiryFormContentJson(contentJson)
-            : contentJson;
+    const normalizedContent = TEMPLATE_REGISTRY[templateType]?.normalize?.(contentJson) ?? contentJson;
 
     const cleanedContent = pruneEmpty(normalizedContent);
     const safeContent = isObject(cleanedContent) ? cleanedContent : {};
@@ -442,28 +318,7 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
     if (!supabase || !pageId) return;
 
     setDuplicating(true);
-    const normalizedContent =
-      templateType === 'ems_home'
-        ? normalizeEmsHomeContentJson(contentJson)
-        : templateType === 'components_sourcing'
-          ? normalizeComponentsSourcingContentJson(contentJson)
-          : templateType === 'pcb_applications'
-            ? normalizePcbApplicationsContentJson(contentJson)
-            : templateType === 'pcb_board_manufacturing'
-              ? normalizePcbBoardManufacturingContentJson(contentJson)
-              : templateType === 'pcb_assembly'
-                ? normalizePcbAssemblyContentJson(contentJson)
-                : templateType === 'pcb_design'
-                  ? normalizePcbDesignContentJson(contentJson)
-                  : templateType === 'pcb_manufacturing'
-                    ? normalizePcbManufacturingContentJson(contentJson)
-                    : templateType === 'site_footer'
-                      ? normalizeSiteFooterContentJson(contentJson)
-                      : templateType === 'site_header'
-                        ? normalizeSiteHeaderContentJson(contentJson)
-                        : templateType === 'site_inquiry_form'
-                          ? normalizeSiteInquiryFormContentJson(contentJson)
-                        : contentJson;
+    const normalizedContent = TEMPLATE_REGISTRY[templateType]?.normalize?.(contentJson) ?? contentJson;
     const cleanedContent = pruneEmpty(normalizedContent);
     const safeContent = isObject(cleanedContent) ? cleanedContent : {};
 
@@ -733,17 +588,9 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
                 setDirty(true);
               }}
             >
-              <option value="ems_home">ems_home</option>
-              <option value="ems_service">ems_service</option>
-              <option value="components_sourcing">components_sourcing</option>
-              <option value="pcb_applications">pcb_applications</option>
-              <option value="pcb_board_manufacturing">pcb_board_manufacturing</option>
-              <option value="pcb_assembly">pcb_assembly</option>
-              <option value="pcb_design">pcb_design</option>
-              <option value="pcb_manufacturing">pcb_manufacturing</option>
-              <option value="site_inquiry_form">site_inquiry_form</option>
-              <option value="site_footer">site_footer</option>
-              <option value="site_header">site_header</option>
+              {TEMPLATE_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
             </Select>
           </label>
           <div className="rounded-[var(--admin-radius-sm)] bg-[var(--admin-primary-soft)] px-3 py-2 text-xs text-[var(--admin-fg-muted)]">
@@ -783,91 +630,9 @@ function AdminPageEditorInner({ initialSlug, createIfMissing }: AdminPageEditorP
     }
 
     // content tab
-    if (isEmsHome) return <EmsEditorContentModules contentJson={contentJson} onModuleChange={onEmsHomeModuleChange} />;
-    if (isComponentsSourcing)
-      return (
-        <ComponentsSourcingEditorContentModules
-          contentJson={contentJson}
-          onModuleChange={onComponentsSourcingModuleChange}
-        />
-      );
-    if (isPcbApplications)
-      return (
-        <PcbApplicationsEditorContentModules
-          contentJson={contentJson}
-          onModuleChange={onPcbApplicationsModuleChange}
-        />
-      );
-    if (isPcbBoardManufacturing)
-      return (
-        <PcbBoardManufacturingEditorContentModules
-          contentJson={contentJson}
-          onModuleChange={onPcbBoardManufacturingModuleChange}
-        />
-      );
-    if (isPcbAssembly) return <PcbAssemblyEditorContentModules contentJson={contentJson} onModuleChange={onPcbAssemblyModuleChange} />;
-    if (isPcbDesign) return <PcbDesignEditorContentModules contentJson={contentJson} onModuleChange={onPcbDesignModuleChange} />;
-    if (isPcbManufacturing)
-      return <PcbManufacturingEditorContentModules contentJson={contentJson} onModuleChange={onPcbManufacturingModuleChange} />;
-    if (isSiteFooter) {
-      return (
-        <Card>
-          <CardHeader>
-            <CardTitle>Footer</CardTitle>
-          </CardHeader>
-          <CardBody className="space-y-3 pt-0">
-            <SchemaForm
-              schema={siteFooterSchema as any}
-              value={contentJson}
-              onChange={(next) => {
-                setContentJson(next);
-                setDirty(true);
-              }}
-              pathLabel="Footer"
-            />
-          </CardBody>
-        </Card>
-      );
-    }
-    if (isSiteHeader) {
-      return (
-        <Card>
-          <CardHeader>
-            <CardTitle>Header</CardTitle>
-          </CardHeader>
-          <CardBody className="space-y-3 pt-0">
-            <SchemaForm
-              schema={siteHeaderSchema as any}
-              value={contentJson}
-              onChange={(next) => {
-                setContentJson(next);
-                setDirty(true);
-              }}
-              pathLabel="Header"
-            />
-          </CardBody>
-        </Card>
-      );
-    }
-    if (isSiteInquiryForm) {
-      return (
-        <Card>
-          <CardHeader>
-            <CardTitle>Inquiry Form</CardTitle>
-          </CardHeader>
-          <CardBody className="space-y-3 pt-0">
-            <SchemaForm
-              schema={siteInquiryFormSchema as any}
-              value={contentJson}
-              onChange={(next) => {
-                setContentJson(next);
-                setDirty(true);
-              }}
-              pathLabel="Inquiry Form"
-            />
-          </CardBody>
-        </Card>
-      );
+    const Editor = TEMPLATE_REGISTRY[templateType]?.ContentEditor;
+    if (Editor) {
+      return <Editor contentJson={contentJson} onModuleChange={onModuleChange} onContentReplace={onContentReplace} />;
     }
     return (
       <Card>

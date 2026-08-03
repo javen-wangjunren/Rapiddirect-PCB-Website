@@ -5,7 +5,7 @@ import { createAdminSupabaseClient } from '../../lib/supabase/adminClient';
 import { buildPreviewHref, isPreviewableTemplateType } from '../../lib/supabase/preview';
 import { createPageForAdmin, listPagesForAdminPaged, type AdminPageListItem } from '../../lib/supabase/adminQueries';
 import type { TemplateType } from '../../types/page';
-import { TEMPLATE_OPTIONS } from '../../registry/templateRegistry';
+import { TEMPLATE_OPTIONS, PAGE_TEMPLATE_OPTIONS } from '../../registry/templateRegistry';
 import { Badge, Button, Card, CardBody, Input, Modal, Pagination, Select, ToastProvider, useToast } from './ui';
 import { cn } from './ui/cn';
 import { ListTemplate } from './templates/ListTemplate';
@@ -474,7 +474,7 @@ function AdminPagesIndexInner() {
           <label className="block">
             <div className="mb-1 text-xs font-medium text-[var(--admin-fg-muted)]">Template</div>
             <Select value={createTemplateType} onChange={(e) => setCreateTemplateType(e.target.value as TemplateType)}>
-              {TEMPLATE_OPTIONS.map((opt) => (
+              {PAGE_TEMPLATE_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
               ))}
             </Select>

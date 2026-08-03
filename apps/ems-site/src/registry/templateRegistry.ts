@@ -49,6 +49,8 @@ export interface TemplateConfig {
     onContentReplace?: (next: JsonValue) => void;
   }> | null;
   label: string;
+  /** 是否为页面模板（false = 全局模板，如 header/footer/form） */
+  isPageTemplate: boolean;
 }
 
 export const TEMPLATE_REGISTRY: Record<TemplateType, TemplateConfig> = {
@@ -56,80 +58,98 @@ export const TEMPLATE_REGISTRY: Record<TemplateType, TemplateConfig> = {
     defaults: emsHomeDefaults,
     normalize: normalizeEmsHomeContentJson,
     ContentEditor: EmsEditorContentModules,
-    label: 'ems_home'
+    label: 'ems_home',
+    isPageTemplate: true
   },
   components_sourcing: {
     defaults: componentsSourcingDefaults,
     normalize: normalizeComponentsSourcingContentJson,
     ContentEditor: ComponentsSourcingEditorContentModules,
-    label: 'components_sourcing'
+    label: 'components_sourcing',
+    isPageTemplate: true
   },
   contact_us: {
     defaults: contactUsDefaults,
     normalize: normalizeContactUsContentJson,
     ContentEditor: ContactUsEditorContentModules,
-    label: 'contact_us'
+    label: 'contact_us',
+    isPageTemplate: true
   },
   pcb_applications: {
     defaults: pcbApplicationsDefaults,
     normalize: normalizePcbApplicationsContentJson,
     ContentEditor: PcbApplicationsEditorContentModules,
-    label: 'pcb_applications'
+    label: 'pcb_applications',
+    isPageTemplate: true
   },
   pcb_board_manufacturing: {
     defaults: pcbBoardManufacturingDefaults,
     normalize: normalizePcbBoardManufacturingContentJson,
     ContentEditor: PcbBoardManufacturingEditorContentModules,
-    label: 'pcb_board_manufacturing'
+    label: 'pcb_board_manufacturing',
+    isPageTemplate: true
   },
   pcb_assembly: {
     defaults: pcbAssemblyDefaults,
     normalize: normalizePcbAssemblyContentJson,
     ContentEditor: PcbAssemblyEditorContentModules,
-    label: 'pcb_assembly'
+    label: 'pcb_assembly',
+    isPageTemplate: true
   },
   pcb_design: {
     defaults: pcbDesignDefaults,
     normalize: normalizePcbDesignContentJson,
     ContentEditor: PcbDesignEditorContentModules,
-    label: 'pcb_design'
+    label: 'pcb_design',
+    isPageTemplate: true
   },
   pcb_manufacturing: {
     defaults: pcbManufacturingDefaults,
     normalize: normalizePcbManufacturingContentJson,
     ContentEditor: PcbManufacturingEditorContentModules,
-    label: 'pcb_manufacturing'
+    label: 'pcb_manufacturing',
+    isPageTemplate: true
   },
   site_footer: {
     defaults: siteFooterDefaults,
     normalize: normalizeSiteFooterContentJson,
     ContentEditor: SiteFooterEditorContentModules,
-    label: 'site_footer'
+    label: 'site_footer',
+    isPageTemplate: false
   },
   site_header: {
     defaults: siteHeaderDefaults,
     normalize: normalizeSiteHeaderContentJson,
     ContentEditor: SiteHeaderEditorContentModules,
-    label: 'site_header'
+    label: 'site_header',
+    isPageTemplate: false
   },
   site_inquiry_form: {
     defaults: siteInquiryFormDefaults,
     normalize: normalizeSiteInquiryFormContentJson,
     ContentEditor: SiteInquiryFormEditorContentModules,
-    label: 'site_inquiry_form'
+    label: 'site_inquiry_form',
+    isPageTemplate: false
   },
   ems_service: {
     defaults: {},
     normalize: (data) => data,
     ContentEditor: null,
-    label: 'ems_service'
+    label: 'ems_service',
+    isPageTemplate: true
   }
 };
 
-/** 后台下拉选项列表 */
+/** 后台下拉选项列表（全部模板） */
 export const TEMPLATE_OPTIONS: { value: TemplateType; label: string }[] = (
   Object.entries(TEMPLATE_REGISTRY) as [TemplateType, TemplateConfig][]
 ).map(([value, config]) => ({ value, label: config.label }));
+
+/** 页面模板选项列表（排除 header/footer/form 等全局模板） */
+export const PAGE_TEMPLATE_OPTIONS: { value: TemplateType; label: string }[] = (
+  Object.entries(TEMPLATE_REGISTRY) as [TemplateType, TemplateConfig][]
+).filter(([, config]) => config.isPageTemplate)
+  .map(([value, config]) => ({ value, label: config.label }));
 
 /** 有 Schema 编辑器的模板列表 */
 export const TEMPLATES_WITH_SCHEMA: TemplateType[] = (

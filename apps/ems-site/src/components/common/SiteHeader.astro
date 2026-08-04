@@ -1,183 +1,504 @@
 ---
 import { siteHeaderDefaults } from '../../content/defaults/site-header';
+import type { SiteHeaderData, NavItemData, CapSectionData, CapTabData, SolTabData, SolStepData } from '../../content/schemas/site-header';
 import { getAssetPath, getHref } from '../../lib/assets';
 
-type ChildLink = { label?: string; href?: string; openInNewTab?: boolean };
-type NavItem = { label?: string; href?: string; openInNewTab?: boolean; children?: ChildLink[] };
-type HeaderData = {
-  logo_url?: string;
-  cta_text?: string;
-  cta_href?: string;
-  nav_items?: NavItem[];
-};
-
-const { data = siteHeaderDefaults } = Astro.props as { data?: HeaderData };
+const { data = siteHeaderDefaults } = Astro.props as { data?: SiteHeaderData };
 
 const fallbackLogoUrl = getAssetPath('/assets/images/rd-logo.png');
 const logoUrl = data?.logo_url?.trim() ? getAssetPath(data.logo_url) : fallbackLogoUrl;
-const ctaText = data?.cta_text?.trim() || siteHeaderDefaults.cta_text;
-const ctaHref = data?.cta_href?.trim() || siteHeaderDefaults.cta_href;
-const navItems = (data?.nav_items?.length ? data.nav_items : siteHeaderDefaults.nav_items) as NavItem[];
+const ctaText = data?.cta_text?.trim() || 'Get instant quote';
+const ctaHref = data?.cta_href?.trim() || '#';
+const navItems: NavItemData[] = (data?.nav_items?.length ? data.nav_items : siteHeaderDefaults.nav_items) as NavItemData[];
+const topBanner = data?.top_banner;
 ---
 
 <input id="ems-site-mobile-menu-toggle" type="checkbox" class="peer fixed left-0 top-0 h-px w-px opacity-0 pointer-events-none md:hidden" />
 
-<header class="site-header sticky top-0 z-[1000] border-b border-slate-100 bg-white px-4 sm:px-6 lg:px-10">
-  <div class="mx-auto flex h-20 max-w-[1440px] items-center justify-between gap-4">
+<!-- ═══ 顶部通知栏 ═══ -->
+{topBanner && (
+  <div class="top-banner flex items-center justify-between bg-[#1C1C1C] text-white px-6 py-2 text-[13px] font-medium">
+    <div class="flex-1 hidden sm:block"></div>
+    <div class="flex-[2] text-center">
+      {topBanner.notification_text}
+      {topBanner.notification_link_text && topBanner.notification_link_href && (
+        <a href={topBanner.notification_link_href} class="text-[#EA543F] underline font-bold ml-2.5">
+          {topBanner.notification_link_text} →
+        </a>
+      )}
+    </div>
+    <div class="flex-1 flex justify-end gap-6 items-center">
+      {topBanner.languages && topBanner.languages.length > 0 && (
+        <div class="lang-selector relative">
+          <button class="top-icon-btn bg-transparent border-none text-[13px] font-medium text-white cursor-pointer flex items-center gap-1 hover:text-[#EA543F] transition-colors">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="w-4 h-4"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"/><path d="M2 12H22"/><path d="M12 2C14.5013 4.73835 15.9228 8.29203 16 12C15.9228 15.708 14.5013 19.2616 12 22C9.49872 19.2616 8.07725 15.708 8 12C8.07725 8.29203 9.49872 4.73835 12 2Z"/></svg>
+            {topBanner.languages[0]?.code?.toUpperCase() || 'EN'} ▾
+          </button>
+          <div class="lang-menu absolute top-full right-0 mt-2.5 bg-white text-black shadow-[0_4px_15px_rgba(0,0,0,0.15)] rounded-xl overflow-hidden hidden flex-col min-w-[120px] z-[1001]">
+            {topBanner.languages.map((lang) => (
+              <a href="#" class="px-4 py-3 text-[13px] font-medium text-black no-underline border-b border-[#E5E5E5] last:border-b-0 hover:bg-[#F6F6F6] hover:text-[#EA543F] hover:pl-5 transition-all">
+                {lang.label}
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+      {topBanner.login_text && topBanner.login_href && (
+        <a href={topBanner.login_href} class="top-icon-btn bg-transparent border-none text-[13px] font-medium text-white cursor-pointer flex items-center gap-1 hover:text-[#EA543F] transition-colors no-underline">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="w-4 h-4"><path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21"/><path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z"/></svg>
+          {topBanner.login_text}
+        </a>
+      )}
+    </div>
+  </div>
+)}
+
+<!-- ═══ 主导航栏 ═══ -->
+<header class="site-header sticky top-0 z-[1000] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+  <div class="mx-auto flex h-20 max-w-[1440px] items-center justify-between px-6">
     <a href={getHref('/')} class="flex items-center no-underline" aria-label="RapidDirect home">
       {logoUrl ? (
-        <img src={logoUrl} alt="RapidDirect" class="h-10 w-auto object-contain" loading="eager" decoding="async" />
+        <img src={logoUrl} alt="RapidDirect" class="h-8 w-auto object-contain" loading="eager" decoding="async" />
       ) : (
-        <div class="h-10 w-10 rounded bg-slate-200" aria-hidden="true" />
+        <div class="h-8 w-8 rounded bg-slate-200" aria-hidden="true" />
       )}
     </a>
 
+    <!-- 移动端汉堡按钮 -->
     <label
       for="ems-site-mobile-menu-toggle"
-      class="inline-flex h-10 w-10 items-center justify-center rounded border border-slate-200 text-slate-900 hover:bg-slate-50 md:hidden"
+      class="inline-flex h-10 w-10 items-center justify-center rounded border border-slate-200 text-slate-900 hover:bg-slate-50 md:hidden cursor-pointer"
       aria-label="Open menu"
-      aria-controls="ems-site-mobile-menu"
-      role="button"
     >
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-6 w-6">
         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
       </svg>
     </label>
 
-    <nav class="hidden items-center gap-8 md:flex">
-      {navItems.map((item) => {
-        const hasChildren = item.children && item.children.length > 0;
-        if (hasChildren) {
-          const parentHref = item.href?.trim();
-          const parentIsLink = Boolean(parentHref && parentHref !== '#');
+    <!-- 桌面端导航 -->
+    <nav class="hidden md:flex items-center h-full">
+      <ul class="nav-links flex h-full list-none m-0 p-0">
+        {navItems.map((item) => {
+          const hasMega = item.mega_type === 'capabilities' || item.mega_type === 'solutions' || item.mega_type === 'industries' || item.mega_type === 'platform' || item.mega_type === 'resources' || item.mega_type === 'about';
           return (
-            <div class="nav-item has-dropdown relative flex items-center">
-              {parentIsLink ? (
-                <a
-                  href={getHref(parentHref!)}
-                  target={item.openInNewTab ? '_blank' : undefined}
-                  rel={item.openInNewTab ? 'noopener noreferrer' : undefined}
-                  class="nav-item-link flex items-center gap-1 py-7 text-base font-bold text-[#0f172a] no-underline transition-colors hover:text-[#f25537]"
-                >
-                  {item.label}
-                  <svg class="dropdown-icon h-4 w-4 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <li class="nav-item has-dropdown flex items-center px-4 static">
+              <a href={item.href || '#'} class="nav-item-link flex items-center gap-1 text-[15px] font-semibold text-black no-underline transition-colors hover:text-[#EA543F] cursor-pointer">
+                {item.label}
+                {hasMega && (
+                  <svg class="dropdown-icon w-3 h-3 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="6 9 12 15 18 9"></polyline>
                   </svg>
-                </a>
-              ) : (
-                <div class="flex cursor-pointer items-center gap-1 py-7 text-base font-bold text-[#0f172a] transition-colors hover:text-[#f25537]">
-                  {item.label}
-                  <svg class="dropdown-icon h-4 w-4 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="6 9 12 15 18 9"></polyline>
-                  </svg>
+                )}
+              </a>
+
+              {hasMega && item.mega_type === 'capabilities' && (
+                <div class="mega-menu absolute top-full left-1/2 -translate-x-1/2 translate-y-2.5 w-full max-w-[1280px] bg-[#1C1C1C] rounded-b-[20px] shadow-[0_20px_40px_rgba(0,0,0,0.2)] opacity-0 invisible pointer-events-none transition-all duration-300 flex overflow-hidden z-[999]">
+                  <div class="menu-body menu-body-capabilities flex-1 p-10 flex gap-10">
+                    {/* 左侧导航 */}
+                    <div class="cap-nav flex flex-col gap-4 min-w-0 bg-[rgba(255,255,255,0.05)] p-4 rounded-[10px] w-[220px] shrink-0">
+                      {item.sections?.map((section) => (
+                        <div class="cap-nav-section flex flex-col gap-2.5">
+                          <div class="cap-nav-label relative pb-2.5 text-sm font-bold text-white after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-[34px] after:h-px after:bg-[rgba(255,255,255,0.22)]">
+                            {section.section_label}
+                          </div>
+                          <div class="cap-nav-tabs flex flex-col gap-1">
+                            {section.tabs?.map((tab) => (
+                              <button
+                                type="button"
+                                class={`cap-tab w-full text-left px-3.5 py-2.5 rounded-none border-0 border-l border-transparent bg-transparent text-[13px] font-semibold cursor-pointer transition-all ${tab.is_muted ? 'text-[#B0B0B0]' : 'text-[#B0B0B0]'} hover:bg-[rgba(255,255,255,0.018)] hover:text-white hover:border-l-[rgba(234,84,63,0.36)]`}
+                                data-cap-tab={tab.tab_label.toLowerCase().replace(/\s+/g, '-')}
+                              >
+                                {tab.tab_label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* 中间面板区 */}
+                    <div class="cap-panels min-w-0 w-full">
+                      {item.sections?.flatMap((section) =>
+                        section.tabs?.map((tab, ti) => (
+                          <div class={`cap-panel ${ti === 0 && section === item.sections![0] ? 'is-active' : ''}`} data-cap-panel={tab.tab_label.toLowerCase().replace(/\s+/g, '-')} style="display:none">
+                            <div class="cap-panel-top flex items-start justify-between gap-5 mb-4 pb-3 border-b border-[rgba(255,255,255,0.1)]">
+                              <div class="text-[21px] leading-tight font-semibold text-[#EA543F] tracking-[-0.01em]">{tab.tab_label}</div>
+                            </div>
+                            {tab.cards && tab.cards.length > 0 && (
+                              <ul class="cap-card-grid list-none m-0 p-0 grid grid-cols-2 gap-2.5">
+                                {tab.cards.map((card) => (
+                                  <li class="min-w-0">
+                                    <a href={card.href || '#'} class="cap-service-card flex items-center min-h-[64px] px-4 py-3.5 rounded-md bg-[rgba(255,255,255,0.015)] border border-[rgba(255,255,255,0.06)] text-[#F5F5F5] no-underline text-sm font-[550] hover:bg-[rgba(255,255,255,0.028)] hover:border-[rgba(234,84,63,0.22)] hover:text-[#EA543F] transition-all">
+                                      {card.label}
+                                    </a>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+                        ))
+                      )}
+                      {/* 底部 CTA */}
+                      {item.footer && (
+                        <div class="cap-footer flex flex-wrap items-center justify-between gap-4 mt-[18px] pt-4 border-t border-[rgba(255,255,255,0.1)]">
+                          <div class="cap-footer-actions inline-flex items-center gap-[18px] flex-wrap">
+                            <a href={item.footer.browse_all_href || '#'} class="text-[13px] font-semibold text-[#EA543F] no-underline hover:translate-x-[3px] transition-all">Browse all capabilities →</a>
+                            <a href={item.footer.get_quote_href || '#'} class="text-[13px] font-semibold text-[#F5F5F5] no-underline hover:text-[#EA543F] hover:translate-x-[3px] transition-all">Get Instant Quote →</a>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 右侧图片 */}
+                    <div class="cap-visual w-[248px] min-w-0 h-[clamp(280px,30vw,340px)] rounded-lg overflow-hidden border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.01)] shrink-0 self-start" aria-hidden="true">
+                      {item.sections?.flatMap((section) =>
+                        section.tabs?.map((tab, i) => (
+                          tab.image_url ? (
+                            <img
+                              class={`cap-visual-img w-full h-full object-cover ${i === 0 && section === item.sections![0] ? 'is-active' : ''}`}
+                              data-cap-visual={tab.tab_label.toLowerCase().replace(/\s+/g, '-')}
+                              src={tab.image_url}
+                              alt=""
+                              loading="lazy"
+                              style="display:none"
+                            />
+                          ) : null
+                        ))
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
-              <div class="dropdown-menu absolute left-[-20px] top-full min-w-[240px] rounded-lg border border-slate-100 bg-white px-0 py-3 opacity-0 shadow-[0_10px_30px_rgba(0,0,0,0.08)] transition-all duration-300 invisible translate-y-2.5 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0">
-                {item.children!.map((child) => (
-                  <a
-                    href={getHref(child.href ?? '#')}
-                    target={child.openInNewTab ? '_blank' : undefined}
-                    rel={child.openInNewTab ? 'noopener noreferrer' : undefined}
-                    class="block px-6 py-3 text-[15px] font-medium text-[#475569] no-underline transition-all hover:text-[#f25537] hover:bg-[#fffaf9] hover:pl-7"
-                  >
-                    {child.label}
-                  </a>
-                ))}
-              </div>
-            </div>
+
+              {/* Solutions Mega Menu */}
+              {hasMega && item.mega_type === 'solutions' && (
+                <div class="mega-menu mega-menu-solutions absolute top-full left-1/2 -translate-x-1/2 translate-y-2.5 w-full max-w-[1280px] bg-[#1C1C1C] rounded-b-[20px] shadow-[0_20px_40px_rgba(0,0,0,0.2)] opacity-0 invisible pointer-events-none transition-all duration-300 flex overflow-hidden z-[999]">
+                  <div class="menu-body menu-body-solutions flex-1 p-10 flex gap-10">
+                    {/* 左侧导航 */}
+                    {item.tabs && item.tabs.length > 0 && (
+                      <div class="sol-nav flex flex-col gap-2.5 min-w-0 bg-[rgba(255,255,255,0.05)] py-3.5 px-[18px] rounded-[10px] w-[176px] shrink-0">
+                        <div class="sol-tabs flex flex-col gap-1">
+                          {item.tabs.map((tab) => (
+                            <button
+                              type="button"
+                              class="sol-tab w-full text-left px-3 py-2.5 rounded-none border-0 border-l border-transparent bg-transparent text-[13px] font-semibold text-[#B0B0B0] cursor-pointer transition-all hover:bg-[rgba(255,255,255,0.018)] hover:text-white hover:border-l-[rgba(234,84,63,0.36)]"
+                              data-sol-tab={tab.tab_label.toLowerCase().replace(/\s+/g, '-')}
+                            >
+                              {tab.tab_label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 中间面板区 */}
+                    <div class="sol-panels min-w-0 w-full">
+                      {item.tabs?.map((tab, ti) => {
+                        const isNpi = tab.panel_style === 'npi';
+                        return (
+                          <div class={`sol-panel${ti === 0 ? ' is-active' : ''}`} data-sol-panel={tab.tab_label.toLowerCase().replace(/\s+/g, '-')} style="display:none">
+                            <div class="sol-panel-top flex items-start justify-between gap-5 mb-3.5 pb-3 border-b border-[rgba(255,255,255,0.1)]">
+                              <div class="text-[21px] leading-tight font-semibold text-[#EA543F] tracking-[-0.01em]">{tab.tab_label}</div>
+                            </div>
+                            {tab.panel_desc && (
+                              <p class="text-sm leading-relaxed text-[#D2D2D2] max-w-[60ch] mb-3.5">{tab.panel_desc}</p>
+                            )}
+
+                            {/* NPI 样式：步骤时间轴 */}
+                            {isNpi && tab.steps && tab.steps.length > 0 && (
+                              <div class="sol-panel-body">
+                                <ul class="sol-stage-list list-none m-0 p-0 grid gap-3 relative before:content-[''] before:absolute before:left-[13px] before:top-2 before:bottom-2 before:w-px before:bg-[rgba(255,255,255,0.1)]">
+                                  {tab.steps.map((step) => (
+                                    <li class="sol-stage-item relative grid grid-cols-[30px_minmax(0,1fr)] gap-2.5 pl-0 border-l-0">
+                                      <div class="sol-stage-index relative z-[1] flex items-start justify-center">
+                                        <span class="w-[26px] h-[26px] rounded-full border border-[rgba(234,84,63,0.38)] bg-[#1C1C1C] text-[#EA543F] text-xs font-bold leading-6 text-center">{step.step_number}</span>
+                                      </div>
+                                      <div class="sol-stage-content grid gap-[3px] pb-1.5">
+                                        <a href="#" class="sol-stage-link no-underline text-inherit">
+                                          <div class="sol-stage-title text-sm font-semibold text-[#F5F5F5] transition-all hover:text-[#EA543F] hover:translate-x-0.5">{step.title}</div>
+                                          <div class="sol-stage-desc text-[13px] leading-relaxed text-[#AFAFAF] transition-colors">{step.desc}</div>
+                                        </a>
+                                      </div>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+
+                            {/* Manufacturing 样式：服务卡片 */}
+                            {!isNpi && tab.cards && tab.cards.length > 0 && (
+                              <div class="sol-panel-body">
+                                <ul class="sol-service-grid list-none m-0 p-0 grid grid-cols-2 gap-2.5">
+                                  {tab.cards.map((card) => (
+                                    <li>
+                                      <a href={card.href || '#'} class="sol-service-link flex items-center min-h-[60px] px-4 py-3.5 rounded-md bg-[rgba(255,255,255,0.015)] border border-[rgba(255,255,255,0.06)] text-[#F5F5F5] no-underline text-sm font-[550] hover:bg-[rgba(255,255,255,0.028)] hover:border-[rgba(234,84,63,0.22)] hover:text-[#EA543F] transition-all">{card.label}</a>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+
+                            {/* CTA */}
+                            <div class="sol-footer flex flex-wrap items-center gap-[18px] mt-3.5 pt-3.5 border-t border-[rgba(255,255,255,0.1)]">
+                              {tab.cta1_label && tab.cta1_href && (
+                                <a href={tab.cta1_href} class="text-[13px] font-semibold text-[#EA543F] no-underline hover:translate-x-[3px] transition-all">{tab.cta1_label} →</a>
+                              )}
+                              {tab.cta2_href && (
+                                <a href={tab.cta2_href} class="text-[13px] font-semibold text-[#F5F5F5] no-underline hover:text-[#EA543F] hover:translate-x-[3px] transition-all">Get Instant Quote →</a>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* 右侧图片 */}
+                    <div class="sol-aside min-w-0 self-center justify-self-center shrink-0">
+                      <div class="sol-visual w-[280px] min-w-0 h-[clamp(260px,30vw,340px)] rounded-lg overflow-hidden border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.01)]" aria-hidden="true">
+                        {item.tabs?.map((tab, ti) => (
+                          tab.image_url ? (
+                            <img
+                              class={`sol-visual-img w-full h-full object-cover ${ti === 0 ? 'is-active' : ''}`}
+                              data-sol-visual={tab.tab_label.toLowerCase().replace(/\s+/g, '-')}
+                              src={tab.image_url}
+                              alt=""
+                              loading="lazy"
+                              style="display:none"
+                            />
+                          ) : null
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Industries Mega Menu */}
+              {hasMega && item.mega_type === 'industries' && (
+                <div class="mega-menu absolute top-full left-1/2 -translate-x-1/2 translate-y-2.5 w-full max-w-[1280px] bg-[#1C1C1C] rounded-b-[20px] shadow-[0_20px_40px_rgba(0,0,0,0.2)] opacity-0 invisible pointer-events-none transition-all duration-300 flex overflow-hidden z-[999]">
+                  <div class="menu-body menu-body-industries flex-1 p-8 flex gap-7">
+                    {/* 左侧行业网格 */}
+                    <div class="industries-main min-w-0 flex-1">
+                      <div class="industries-header flex items-center justify-between gap-5 mb-4 pb-3 border-b border-[rgba(255,255,255,0.1)]">
+                        <div class="text-lg font-bold text-[#EA543F]">{item.industries_header_title || 'Industries We Serve'}</div>
+                        {item.industries_browse_href && (
+                          <a href={item.industries_browse_href} class="text-[13px] font-semibold text-[#EA543F] no-underline hover:translate-x-[3px] transition-all whitespace-nowrap">Browse all industries →</a>
+                        )}
+                      </div>
+                      <ul class="industry-grid list-none m-0 p-0 grid grid-cols-3 gap-x-3 gap-y-0.5">
+                        {item.industries?.map((ind) => (
+                          <li>
+                            <a href={ind.href || '#'} class="industry-link flex items-center gap-2.5 min-h-[46px] px-3 py-2.5 rounded-md bg-transparent border border-transparent no-underline text-[#F5F5F5] text-sm font-[550] hover:bg-[rgba(255,255,255,0.022)] hover:border-[rgba(234,84,63,0.2)] hover:text-[#EA543F] transition-all">
+                              {ind.icon_svg && (
+                                <span class="w-5 h-5 shrink-0 text-[#EA543F]" set:html={ind.icon_svg} />
+                              )}
+                              <span class="flex-1">{ind.label}</span>
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    {/* 右侧 Case Study 卡片 */}
+                    {item.case_study && (
+                      <div class="industries-aside min-w-0 self-center shrink-0">
+                        <div class="industries-castudies w-60 min-w-0 h-[clamp(210px,24vw,280px)] rounded-lg overflow-hidden border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.01)] relative">
+                          {item.case_study.image_url ? (
+                            <img class="industries-castudies-img w-full h-full object-cover" src={item.case_study.image_url} alt="" loading="lazy" />
+                          ) : (
+                            <div class="w-full h-full bg-[rgba(255,255,255,0.03)]" />
+                          )}
+                          <div class="industries-castudies-overlay absolute inset-0 flex flex-col justify-end gap-3 px-[18px] pb-[18px] pt-5 bg-gradient-to-b from-[rgba(0,0,0,0.04)] via-transparent to-[rgba(0,0,0,0.72)]">
+                            {item.case_study.tag && (
+                              <div class="text-[10px] font-bold tracking-wider uppercase text-white bg-[rgba(234,84,63,0.9)] inline-block px-2.5 py-[3px] rounded w-fit">{item.case_study.tag}</div>
+                            )}
+                            <div class="flex flex-col gap-1.5">
+                              {item.case_study.title && (
+                                <div class="text-lg leading-tight font-semibold text-white">{item.case_study.title}</div>
+                              )}
+                            </div>
+                            {item.case_study.cta_label && item.case_study.cta_href && (
+                              <a href={item.case_study.cta_href} class="text-[13px] font-semibold text-[#EA543F] no-underline hover:text-[#EA543F] hover:translate-x-[3px] transition-all inline-flex items-center gap-1.5 w-fit">{item.case_study.cta_label} →</a>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Platform Mega Menu */}
+              {hasMega && item.mega_type === 'platform' && (
+                <div class="mega-menu absolute top-full left-1/2 -translate-x-1/2 translate-y-2.5 w-full max-w-[1280px] bg-[#1C1C1C] rounded-b-[20px] shadow-[0_20px_40px_rgba(0,0,0,0.2)] opacity-0 invisible pointer-events-none transition-all duration-300 flex overflow-hidden z-[999]">
+                  <div class="menu-body menu-body-platform flex-1 p-8 grid grid-cols-2 gap-7">
+                    {item.platform_cards?.map((card) => {
+                      const isTimeline = card.list_style === 'timeline';
+                      return (
+                        <div class="platform-card min-w-0 flex flex-col gap-3.5">
+                          {card.image_url && (
+                            <div class="platform-shot w-full aspect-[16/9] overflow-hidden rounded-lg">
+                              <img class="platform-shot-img w-full h-full object-contain" src={card.image_url} alt="" loading="lazy" />
+                            </div>
+                          )}
+                          <div class="text-lg font-bold text-[#EA543F] pb-3 border-b-2 border-[rgba(255,255,255,0.14)] flex justify-between items-center">
+                            {card.title}
+                          </div>
+                          {card.description && (
+                            <p class="text-[13px] leading-relaxed text-[#D2D2D2] -mt-1.5">{card.description}</p>
+                          )}
+
+                          {/* Simple list style */}
+                          {!isTimeline && card.links && card.links.length > 0 && (
+                            <ul class="menu-list platform-links list-none m-0 p-0 mt-1.5">
+                              {card.links.map((link) => (
+                                <li class="relative mb-2.5 pl-3.5 before:content-['•'] before:absolute before:left-0 before:top-[0.18em] before:text-[rgba(245,245,245,0.35)] before:text-sm before:leading-none">
+                                  <a href={link.href || '#'} class="text-[#F5F5F5] no-underline text-sm hover:text-[#EA543F] hover:translate-x-[5px] transition-all inline-block">{link.label}</a>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+
+                          {/* Timeline list style */}
+                          {isTimeline && card.links && card.links.length > 0 && (
+                            <ul class="timeline-list border-l-2 border-[rgba(255,255,255,0.14)] pl-5 ml-1 flex flex-col gap-3.5 list-none m-0 p-0 mt-1.5">
+                              {card.links.map((link, i) => (
+                                <li class="relative before:content-[''] before:absolute before:left-[-25px] before:top-[5px] before:w-2 before:h-2 before:rounded-full before:bg-[rgba(245,245,245,0.25)] hover:before:bg-[#EA543F] hover:before:shadow-[0_0_8px_rgba(234,84,63,0.5)] before:transition-all">
+                                  <a href={link.href || '#'} class="no-underline block">
+                                    <span class="timeline-title text-sm text-[#F5F5F5] font-medium block hover:text-[#EA543F] hover:translate-x-[3px] transition-all">{link.label}</span>
+                                  </a>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+
+                          {isTimeline && card.cta_label && card.cta_href && (
+                            <a href={card.cta_href} class="btn-ai inline-block bg-[rgba(234,84,63,0.12)] border border-[#EA543F] text-[#EA543F] px-5 py-2.5 text-center rounded-xl no-underline font-semibold text-[13px] hover:bg-[#EA543F] hover:text-white hover:shadow-[0_4px_15px_rgba(234,84,63,0.3)] hover:-translate-y-0.5 transition-all mt-4">{card.cta_label} →</a>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Resources Mega Menu */}
+              {hasMega && item.mega_type === 'resources' && (
+                <div class="mega-menu absolute top-full left-1/2 -translate-x-1/2 translate-y-2.5 w-full max-w-[1280px] bg-[#1C1C1C] rounded-b-[20px] shadow-[0_20px_40px_rgba(0,0,0,0.2)] opacity-0 invisible pointer-events-none transition-all duration-300 flex overflow-hidden z-[999]">
+                  <div class="menu-body menu-body-resources flex-1 p-8 grid grid-cols-3 gap-7">
+                    {item.resource_sections?.map((section) => {
+                      const isService = section.link_style === 'service';
+                      return (
+                        <div class="resources-section min-w-0">
+                          <div class="text-lg font-bold text-[#EA543F] pb-3 border-b-2 border-[rgba(255,255,255,0.14)] mb-5">{section.section_title}</div>
+
+                          {/* Service 样式：标题+描述卡片 */}
+                          {isService && section.service_items && section.service_items.length > 0 && (
+                            <div class="materials-service flex flex-col gap-2.5 mb-5">
+                              {section.service_items.map((item) => (
+                                <a href={item.href || '#'} class="service-item flex flex-col gap-[3px] px-3 py-2.5 rounded-md bg-transparent border border-transparent no-underline hover:bg-[rgba(255,255,255,0.04)] hover:border-[rgba(255,255,255,0.08)] transition-all">
+                                  <span class="service-title text-sm font-[550] text-[#F5F5F5] hover:text-[#EA543F] transition-colors">{item.title}</span>
+                                  <span class="service-desc text-xs leading-relaxed text-[#9A9A9A]">{item.desc}</span>
+                                </a>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Simple 样式：链接列表 */}
+                          {!isService && section.links && section.links.length > 0 && (
+                            <ul class="menu-list list-none m-0 p-0 mb-5">
+                              {section.links.map((link) => (
+                                <li class="mb-3">
+                                  <a href={link.href || '#'} class="text-[#F5F5F5] no-underline text-sm hover:text-[#EA543F] hover:translate-x-[5px] transition-all inline-block">{link.label}</a>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+
+                          {/* Footer */}
+                          {section.footer_label && section.footer_href && (
+                            <a href={section.footer_href} class="text-sm text-[#EA543F] no-underline font-semibold hover:underline hover:translate-x-[5px] transition-all inline-block">{section.footer_label} →</a>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* About Mega Menu */}
+              {hasMega && item.mega_type === 'about' && (
+                <div class="mega-menu absolute top-full left-1/2 -translate-x-1/2 translate-y-2.5 w-full max-w-[1280px] bg-[#1C1C1C] rounded-b-[20px] shadow-[0_20px_40px_rgba(0,0,0,0.2)] opacity-0 invisible pointer-events-none transition-all duration-300 flex overflow-hidden z-[999]">
+                  {/* 左侧 Banner */}
+                  <div class="menu-banner w-[250px] shrink-0 relative p-[34px_26px] flex flex-col bg-cover bg-center" style={item.about_banner_image_url ? `background-image: url(${item.about_banner_image_url})` : ''}>
+                    <div class="menu-banner-overlay absolute inset-0 bg-gradient-to-b from-[rgba(0,0,0,0.7)] to-[rgba(0,0,0,0.3)] z-[1]"></div>
+                    <div class="menu-banner-content relative z-[2] text-white">
+                      {item.about_banner_title && (
+                        <div class="text-2xl font-bold mb-3 text-white">{item.about_banner_title}</div>
+                      )}
+                      {item.about_banner_desc && (
+                        <p class="text-sm text-[#C7C7C7] leading-relaxed">{item.about_banner_desc}</p>
+                      )}
+                    </div>
+                  </div>
+                  {/* 右侧链接组 */}
+                  <div class="menu-body flex-1 p-10 grid grid-cols-2 gap-[50px]">
+                    {item.about_link_groups?.map((group) => (
+                      <div class="min-w-0">
+                        <div class="text-lg font-bold text-[#EA543F] pb-3 border-b-2 border-[rgba(255,255,255,0.14)] mb-5">{group.group_title}</div>
+                        <ul class="menu-list list-none m-0 p-0">
+                          {group.links?.map((link) => (
+                            <li class="mb-3">
+                              <a href={link.href || '#'} class="text-[#F5F5F5] no-underline text-sm hover:text-[#EA543F] hover:translate-x-[5px] transition-all inline-block">{link.label}</a>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </li>
           );
-        }
-        return (
-          <a
-            href={getHref(item.href ?? '#')}
-            target={item.openInNewTab ? '_blank' : undefined}
-            rel={item.openInNewTab ? 'noopener noreferrer' : undefined}
-            class="nav-item py-7 text-base font-bold text-[#0f172a] no-underline transition-colors hover:text-[#f25537]"
-          >
-            {item.label}
-          </a>
-        );
-      })}
+        })}
+      </ul>
     </nav>
 
-    <div class="hidden items-center gap-5 md:flex">
-      <a href={getHref(ctaHref)} class="rounded px-7 py-3.5 text-base font-bold text-white no-underline transition-colors bg-[#f25537] hover:bg-[#d94527]">
+    <!-- CTA 按钮 -->
+    <div class="hidden md:flex items-center gap-5">
+      <a href={getHref(ctaHref)} class="btn-quote rounded-xl px-6 py-3 text-sm font-semibold text-white no-underline bg-[#EA543F] hover:bg-[#D84A36] transition-colors">
         {ctaText}
       </a>
     </div>
   </div>
 </header>
 
+<!-- ═══ 移动端菜单 ═══ -->
 <div
   id="ems-site-mobile-menu"
   class="mobile-menu fixed inset-0 z-[1100] opacity-0 pointer-events-none transition-opacity duration-300 peer-checked:opacity-100 peer-checked:pointer-events-auto peer-checked:[&_.mobile-menu-panel]:translate-x-0 md:hidden"
   role="dialog"
   aria-modal="true"
-  aria-hidden="true"
 >
   <label class="absolute inset-0 bg-slate-900/40" for="ems-site-mobile-menu-toggle" aria-label="Close menu"></label>
-
   <div class="mobile-menu-panel absolute right-0 top-0 h-full w-[82vw] max-w-[380px] translate-x-full bg-white text-slate-900 shadow-[-20px_0_60px_rgba(15,23,42,0.18)] transition-transform duration-300 ease-out">
     <div class="flex h-16 items-center justify-between border-b border-slate-200 px-5">
       <div class="text-lg font-semibold tracking-tight">Menu</div>
-      <label
-        for="ems-site-mobile-menu-toggle"
-        class="inline-flex h-10 w-10 items-center justify-center rounded border border-slate-200 text-slate-900 hover:bg-slate-50"
-        aria-label="Close menu"
-        role="button"
-      >
+      <label for="ems-site-mobile-menu-toggle" class="inline-flex h-10 w-10 items-center justify-center rounded border border-slate-200 text-slate-900 hover:bg-slate-50 cursor-pointer" aria-label="Close menu">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-6 w-6">
           <path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6l-12 12" />
         </svg>
       </label>
     </div>
-
     <div class="h-[calc(100vh-4rem)] overflow-y-auto px-5 pb-6 pt-4">
       <nav class="flex flex-col">
-        {navItems.map((item) => {
-          const hasChildren = item.children && item.children.length > 0;
-          if (hasChildren) {
-            return (
-              <details class="border-b border-slate-200 py-2">
-                <summary class="flex cursor-pointer list-none items-center justify-between py-3 text-base font-semibold text-slate-900">
-                  <span>{item.label}</span>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5 text-slate-500">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6" />
-                  </svg>
-                </summary>
-                <div class="pb-3">
-                  {item.children!.map((child) => (
-                    <a
-                      href={getHref(child.href ?? '#')}
-                      target={child.openInNewTab ? '_blank' : undefined}
-                      rel={child.openInNewTab ? 'noopener noreferrer' : undefined}
-                      class="block rounded px-3 py-2 text-[15px] font-medium text-slate-600 hover:bg-slate-50 hover:text-[#f25537]"
-                    >
-                      {child.label}
-                    </a>
-                  ))}
-                </div>
-              </details>
-            );
-          }
-          return (
-            <a
-              href={getHref(item.href ?? '#')}
-              target={item.openInNewTab ? '_blank' : undefined}
-              rel={item.openInNewTab ? 'noopener noreferrer' : undefined}
-              class="border-b border-slate-200 py-4 text-base font-semibold text-slate-900 hover:bg-slate-50 hover:text-[#f25537]"
-            >
-              {item.label}
-            </a>
-          );
-        })}
+        {navItems.map((item) => (
+          <a href={item.href || '#'} class="border-b border-slate-200 py-4 text-base font-semibold text-slate-900 hover:bg-slate-50 hover:text-[#EA543F] no-underline">
+            {item.label}
+          </a>
+        ))}
       </nav>
-
       <div class="mt-6">
-        <a
-          href={getHref(ctaHref)}
-          class="block w-full rounded bg-[#f25537] px-6 py-3.5 text-center text-base font-bold text-white no-underline transition-colors hover:bg-[#d94527]"
-        >
+        <a href={getHref(ctaHref)} class="block w-full rounded-xl bg-[#EA543F] px-6 py-3.5 text-center text-base font-bold text-white no-underline hover:bg-[#D84A36] transition-colors">
           {ctaText}
         </a>
       </div>
@@ -185,19 +506,57 @@ const navItems = (data?.nav_items?.length ? data.nav_items : siteHeaderDefaults.
   </div>
 </div>
 
+<!-- ═══ 样式 ═══ -->
 <style>
+  /* 顶部通知栏 */
+  .lang-selector:hover .lang-menu,
+  .lang-selector:focus-within .lang-menu {
+    display: flex;
+  }
+
+  /* 导航栏 */
+  .nav-item:hover > .nav-item-link {
+    color: #EA543F;
+  }
   .has-dropdown:hover .dropdown-icon {
     transform: rotate(180deg);
-    color: #f25537;
   }
-  .has-dropdown:hover .nav-item-link {
-    color: #f25537;
-  }
-  .has-dropdown:hover .dropdown-menu {
+
+  /* Mega Menu 展开 */
+  .has-dropdown:hover .mega-menu {
     opacity: 1;
     visibility: visible;
-    transform: translateY(0);
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
   }
+
+  /* Capabilities Panel 显示 */
+  .cap-panel.is-active {
+    display: block !important;
+  }
+  .cap-visual-img.is-active {
+    display: block !important;
+  }
+  .cap-tab.is-active {
+    color: #FFFFFF !important;
+    border-left-color: rgba(234,84,63,0.9) !important;
+    background: rgba(255,255,255,0.018);
+  }
+
+  /* Solutions Panel 显示 */
+  .sol-panel.is-active {
+    display: block !important;
+  }
+  .sol-visual-img.is-active {
+    display: block !important;
+  }
+  .sol-tab.is-active {
+    color: #FFFFFF !important;
+    border-left-color: rgba(234,84,63,0.9) !important;
+    background: rgba(255,255,255,0.018);
+  }
+
+  /* 移动端 */
   .mobile-menu details[open] summary svg {
     transform: rotate(180deg);
   }
@@ -208,3 +567,68 @@ const navItems = (data?.nav_items?.length ? data.nav_items : siteHeaderDefaults.
     overflow: hidden;
   }
 </style>
+
+<!-- ═══ JavaScript ═══ -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Capabilities tab 切换
+    const capTabs = document.querySelectorAll('.cap-tab[data-cap-tab]');
+    const capPanels = document.querySelectorAll('.cap-panel[data-cap-panel]');
+    const capVisuals = document.querySelectorAll('.cap-visual-img[data-cap-visual]');
+
+    const activateCapTab = (tabKey: string) => {
+      capTabs.forEach(tab => {
+        const isActive = tab.getAttribute('data-cap-tab') === tabKey;
+        tab.classList.toggle('is-active', isActive);
+      });
+      capPanels.forEach(panel => {
+        panel.classList.toggle('is-active', panel.getAttribute('data-cap-panel') === tabKey);
+      });
+      capVisuals.forEach(img => {
+        img.classList.toggle('is-active', img.getAttribute('data-cap-visual') === tabKey);
+      });
+    };
+
+    capTabs.forEach(tab => {
+      const key = tab.getAttribute('data-cap-tab');
+      if (key) {
+        tab.addEventListener('mouseenter', () => activateCapTab(key));
+        tab.addEventListener('focus', () => activateCapTab(key));
+        tab.addEventListener('click', (e) => {
+          e.preventDefault();
+          activateCapTab(key);
+        });
+      }
+    });
+
+    // Solutions tab 切换
+    const solTabs = document.querySelectorAll('.sol-tab[data-sol-tab]');
+    const solPanels = document.querySelectorAll('.sol-panel[data-sol-panel]');
+    const solVisuals = document.querySelectorAll('.sol-visual-img[data-sol-visual]');
+
+    const activateSolTab = (tabKey: string) => {
+      solTabs.forEach(tab => {
+        const isActive = tab.getAttribute('data-sol-tab') === tabKey;
+        tab.classList.toggle('is-active', isActive);
+      });
+      solPanels.forEach(panel => {
+        panel.classList.toggle('is-active', panel.getAttribute('data-sol-panel') === tabKey);
+      });
+      solVisuals.forEach(img => {
+        img.classList.toggle('is-active', img.getAttribute('data-sol-visual') === tabKey);
+      });
+    };
+
+    solTabs.forEach(tab => {
+      const key = tab.getAttribute('data-sol-tab');
+      if (key) {
+        tab.addEventListener('mouseenter', () => activateSolTab(key));
+        tab.addEventListener('focus', () => activateSolTab(key));
+        tab.addEventListener('click', (e) => {
+          e.preventDefault();
+          activateSolTab(key);
+        });
+      }
+    });
+  });
+</script>

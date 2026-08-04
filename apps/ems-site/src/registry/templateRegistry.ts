@@ -118,7 +118,7 @@ export const TEMPLATE_REGISTRY: Record<TemplateType, TemplateConfig> = {
     isPageTemplate: false
   },
   site_header: {
-    defaults: siteHeaderDefaults,
+    defaults: siteHeaderDefaults as unknown as Record<string, unknown>,
     normalize: normalizeSiteHeaderContentJson,
     ContentEditor: SiteHeaderEditorContentModules,
     label: 'site_header',

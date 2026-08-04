@@ -1,0 +1,98 @@
+---
+import type { NavItemData } from '../../content/schemas/site-header';
+const { item } = Astro.props as { item: NavItemData };
+---
+
+<div class="mega-menu mega-menu-solutions absolute top-full left-1/2 -translate-x-1/2 translate-y-2.5 w-full max-w-[1280px] bg-[#1C1C1C] rounded-b-[20px] shadow-[0_20px_40px_rgba(0,0,0,0.2)] opacity-0 invisible pointer-events-none transition-all duration-300 flex overflow-hidden z-[999]">
+  <div class="menu-body menu-body-solutions flex-1 p-10 flex gap-10">
+    {item.tabs && item.tabs.length > 0 && (
+      <div class="sol-nav flex flex-col gap-2.5 min-w-0 bg-[rgba(255,255,255,0.05)] py-3.5 px-[18px] rounded-[10px] w-[176px] shrink-0">
+        <div class="sol-tabs flex flex-col gap-1">
+          {item.tabs.map((tab) => (
+            <button
+              type="button"
+              class="sol-tab w-full text-left px-3 py-2.5 rounded-none border-0 border-l border-transparent bg-transparent text-[13px] font-semibold text-[#B0B0B0] cursor-pointer transition-all hover:bg-[rgba(255,255,255,0.018)] hover:text-white hover:border-l-[rgba(234,84,63,0.36)]"
+              data-sol-tab={tab.tab_label.toLowerCase().replace(/\s+/g, '-')}
+            >
+              {tab.tab_label}
+            </button>
+          ))}
+        </div>
+      </div>
+    )}
+
+    <div class="sol-panels min-w-0 w-full">
+      {item.tabs?.map((tab, ti) => {
+        const isNpi = tab.panel_style === 'npi';
+        return (
+          <div class={`sol-panel${ti === 0 ? ' is-active' : ''}`} data-sol-panel={tab.tab_label.toLowerCase().replace(/\s+/g, '-')} style="display:none">
+            <div class="sol-panel-top flex items-start justify-between gap-5 mb-3.5 pb-3 border-b border-[rgba(255,255,255,0.1)]">
+              <div class="text-[21px] leading-tight font-semibold text-[#EA543F] tracking-[-0.01em]">{tab.tab_label}</div>
+            </div>
+            {tab.panel_desc && (
+              <p class="text-sm leading-relaxed text-[#D2D2D2] max-w-[60ch] mb-3.5">{tab.panel_desc}</p>
+            )}
+
+            {isNpi && tab.steps && tab.steps.length > 0 && (
+              <div class="sol-panel-body">
+                <ul class="sol-stage-list list-none m-0 p-0 grid gap-3 relative before:content-[''] before:absolute before:left-[13px] before:top-2 before:bottom-2 before:w-px before:bg-[rgba(255,255,255,0.1)]">
+                  {tab.steps.map((step) => (
+                    <li class="sol-stage-item relative grid grid-cols-[30px_minmax(0,1fr)] gap-2.5 pl-0 border-l-0">
+                      <div class="sol-stage-index relative z-[1] flex items-start justify-center">
+                        <span class="w-[26px] h-[26px] rounded-full border border-[rgba(234,84,63,0.38)] bg-[#1C1C1C] text-[#EA543F] text-xs font-bold leading-6 text-center">{step.step_number}</span>
+                      </div>
+                      <div class="sol-stage-content grid gap-[3px] pb-1.5">
+                        <a href="#" class="sol-stage-link no-underline text-inherit">
+                          <div class="sol-stage-title text-sm font-semibold text-[#F5F5F5] transition-all hover:text-[#EA543F] hover:translate-x-0.5">{step.title}</div>
+                          <div class="sol-stage-desc text-[13px] leading-relaxed text-[#AFAFAF] transition-colors">{step.desc}</div>
+                        </a>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {!isNpi && tab.cards && tab.cards.length > 0 && (
+              <div class="sol-panel-body">
+                <ul class="sol-service-grid list-none m-0 p-0 grid grid-cols-2 gap-2.5">
+                  {tab.cards.map((card) => (
+                    <li>
+                      <a href={card.href || '#'} class="sol-service-link flex items-center min-h-[60px] px-4 py-3.5 rounded-md bg-[rgba(255,255,255,0.015)] border border-[rgba(255,255,255,0.06)] text-[#F5F5F5] no-underline text-sm font-[550] hover:bg-[rgba(255,255,255,0.028)] hover:border-[rgba(234,84,63,0.22)] hover:text-[#EA543F] transition-all">{card.label}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <div class="sol-footer flex flex-wrap items-center gap-[18px] mt-3.5 pt-3.5 border-t border-[rgba(255,255,255,0.1)]">
+              {tab.cta1_label && tab.cta1_href && (
+                <a href={tab.cta1_href} class="text-[13px] font-semibold text-[#EA543F] no-underline hover:translate-x-[3px] transition-all">{tab.cta1_label} →</a>
+              )}
+              {tab.cta2_href && (
+                <a href={tab.cta2_href} class="text-[13px] font-semibold text-[#F5F5F5] no-underline hover:text-[#EA543F] hover:translate-x-[3px] transition-all">Get Instant Quote →</a>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+
+    <div class="sol-aside min-w-0 self-center justify-self-center shrink-0">
+      <div class="sol-visual w-[280px] min-w-0 h-[clamp(260px,30vw,340px)] rounded-lg overflow-hidden border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.01)]" aria-hidden="true">
+        {item.tabs?.map((tab, ti) => (
+          tab.image_url ? (
+            <img
+              class={`sol-visual-img w-full h-full object-cover ${ti === 0 ? 'is-active' : ''}`}
+              data-sol-visual={tab.tab_label.toLowerCase().replace(/\s+/g, '-')}
+              src={tab.image_url}
+              alt=""
+              loading="lazy"
+              style="display:none"
+            />
+          ) : null
+        ))}
+      </div>
+    </div>
+  </div>
+</div>

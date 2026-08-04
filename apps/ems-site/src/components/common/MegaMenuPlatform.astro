@@ -1,0 +1,53 @@
+---
+import type { NavItemData } from '../../content/schemas/site-header';
+const { item } = Astro.props as { item: NavItemData };
+---
+
+<div class="mega-menu absolute top-full left-1/2 -translate-x-1/2 translate-y-2.5 w-full max-w-[1280px] bg-[#1C1C1C] rounded-b-[20px] shadow-[0_20px_40px_rgba(0,0,0,0.2)] opacity-0 invisible pointer-events-none transition-all duration-300 flex overflow-hidden z-[999]">
+  <div class="menu-body menu-body-platform flex-1 p-8 grid grid-cols-2 gap-7">
+    {item.platform_cards?.map((card) => {
+      const isTimeline = card.list_style === 'timeline';
+      return (
+        <div class="platform-card min-w-0 flex flex-col gap-3.5">
+          {card.image_url && (
+            <div class="platform-shot w-full aspect-[16/9] overflow-hidden rounded-lg">
+              <img class="platform-shot-img w-full h-full object-contain" src={card.image_url} alt="" loading="lazy" />
+            </div>
+          )}
+          <div class="text-lg font-bold text-[#EA543F] pb-3 border-b-2 border-[rgba(255,255,255,0.14)] flex justify-between items-center">
+            {card.title}
+          </div>
+          {card.description && (
+            <p class="text-[13px] leading-relaxed text-[#D2D2D2] -mt-1.5">{card.description}</p>
+          )}
+
+          {!isTimeline && card.links && card.links.length > 0 && (
+            <ul class="menu-list platform-links list-none m-0 p-0 mt-1.5">
+              {card.links.map((link) => (
+                <li class="relative mb-2.5 pl-3.5 before:content-['•'] before:absolute before:left-0 before:top-[0.18em] before:text-[rgba(245,245,245,0.35)] before:text-sm before:leading-none">
+                  <a href={link.href || '#'} class="text-[#F5F5F5] no-underline text-sm hover:text-[#EA543F] hover:translate-x-[5px] transition-all inline-block">{link.label}</a>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {isTimeline && card.links && card.links.length > 0 && (
+            <ul class="timeline-list border-l-2 border-[rgba(255,255,255,0.14)] pl-5 ml-1 flex flex-col gap-3.5 list-none m-0 p-0 mt-1.5">
+              {card.links.map((link, i) => (
+                <li class="relative before:content-[''] before:absolute before:left-[-25px] before:top-[5px] before:w-2 before:h-2 before:rounded-full before:bg-[rgba(245,245,245,0.25)] hover:before:bg-[#EA543F] hover:before:shadow-[0_0_8px_rgba(234,84,63,0.5)] before:transition-all">
+                  <a href={link.href || '#'} class="no-underline block">
+                    <span class="timeline-title text-sm text-[#F5F5F5] font-medium block hover:text-[#EA543F] hover:translate-x-[3px] transition-all">{link.label}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {isTimeline && card.cta_label && card.cta_href && (
+            <a href={card.cta_href} class="btn-ai inline-block bg-[rgba(234,84,63,0.12)] border border-[#EA543F] text-[#EA543F] px-5 py-2.5 text-center rounded-xl no-underline font-semibold text-[13px] hover:bg-[#EA543F] hover:text-white hover:shadow-[0_4px_15px_rgba(234,84,63,0.3)] hover:-translate-y-0.5 transition-all mt-4">{card.cta_label} →</a>
+          )}
+        </div>
+      );
+    })}
+  </div>
+</div>

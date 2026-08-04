@@ -1,0 +1,77 @@
+---
+import type { NavItemData } from '../../content/schemas/site-header';
+const { item } = Astro.props as { item: NavItemData };
+---
+
+<div class="mega-menu absolute top-full left-1/2 -translate-x-1/2 translate-y-2.5 w-full max-w-[1280px] bg-[#1C1C1C] rounded-b-[20px] shadow-[0_20px_40px_rgba(0,0,0,0.2)] opacity-0 invisible pointer-events-none transition-all duration-300 flex overflow-hidden z-[999]">
+  <div class="menu-body menu-body-capabilities flex-1 p-10 flex gap-10">
+    <div class="cap-nav flex flex-col gap-4 min-w-0 bg-[rgba(255,255,255,0.05)] p-4 rounded-[10px] w-[220px] shrink-0">
+      {item.sections?.map((section) => (
+        <div class="cap-nav-section flex flex-col gap-2.5">
+          <div class="cap-nav-label relative pb-2.5 text-sm font-bold text-white after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-[34px] after:h-px after:bg-[rgba(255,255,255,0.22)]">
+            {section.section_label}
+          </div>
+          <div class="cap-nav-tabs flex flex-col gap-1">
+            {section.tabs?.map((tab) => (
+              <button
+                type="button"
+                class="cap-tab w-full text-left px-3.5 py-2.5 rounded-none border-0 border-l border-transparent bg-transparent text-[13px] font-semibold cursor-pointer transition-all text-[#B0B0B0] hover:bg-[rgba(255,255,255,0.018)] hover:text-white hover:border-l-[rgba(234,84,63,0.36)]"
+                data-cap-tab={tab.tab_label.toLowerCase().replace(/\s+/g, '-')}
+              >
+                {tab.tab_label}
+              </button>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div class="cap-panels min-w-0 w-full">
+      {item.sections?.flatMap((section) =>
+        section.tabs?.map((tab, ti) => (
+          <div class={`cap-panel ${ti === 0 && section === item.sections![0] ? 'is-active' : ''}`} data-cap-panel={tab.tab_label.toLowerCase().replace(/\s+/g, '-')} style="display:none">
+            <div class="cap-panel-top flex items-start justify-between gap-5 mb-4 pb-3 border-b border-[rgba(255,255,255,0.1)]">
+              <div class="text-[21px] leading-tight font-semibold text-[#EA543F] tracking-[-0.01em]">{tab.tab_label}</div>
+            </div>
+            {tab.cards && tab.cards.length > 0 && (
+              <ul class="cap-card-grid list-none m-0 p-0 grid grid-cols-2 gap-2.5">
+                {tab.cards.map((card) => (
+                  <li class="min-w-0">
+                    <a href={card.href || '#'} class="cap-service-card flex items-center min-h-[64px] px-4 py-3.5 rounded-md bg-[rgba(255,255,255,0.015)] border border-[rgba(255,255,255,0.06)] text-[#F5F5F5] no-underline text-sm font-[550] hover:bg-[rgba(255,255,255,0.028)] hover:border-[rgba(234,84,63,0.22)] hover:text-[#EA543F] transition-all">
+                      {card.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        ))
+      )}
+      {item.footer && (
+        <div class="cap-footer flex flex-wrap items-center justify-between gap-4 mt-[18px] pt-4 border-t border-[rgba(255,255,255,0.1)]">
+          <div class="cap-footer-actions inline-flex items-center gap-[18px] flex-wrap">
+            <a href={item.footer.browse_all_href || '#'} class="text-[13px] font-semibold text-[#EA543F] no-underline hover:translate-x-[3px] transition-all">Browse all capabilities →</a>
+            <a href={item.footer.get_quote_href || '#'} class="text-[13px] font-semibold text-[#F5F5F5] no-underline hover:text-[#EA543F] hover:translate-x-[3px] transition-all">Get Instant Quote →</a>
+          </div>
+        </div>
+      )}
+    </div>
+
+    <div class="cap-visual w-[248px] min-w-0 h-[clamp(280px,30vw,340px)] rounded-lg overflow-hidden border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.01)] shrink-0 self-start" aria-hidden="true">
+      {item.sections?.flatMap((section) =>
+        section.tabs?.map((tab, i) => (
+          tab.image_url ? (
+            <img
+              class={`cap-visual-img w-full h-full object-cover ${i === 0 && section === item.sections![0] ? 'is-active' : ''}`}
+              data-cap-visual={tab.tab_label.toLowerCase().replace(/\s+/g, '-')}
+              src={tab.image_url}
+              alt=""
+              loading="lazy"
+              style="display:none"
+            />
+          ) : null
+        ))
+      )}
+    </div>
+  </div>
+</div>

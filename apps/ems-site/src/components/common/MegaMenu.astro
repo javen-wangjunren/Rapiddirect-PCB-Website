@@ -1,0 +1,18 @@
+---
+import type { NavItemData } from '../../content/schemas/site-header';
+import MegaMenuCapabilities from './MegaMenuCapabilities.astro';
+import MegaMenuSolutions from './MegaMenuSolutions.astro';
+import MegaMenuIndustries from './MegaMenuIndustries.astro';
+import MegaMenuPlatform from './MegaMenuPlatform.astro';
+import MegaMenuResources from './MegaMenuResources.astro';
+import MegaMenuAbout from './MegaMenuAbout.astro';
+
+const { item } = Astro.props as { item: NavItemData };
+---
+
+{item.mega_type === 'capabilities' && <MegaMenuCapabilities item={item} />}
+{item.mega_type === 'solutions' && <MegaMenuSolutions item={item} />}
+{item.mega_type === 'industries' && <MegaMenuIndustries item={item} />}
+{item.mega_type === 'platform' && <MegaMenuPlatform item={item} />}
+{item.mega_type === 'resources' && <MegaMenuResources item={item} />}
+{item.mega_type === 'about' && <MegaMenuAbout item={item} />}

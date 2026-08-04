@@ -1,0 +1,54 @@
+---
+import type { NavItemData } from '../../content/schemas/site-header';
+const { item } = Astro.props as { item: NavItemData };
+---
+
+<div class="mega-menu absolute top-full left-1/2 -translate-x-1/2 translate-y-2.5 w-full max-w-[1280px] bg-[#1C1C1C] rounded-b-[20px] shadow-[0_20px_40px_rgba(0,0,0,0.2)] opacity-0 invisible pointer-events-none transition-all duration-300 flex overflow-hidden z-[999]">
+  <div class="menu-body menu-body-industries flex-1 p-8 flex gap-7">
+    <div class="industries-main min-w-0 flex-1">
+      <div class="industries-header flex items-center justify-between gap-5 mb-4 pb-3 border-b border-[rgba(255,255,255,0.1)]">
+        <div class="text-lg font-bold text-[#EA543F]">{item.industries_header_title || 'Industries We Serve'}</div>
+        {item.industries_browse_href && (
+          <a href={item.industries_browse_href} class="text-[13px] font-semibold text-[#EA543F] no-underline hover:translate-x-[3px] transition-all whitespace-nowrap">Browse all industries →</a>
+        )}
+      </div>
+      <ul class="industry-grid list-none m-0 p-0 grid grid-cols-3 gap-x-3 gap-y-0.5">
+        {item.industries?.map((ind) => (
+          <li>
+            <a href={ind.href || '#'} class="industry-link flex items-center gap-2.5 min-h-[46px] px-3 py-2.5 rounded-md bg-transparent border border-transparent no-underline text-[#F5F5F5] text-sm font-[550] hover:bg-[rgba(255,255,255,0.022)] hover:border-[rgba(234,84,63,0.2)] hover:text-[#EA543F] transition-all">
+              {ind.icon_svg && (
+                <span class="w-5 h-5 shrink-0 text-[#EA543F]" set:html={ind.icon_svg} />
+              )}
+              <span class="flex-1">{ind.label}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    {item.case_study && (
+      <div class="industries-aside min-w-0 self-center shrink-0">
+        <div class="industries-castudies w-60 min-w-0 h-[clamp(210px,24vw,280px)] rounded-lg overflow-hidden border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.01)] relative">
+          {item.case_study.image_url ? (
+            <img class="industries-castudies-img w-full h-full object-cover" src={item.case_study.image_url} alt="" loading="lazy" />
+          ) : (
+            <div class="w-full h-full bg-[rgba(255,255,255,0.03)]" />
+          )}
+          <div class="industries-castudies-overlay absolute inset-0 flex flex-col justify-end gap-3 px-[18px] pb-[18px] pt-5 bg-gradient-to-b from-[rgba(0,0,0,0.04)] via-transparent to-[rgba(0,0,0,0.72)]">
+            {item.case_study.tag && (
+              <div class="text-[10px] font-bold tracking-wider uppercase text-white bg-[rgba(234,84,63,0.9)] inline-block px-2.5 py-[3px] rounded w-fit">{item.case_study.tag}</div>
+            )}
+            <div class="flex flex-col gap-1.5">
+              {item.case_study.title && (
+                <div class="text-lg leading-tight font-semibold text-white">{item.case_study.title}</div>
+              )}
+            </div>
+            {item.case_study.cta_label && item.case_study.cta_href && (
+              <a href={item.case_study.cta_href} class="text-[13px] font-semibold text-[#EA543F] no-underline hover:text-[#EA543F] hover:translate-x-[3px] transition-all inline-flex items-center gap-1.5 w-fit">{item.case_study.cta_label} →</a>
+            )}
+          </div>
+        </div>
+      </div>
+    )}
+  </div>
+</div>

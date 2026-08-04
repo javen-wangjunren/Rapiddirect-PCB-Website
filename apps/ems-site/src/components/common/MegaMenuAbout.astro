@@ -1,0 +1,32 @@
+---
+import type { NavItemData } from '../../content/schemas/site-header';
+const { item } = Astro.props as { item: NavItemData };
+---
+
+<div class="mega-menu absolute top-full left-1/2 -translate-x-1/2 translate-y-2.5 w-full max-w-[1280px] bg-[#1C1C1C] rounded-b-[20px] shadow-[0_20px_40px_rgba(0,0,0,0.2)] opacity-0 invisible pointer-events-none transition-all duration-300 flex overflow-hidden z-[999]">
+  <div class="menu-banner w-[250px] shrink-0 relative p-[34px_26px] flex flex-col bg-cover bg-center" style={item.about_banner_image_url ? `background-image: url(${item.about_banner_image_url})` : ''}>
+    <div class="menu-banner-overlay absolute inset-0 bg-gradient-to-b from-[rgba(0,0,0,0.7)] to-[rgba(0,0,0,0.3)] z-[1]"></div>
+    <div class="menu-banner-content relative z-[2] text-white">
+      {item.about_banner_title && (
+        <div class="text-2xl font-bold mb-3 text-white">{item.about_banner_title}</div>
+      )}
+      {item.about_banner_desc && (
+        <p class="text-sm text-[#C7C7C7] leading-relaxed">{item.about_banner_desc}</p>
+      )}
+    </div>
+  </div>
+  <div class="menu-body flex-1 p-10 grid grid-cols-2 gap-[50px]">
+    {item.about_link_groups?.map((group) => (
+      <div class="min-w-0">
+        <div class="text-lg font-bold text-[#EA543F] pb-3 border-b-2 border-[rgba(255,255,255,0.14)] mb-5">{group.group_title}</div>
+        <ul class="menu-list list-none m-0 p-0">
+          {group.links?.map((link) => (
+            <li class="mb-3">
+              <a href={link.href || '#'} class="text-[#F5F5F5] no-underline text-sm hover:text-[#EA543F] hover:translate-x-[5px] transition-all inline-block">{link.label}</a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </div>
+</div>

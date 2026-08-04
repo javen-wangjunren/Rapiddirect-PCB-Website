@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { siteHeaderSchema } from '../../content/schemas/site-header';
 import type { NavItemData, SiteHeaderData } from '../../content/schemas/site-header';
 import type { JsonValue } from '../../utils/jsonTree';
@@ -60,6 +60,21 @@ export default function SiteHeaderEditorContentModules({
   const topBanner = useMemo(() => extractTopBanner(safeContent), [safeContent]);
   const navItems = useMemo(() => extractNavItems(safeContent), [safeContent]);
 
+  // 折叠状态：默认展开第一个，其余折叠
+  const [expandedNavItems, setExpandedNavItems] = useState<Set<number>>(() => new Set([0]));
+
+  const toggleNavItem = (index: number) => {
+    setExpandedNavItems((prev) => {
+      const next = new Set(prev);
+      if (next.has(index)) {
+        next.delete(index);
+      } else {
+        next.add(index);
+      }
+      return next;
+    });
+  };
+
   // 更新简单字段
   const updateSimpleFields = (next: JsonValue) => {
     if (!isObject(next)) return;
@@ -117,92 +132,98 @@ export default function SiteHeaderEditorContentModules({
       </Card>
 
       {/* Nav Items */}
-      {navItems.map((item, index) => (
-        <Card key={index}>
-          <CardHeader>
-            <CardTitle>Nav Item {index + 1}: {item.label || '(未命名)'}</CardTitle>
-          </CardHeader>
-          <CardBody className="space-y-3 pt-0">
-            {/* 基础字段 */}
-            <div className="grid grid-cols-3 gap-3">
-              <label className="block">
-                <div className="text-xs font-medium text-[var(--admin-fg-muted)] mb-1">Label</div>
-                <input
-                  className="w-full rounded border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-fg)] outline-none focus:border-[var(--admin-primary)]"
-                  value={item.label}
-                  onChange={(e) => updateNavItem(index, { ...item, label: e.target.value })}
-                />
-              </label>
-              <label className="block">
-                <div className="text-xs font-medium text-[var(--admin-fg-muted)] mb-1">Href</div>
-                <input
-                  className="w-full rounded border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-fg)] outline-none focus:border-[var(--admin-primary)]"
-                  value={item.href}
-                  onChange={(e) => updateNavItem(index, { ...item, href: e.target.value })}
-                />
-              </label>
-              <label className="block">
-                <div className="text-xs font-medium text-[var(--admin-fg-muted)] mb-1">Mega Type</div>
-                <select
-                  className="w-full rounded border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-fg)] outline-none focus:border-[var(--admin-primary)]"
-                  value={item.mega_type}
-                  onChange={(e) => updateNavItem(index, { ...item, mega_type: e.target.value as any })}
-                >
-                  <option value="capabilities">capabilities</option>
-                  <option value="solutions">solutions</option>
-                  <option value="industries">industries</option>
-                  <option value="platform">platform</option>
-                  <option value="resources">resources</option>
-                  <option value="about">about</option>
-                </select>
-              </label>
-            </div>
+      {navItems.map((item, index) => {
+        const isExpanded = expandedNavItems.has(index);
+        return (
+          <Card key={index}>
+            <CardHeader className="cursor-pointer select-none flex items-center justify-between" onClick={() => toggleNavItem(index)}>
+              <CardTitle>Nav Item {index + 1}: {item.label || '(未命名)'}</CardTitle>
+              <span className="text-sm text-[var(--admin-fg-muted)] transition-transform" style={{ transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)' }}>▶</span>
+            </CardHeader>
+            {isExpanded && (
+              <CardBody className="space-y-3 pt-0">
+                {/* 基础字段 */}
+                <div className="grid grid-cols-3 gap-3">
+                  <label className="block">
+                    <div className="text-xs font-medium text-[var(--admin-fg-muted)] mb-1">Label</div>
+                    <input
+                      className="w-full rounded border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-fg)] outline-none focus:border-[var(--admin-primary)]"
+                      value={item.label}
+                      onChange={(e) => updateNavItem(index, { ...item, label: e.target.value })}
+                    />
+                  </label>
+                  <label className="block">
+                    <div className="text-xs font-medium text-[var(--admin-fg-muted)] mb-1">Href</div>
+                    <input
+                      className="w-full rounded border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-fg)] outline-none focus:border-[var(--admin-primary)]"
+                      value={item.href}
+                      onChange={(e) => updateNavItem(index, { ...item, href: e.target.value })}
+                    />
+                  </label>
+                  <label className="block">
+                    <div className="text-xs font-medium text-[var(--admin-fg-muted)] mb-1">Mega Type</div>
+                    <select
+                      className="w-full rounded border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-fg)] outline-none focus:border-[var(--admin-primary)]"
+                      value={item.mega_type}
+                      onChange={(e) => updateNavItem(index, { ...item, mega_type: e.target.value as any })}
+                    >
+                      <option value="capabilities">capabilities</option>
+                      <option value="solutions">solutions</option>
+                      <option value="industries">industries</option>
+                      <option value="platform">platform</option>
+                      <option value="resources">resources</option>
+                      <option value="about">about</option>
+                    </select>
+                  </label>
+                </div>
 
-            {/* Mega Menu 编辑器（按类型分发） */}
-            {item.mega_type === 'capabilities' && (
-              <MegaMenuEditorCapabilities
-                navItem={item}
-                onChange={(next) => updateNavItem(index, next)}
-              />
+                {/* Mega Menu 编辑器（按类型分发） */}
+                {item.mega_type === 'capabilities' && (
+                  <MegaMenuEditorCapabilities
+                    navItem={item}
+                    onChange={(next) => updateNavItem(index, next)}
+                  />
+                )}
+                {item.mega_type === 'solutions' && (
+                  <MegaMenuEditorSolutions
+                    navItem={item}
+                    onChange={(next) => updateNavItem(index, next)}
+                  />
+                )}
+                {item.mega_type === 'industries' && (
+                  <MegaMenuEditorIndustries
+                    navItem={item}
+                    onChange={(next) => updateNavItem(index, next)}
+                  />
+                )}
+                {item.mega_type === 'platform' && (
+                  <MegaMenuEditorPlatform
+                    navItem={item}
+                    onChange={(next) => updateNavItem(index, next)}
+                  />
+                )}
+                {item.mega_type === 'resources' && (
+                  <MegaMenuEditorResources
+                    navItem={item}
+                    onChange={(next) => updateNavItem(index, next)}
+                  />
+                )}
+                {item.mega_type === 'about' && (
+                  <MegaMenuEditorAbout
+                    navItem={item}
+                    onChange={(next) => updateNavItem(index, next)}
+                  />
+                )}
+                {item.mega_type !== 'capabilities' && item.mega_type !== 'solutions' && item.mega_type !== 'industries' && item.mega_type !== 'platform' && item.mega_type !== 'resources' && item.mega_type !== 'about' && (
+                  <div className="text-sm text-[var(--admin-fg-muted)] py-4 text-center border border-dashed border-[var(--admin-border)] rounded-lg">
+                    {item.mega_type} 编辑器尚未实现
+                  </div>
+                )}
+              </CardBody>
             )}
-            {item.mega_type === 'solutions' && (
-              <MegaMenuEditorSolutions
-                navItem={item}
-                onChange={(next) => updateNavItem(index, next)}
-              />
-            )}
-            {item.mega_type === 'industries' && (
-              <MegaMenuEditorIndustries
-                navItem={item}
-                onChange={(next) => updateNavItem(index, next)}
-              />
-            )}
-            {item.mega_type === 'platform' && (
-              <MegaMenuEditorPlatform
-                navItem={item}
-                onChange={(next) => updateNavItem(index, next)}
-              />
-            )}
-            {item.mega_type === 'resources' && (
-              <MegaMenuEditorResources
-                navItem={item}
-                onChange={(next) => updateNavItem(index, next)}
-              />
-            )}
-            {item.mega_type === 'about' && (
-              <MegaMenuEditorAbout
-                navItem={item}
-                onChange={(next) => updateNavItem(index, next)}
-              />
-            )}
-            {item.mega_type !== 'capabilities' && item.mega_type !== 'solutions' && item.mega_type !== 'industries' && item.mega_type !== 'platform' && item.mega_type !== 'resources' && item.mega_type !== 'about' && (
-              <div className="text-sm text-[var(--admin-fg-muted)] py-4 text-center border border-dashed border-[var(--admin-border)] rounded-lg">
-                {item.mega_type} 编辑器尚未实现
-              </div>
-            )}
-          </CardBody>
-        </Card>
-      ))}
+          </Card>
+        );
+      })}
     </div>
   );
 }

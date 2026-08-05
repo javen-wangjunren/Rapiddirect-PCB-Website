@@ -119,21 +119,13 @@ export default function SiteHeaderEditorContentModules({
             {isExpanded && (
               <CardBody className="space-y-3 pt-0">
                 {/* 基础字段 */}
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 gap-3">
                   <label className="block">
                     <div className="text-xs font-medium text-[var(--admin-fg-muted)] mb-1">Label</div>
                     <input
                       className="w-full rounded border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-fg)] outline-none focus:border-[var(--admin-primary)]"
                       value={item.label}
                       onChange={(e) => updateNavItem(index, { ...item, label: e.target.value })}
-                    />
-                  </label>
-                  <label className="block">
-                    <div className="text-xs font-medium text-[var(--admin-fg-muted)] mb-1">Href</div>
-                    <input
-                      className="w-full rounded border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-fg)] outline-none focus:border-[var(--admin-primary)]"
-                      value={item.href}
-                      onChange={(e) => updateNavItem(index, { ...item, href: e.target.value })}
                     />
                   </label>
                   <label className="block">

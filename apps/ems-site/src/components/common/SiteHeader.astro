@@ -52,7 +52,7 @@ const navItems: NavItemData[] = (data?.nav_items?.length ? data.nav_items : site
                   </svg>
                 </button>
               ) : (
-                <a href={item.href || '#'} class="nav-item-link flex items-center gap-1 text-[15px] font-semibold text-black no-underline transition-colors hover:text-[#EA543F] cursor-pointer">
+                <a href="#" class="nav-item-link flex items-center gap-1 text-[15px] font-semibold text-black no-underline transition-colors hover:text-[#EA543F] cursor-pointer">
                   {item.label}
                 </a>
               )}
@@ -93,7 +93,7 @@ const navItems: NavItemData[] = (data?.nav_items?.length ? data.nav_items : site
     <div class="h-[calc(100vh-4rem)] overflow-y-auto px-5 pb-6 pt-4">
       <nav class="flex flex-col">
         {navItems.map((item) => (
-          <a href={item.href || '#'} class="border-b border-slate-200 py-4 text-base font-semibold text-slate-900 hover:bg-slate-50 hover:text-[#EA543F] no-underline">
+          <a href="#" class="border-b border-slate-200 py-4 text-base font-semibold text-slate-900 hover:bg-slate-50 hover:text-[#EA543F] no-underline">
             {item.label}
           </a>
         ))}

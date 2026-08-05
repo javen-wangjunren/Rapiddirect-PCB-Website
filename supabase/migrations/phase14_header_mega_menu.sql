@@ -26,7 +26,6 @@ upsert_content as (
   "nav_items": [
     {
       "label": "Capabilities",
-      "href": "#",
       "mega_type": "capabilities",
       "sections": [
         {
@@ -133,7 +132,6 @@ upsert_content as (
     },
     {
       "label": "Solutions",
-      "href": "#",
       "mega_type": "solutions",
       "sections": [],
       "footer": { "browse_all_href": "", "get_quote_href": "" },
@@ -186,7 +184,6 @@ upsert_content as (
     },
     {
       "label": "Industries",
-      "href": "#",
       "mega_type": "industries",
       "sections": [],
       "footer": { "browse_all_href": "", "get_quote_href": "" },
@@ -220,7 +217,6 @@ upsert_content as (
     },
     {
       "label": "Our Platform",
-      "href": "#",
       "mega_type": "platform",
       "sections": [],
       "footer": { "browse_all_href": "", "get_quote_href": "" },
@@ -264,7 +260,6 @@ upsert_content as (
     },
     {
       "label": "Resources",
-      "href": "#",
       "mega_type": "resources",
       "sections": [],
       "footer": { "browse_all_href": "", "get_quote_href": "" },
@@ -328,7 +323,6 @@ upsert_content as (
     },
     {
       "label": "About",
-      "href": "#",
       "mega_type": "about",
       "sections": [],
       "footer": { "browse_all_href": "", "get_quote_href": "" },

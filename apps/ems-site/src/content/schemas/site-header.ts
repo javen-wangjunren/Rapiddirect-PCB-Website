@@ -159,7 +159,6 @@ export const siteHeaderSchema = {
     type: 'array' as const,
     items: {
       label: 'string',
-      href: 'string',
       mega_type: 'string',
       sections: { type: 'array' as const, items: capSectionSchema },
       footer: capFooterSchema,
@@ -298,7 +297,6 @@ export type MegaType = 'capabilities' | 'solutions' | 'industries' | 'platform' 
 
 export interface NavItemData {
   label: string;
-  href: string;
   mega_type: MegaType;
   // Capabilities
   sections: CapSectionData[];

@@ -215,7 +215,6 @@ const normalizeNavItem = (input: unknown) => {
   const obj = isObject(input) ? (input as any) : {};
   return {
     label: asString(obj.label),
-    href: asString(obj.href),
     mega_type: asString(obj.mega_type),
     sections: normalizeCapSections(obj.sections),
     footer: normalizeCapFooter(obj.footer),

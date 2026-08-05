@@ -30,7 +30,6 @@ export const siteHeaderDefaults: SiteHeaderData = {
     // ── 1. Capabilities ──
     {
       label: 'Capabilities',
-      href: '#',
       mega_type: 'capabilities',
       sections: [
         {
@@ -104,7 +103,6 @@ export const siteHeaderDefaults: SiteHeaderData = {
     // ── 2. Solutions ──
     {
       label: 'Solutions',
-      href: '#',
       mega_type: 'solutions',
       sections: [],
       footer: { browse_all_href: '', get_quote_href: '' },
@@ -142,7 +140,6 @@ export const siteHeaderDefaults: SiteHeaderData = {
     // ── 3. Industries ──
     {
       label: 'Industries',
-      href: '#',
       mega_type: 'industries',
       sections: [],
       footer: { browse_all_href: '', get_quote_href: '' },
@@ -201,7 +198,6 @@ export const siteHeaderDefaults: SiteHeaderData = {
     // ── 4. Platform ──
     {
       label: 'Our Platform',
-      href: '#',
       mega_type: 'platform',
       sections: [],
       footer: { browse_all_href: '', get_quote_href: '' },
@@ -240,7 +236,6 @@ export const siteHeaderDefaults: SiteHeaderData = {
     // ── 5. Resources ──
     {
       label: 'Resources',
-      href: '#',
       mega_type: 'resources',
       sections: [],
       footer: { browse_all_href: '', get_quote_href: '' },
@@ -299,7 +294,6 @@ export const siteHeaderDefaults: SiteHeaderData = {
     // ── 6. About ──
     {
       label: 'About',
-      href: '#',
       mega_type: 'about',
       sections: [],
       footer: { browse_all_href: '', get_quote_href: '' },

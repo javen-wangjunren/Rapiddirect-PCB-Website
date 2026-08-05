@@ -11,48 +11,9 @@ const logoUrl = data?.logo_url?.trim() ? getAssetPath(data.logo_url) : fallbackL
 const ctaText = data?.cta_text?.trim() || 'Get instant quote';
 const ctaHref = data?.cta_href?.trim() || '#';
 const navItems: NavItemData[] = (data?.nav_items?.length ? data.nav_items : siteHeaderDefaults.nav_items) as NavItemData[];
-const topBanner = data?.top_banner;
 ---
 
 <input id="ems-site-mobile-menu-toggle" type="checkbox" class="peer fixed left-0 top-0 h-px w-px opacity-0 pointer-events-none md:hidden" />
-
-<!-- ═══ 顶部通知栏 ═══ -->
-{topBanner && (
-  <div class="top-banner flex items-center justify-between bg-[#1C1C1C] text-white px-6 py-2 text-[13px] font-medium">
-    <div class="flex-1 hidden sm:block"></div>
-    <div class="flex-[2] text-center">
-      {topBanner.notification_text}
-      {topBanner.notification_link_text && topBanner.notification_link_href && (
-        <a href={topBanner.notification_link_href} class="text-[#EA543F] underline font-bold ml-2.5">
-          {topBanner.notification_link_text} →
-        </a>
-      )}
-    </div>
-    <div class="flex-1 flex justify-end gap-6 items-center">
-      {topBanner.languages && topBanner.languages.length > 0 && (
-        <div class="lang-selector relative">
-          <button class="top-icon-btn bg-transparent border-none text-[13px] font-medium text-white cursor-pointer flex items-center gap-1 hover:text-[#EA543F] transition-colors">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="w-4 h-4"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"/><path d="M2 12H22"/><path d="M12 2C14.5013 4.73835 15.9228 8.29203 16 12C15.9228 15.708 14.5013 19.2616 12 22C9.49872 19.2616 8.07725 15.708 8 12C8.07725 8.29203 9.49872 4.73835 12 2Z"/></svg>
-            {topBanner.languages[0]?.code?.toUpperCase() || 'EN'} ▾
-          </button>
-          <div class="lang-menu absolute top-full right-0 mt-2.5 bg-white text-black shadow-[0_4px_15px_rgba(0,0,0,0.15)] rounded-xl overflow-hidden hidden flex-col min-w-[120px] z-[1001]">
-            {topBanner.languages.map((lang) => (
-              <a href="#" class="px-4 py-3 text-[13px] font-medium text-black no-underline border-b border-[#E5E5E5] last:border-b-0 hover:bg-[#F6F6F6] hover:text-[#EA543F] hover:pl-5 transition-all">
-                {lang.label}
-              </a>
-            ))}
-          </div>
-        </div>
-      )}
-      {topBanner.login_text && topBanner.login_href && (
-        <a href={topBanner.login_href} class="top-icon-btn bg-transparent border-none text-[13px] font-medium text-white cursor-pointer flex items-center gap-1 hover:text-[#EA543F] transition-colors no-underline">
-          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="w-4 h-4"><path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21"/><path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z"/></svg>
-          {topBanner.login_text}
-        </a>
-      )}
-    </div>
-  </div>
-)}
 
 <!-- ═══ 主导航栏 ═══ -->
 <header class="site-header sticky top-0 z-[1000] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
@@ -148,12 +109,6 @@ const topBanner = data?.top_banner;
 
 <!-- ═══ 样式 ═══ -->
 <style>
-  /* 顶部通知栏 */
-  .lang-selector:hover .lang-menu,
-  .lang-selector:focus-within .lang-menu {
-    display: flex;
-  }
-
   /* 移动端 */
   .mobile-menu details[open] summary svg {
     transform: rotate(180deg);

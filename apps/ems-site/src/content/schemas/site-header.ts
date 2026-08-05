@@ -4,21 +4,6 @@
 // ============================================================
 
 /**
- * 顶部通知栏
- */
-const topBannerSchema = {
-  notification_text: 'string',
-  notification_link_text: 'string',
-  notification_link_href: 'string',
-  login_text: 'string',
-  login_href: 'string',
-  languages: {
-    type: 'array' as const,
-    items: { code: 'string', label: 'string' }
-  }
-} as const;
-
-/**
  * 服务卡片（Capabilities / Solutions 共用）
  */
 const cardSchema = {
@@ -170,7 +155,6 @@ export const siteHeaderSchema = {
   logo_url: 'string',
   cta_text: 'string',
   cta_href: 'string',
-  top_banner: topBannerSchema,
   nav_items: {
     type: 'array' as const,
     items: {
@@ -197,15 +181,6 @@ export const siteHeaderSchema = {
 // ============================================================
 // TypeScript 类型导出
 // ============================================================
-
-export interface TopBannerData {
-  notification_text: string;
-  notification_link_text: string;
-  notification_link_href: string;
-  login_text: string;
-  login_href: string;
-  languages: { code: string; label: string }[];
-}
 
 export interface CardData {
   label: string;
@@ -350,6 +325,5 @@ export interface SiteHeaderData {
   logo_url: string;
   cta_text: string;
   cta_href: string;
-  top_banner: TopBannerData;
   nav_items: NavItemData[];
 }

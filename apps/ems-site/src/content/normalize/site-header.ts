@@ -5,29 +5,6 @@ import { isObject } from '../../utils/jsonTree';
 const asString = (value: unknown) => (typeof value === 'string' ? value : '');
 const asBoolean = (value: unknown) => (typeof value === 'boolean' ? value : false);
 
-// ── 语言列表 ──
-const normalizeLanguages = (input: unknown) => {
-  if (!Array.isArray(input)) return [];
-  return input.map((item) => {
-    const obj = isObject(item) ? (item as any) : {};
-    return { code: asString(obj.code), label: asString(obj.label) };
-  });
-};
-
-// ── 顶部通知栏 ──
-const normalizeTopBanner = (input: unknown) => {
-  if (!isObject(input)) return { notification_text: '', notification_link_text: '', notification_link_href: '', login_text: '', login_href: '', languages: [] };
-  const obj = input as any;
-  return {
-    notification_text: asString(obj.notification_text),
-    notification_link_text: asString(obj.notification_link_text),
-    notification_link_href: asString(obj.notification_link_href),
-    login_text: asString(obj.login_text),
-    login_href: asString(obj.login_href),
-    languages: normalizeLanguages(obj.languages)
-  };
-};
-
 // ── 服务卡片 ──
 const normalizeCard = (input: unknown) => {
   const obj = isObject(input) ? (input as any) : {};
@@ -270,7 +247,6 @@ export const normalizeSiteHeaderContentJson = (input: JsonValue): JsonValue => {
     logo_url: asString(obj.logo_url),
     cta_text: asString(obj.cta_text),
     cta_href: asString(obj.cta_href),
-    top_banner: normalizeTopBanner(obj.top_banner),
     nav_items: normalizeNavItems(obj.nav_items)
   } as any;
 };

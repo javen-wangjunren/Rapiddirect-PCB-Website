@@ -26,19 +26,6 @@ export const siteHeaderDefaults: SiteHeaderData = {
   logo_url: '',
   cta_text: 'Get instant quote',
   cta_href: '#',
-  top_banner: {
-    notification_text: "Accelerate your innovation with RapidDirect's new AI capabilities.",
-    notification_link_text: 'Explore AI Make Studio',
-    notification_link_href: '#',
-    login_text: 'Log in',
-    login_href: '#',
-    languages: [
-      { code: 'en', label: 'English' },
-      { code: 'de', label: 'Deutsch' },
-      { code: 'fr', label: 'Français' },
-      { code: 'ja', label: '日本語' }
-    ]
-  },
   nav_items: [
     // ── 1. Capabilities ──
     {

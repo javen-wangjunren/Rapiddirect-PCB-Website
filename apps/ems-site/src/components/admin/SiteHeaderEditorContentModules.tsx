@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
-import { siteHeaderSchema } from '../../content/schemas/site-header';
-import type { NavItemData, SiteHeaderData } from '../../content/schemas/site-header';
+import type { NavItemData } from '../../content/schemas/site-header';
 import type { JsonValue } from '../../utils/jsonTree';
 import { isObject } from '../../utils/jsonTree';
 import SchemaForm from './SchemaForm';
@@ -18,7 +17,7 @@ export interface SiteHeaderEditorContentModulesProps {
   onContentReplace?: (next: JsonValue) => void;
 }
 
-// 提取顶部简单字段（logo / cta / top_banner），供 SchemaForm 渲染
+// 提取顶部简单字段（logo / cta），供 SchemaForm 渲染
 const simpleFieldsSchema = {
   logo_url: 'string',
   cta_text: 'string',
@@ -36,12 +35,6 @@ function extractSimpleFields(contentJson: JsonValue): Record<string, JsonValue> 
   };
 }
 
-// 从 contentJson 中提取 top_banner
-function extractTopBanner(contentJson: JsonValue): JsonValue {
-  if (!isObject(contentJson)) return {};
-  return (contentJson as any).top_banner ?? {};
-}
-
 // 从 contentJson 中提取 nav_items
 function extractNavItems(contentJson: JsonValue): NavItemData[] {
   if (!isObject(contentJson)) return [];
@@ -57,7 +50,6 @@ export default function SiteHeaderEditorContentModules({
   const safeContent = useMemo(() => (isObject(contentJson) ? (contentJson as any) : {}), [contentJson]);
 
   const simpleFields = useMemo(() => extractSimpleFields(safeContent), [safeContent]);
-  const topBanner = useMemo(() => extractTopBanner(safeContent), [safeContent]);
   const navItems = useMemo(() => extractNavItems(safeContent), [safeContent]);
 
   // 折叠状态：默认展开第一个，其余折叠
@@ -87,11 +79,6 @@ export default function SiteHeaderEditorContentModules({
     });
   };
 
-  // 更新 top_banner
-  const updateTopBanner = (next: JsonValue) => {
-    onContentReplace?.({ ...safeContent, top_banner: next });
-  };
-
   // 更新某个 nav_item
   const updateNavItem = (index: number, next: NavItemData) => {
     const items = [...navItems];
@@ -112,21 +99,6 @@ export default function SiteHeaderEditorContentModules({
             value={simpleFields as any}
             onChange={updateSimpleFields}
             pathLabel="Brand"
-          />
-        </CardBody>
-      </Card>
-
-      {/* 顶部通知栏 */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Top Banner</CardTitle>
-        </CardHeader>
-        <CardBody className="space-y-3 pt-0">
-          <SchemaForm
-            schema={siteHeaderSchema.top_banner as any}
-            value={topBanner}
-            onChange={updateTopBanner}
-            pathLabel="Top Banner"
           />
         </CardBody>
       </Card>

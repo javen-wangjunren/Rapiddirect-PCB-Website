@@ -68,7 +68,8 @@ const capFooterSchema = {
 const solStepSchema = {
   step_number: 'string',
   title: 'string',
-  desc: 'string'
+  desc: 'string',
+  href: 'string'
 } as const;
 
 /**
@@ -234,6 +235,7 @@ export interface SolStepData {
   step_number: string;
   title: string;
   desc: string;
+  href: string;
 }
 
 export type SolPanelStyle = 'npi' | 'manufacturing';

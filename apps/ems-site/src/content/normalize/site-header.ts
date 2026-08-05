@@ -84,7 +84,8 @@ const normalizeSolStep = (input: unknown) => {
   return {
     step_number: asString(obj.step_number),
     title: asString(obj.title),
-    desc: asString(obj.desc)
+    desc: asString(obj.desc),
+    href: asString(obj.href)
   };
 };
 

@@ -83,14 +83,18 @@ const topBanner = data?.top_banner;
           const hasMega = item.mega_type === 'capabilities' || item.mega_type === 'solutions' || item.mega_type === 'industries' || item.mega_type === 'platform' || item.mega_type === 'resources' || item.mega_type === 'about';
           return (
             <li class="nav-item has-dropdown flex items-center px-4 static">
-              <a href={item.href || '#'} class="nav-item-link flex items-center gap-1 text-[15px] font-semibold text-black no-underline transition-colors hover:text-[#EA543F] cursor-pointer">
-                {item.label}
-                {hasMega && (
+              {hasMega ? (
+                <button type="button" class="nav-item-link flex items-center gap-1 text-[15px] font-semibold text-black no-underline transition-colors hover:text-[#EA543F] cursor-pointer bg-transparent border-0 p-0">
+                  {item.label}
                   <svg class="dropdown-icon w-3 h-3 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="6 9 12 15 18 9"></polyline>
                   </svg>
-                )}
-              </a>
+                </button>
+              ) : (
+                <a href={item.href || '#'} class="nav-item-link flex items-center gap-1 text-[15px] font-semibold text-black no-underline transition-colors hover:text-[#EA543F] cursor-pointer">
+                  {item.label}
+                </a>
+              )}
 
               {hasMega && <MegaMenu item={item} />}
             </li>
@@ -150,7 +154,14 @@ const topBanner = data?.top_banner;
     display: flex;
   }
 
-  /* 导航栏 */
+  /* 移动端 */
+  .mobile-menu details[open] summary svg {
+    transform: rotate(180deg);
+  }
+</style>
+
+<style is:global>
+  /* 导航栏 hover（需 global 以穿透子组件） */
   .nav-item:hover > .nav-item-link {
     color: #EA543F;
   }
@@ -166,7 +177,7 @@ const topBanner = data?.top_banner;
     pointer-events: auto;
   }
 
-  /* Capabilities Panel 显示 */
+  /* Capabilities Panel 显示（面板由子组件渲染，需 global） */
   .cap-panel.is-active {
     display: block !important;
   }
@@ -192,13 +203,6 @@ const topBanner = data?.top_banner;
     background: rgba(255,255,255,0.018);
   }
 
-  /* 移动端 */
-  .mobile-menu details[open] summary svg {
-    transform: rotate(180deg);
-  }
-</style>
-
-<style is:global>
   body:has(#ems-site-mobile-menu-toggle:checked) {
     overflow: hidden;
   }

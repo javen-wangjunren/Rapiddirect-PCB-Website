@@ -154,11 +154,11 @@ upsert_content as (
           "panel_style": "npi",
           "panel_desc": "A one-stop product innovation service covering design, prototyping, mass production, and packaging.",
           "steps": [
-            { "step_number": "1", "title": "Design & Engineering", "desc": "Turn concepts into precision parts." },
-            { "step_number": "2", "title": "Verification Phase", "desc": "Rigorous prototyping validation." },
-            { "step_number": "3", "title": "Mass Production", "desc": "Scale into high-volume production." },
-            { "step_number": "4", "title": "Packaging Phase", "desc": "Market-ready solutions." },
-            { "step_number": "5", "title": "Service Package", "desc": "Choose the ideal NPI package—from feasibility to mass production." }
+            { "step_number": "1", "title": "Design & Engineering", "desc": "Turn concepts into precision parts.", "href": "" },
+            { "step_number": "2", "title": "Verification Phase", "desc": "Rigorous prototyping validation.", "href": "" },
+            { "step_number": "3", "title": "Mass Production", "desc": "Scale into high-volume production.", "href": "" },
+            { "step_number": "4", "title": "Packaging Phase", "desc": "Market-ready solutions.", "href": "" },
+            { "step_number": "5", "title": "Service Package", "desc": "Choose the ideal NPI package—from feasibility to mass production.", "href": "" }
           ],
           "cards": [],
           "cta1_label": "Explore NPI solutions",

@@ -42,7 +42,7 @@ const { item } = Astro.props as { item: NavItemData };
                         <span class="w-[26px] h-[26px] rounded-full border border-[rgba(234,84,63,0.38)] bg-[#1C1C1C] text-[#EA543F] text-xs font-bold leading-6 text-center">{step.step_number}</span>
                       </div>
                       <div class="sol-stage-content grid gap-[3px] pb-1.5">
-                        <a href="#" class="sol-stage-link no-underline text-inherit">
+                        <a href={step.href || '#'} class="sol-stage-link no-underline text-inherit">
                           <div class="sol-stage-title text-sm font-semibold text-[#F5F5F5] transition-all hover:text-[#EA543F] hover:translate-x-0.5">{step.title}</div>
                           <div class="sol-stage-desc text-[13px] leading-relaxed text-[#AFAFAF] transition-colors">{step.desc}</div>
                         </a>

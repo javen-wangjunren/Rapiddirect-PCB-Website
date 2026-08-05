@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { NavItemData, SolTabData, SolStepData, CardData } from '../../../content/schemas/site-header';
 import { Button, Input, Card, CardBody, CardHeader, CardTitle } from '../ui';
+import { cn } from '../ui/cn';
 
 interface Props {
   navItem: NavItemData;
@@ -28,6 +29,10 @@ function StepEditor({ step, onChange, onRemove, index }: {
             <Input value={step.title} onChange={(e) => onChange({ ...step, title: e.target.value })} placeholder="Design & Engineering" />
           </label>
         </div>
+        <label className="block">
+          <div className="text-[10px] text-[var(--admin-fg-muted)] mb-0.5">标题链接 (href)</div>
+          <Input value={step.href} onChange={(e) => onChange({ ...step, href: e.target.value })} placeholder="/npi/design-engineering/" />
+        </label>
         <label className="block">
           <div className="text-[10px] text-[var(--admin-fg-muted)] mb-0.5">描述</div>
           <Input value={step.desc} onChange={(e) => onChange({ ...step, desc: e.target.value })} placeholder="Turn concepts into precision parts." />
@@ -58,20 +63,53 @@ function CardEditor({ card, onChange, onRemove, index }: {
 }
 
 // ── Tab 编辑器 ──
-function TabEditor({ tab, onChange, onRemove, index }: {
+function TabEditor({ tab, onChange, onRemove, onMoveUp, onMoveDown, index }: {
   tab: SolTabData;
   onChange: (next: SolTabData) => void;
   onRemove: () => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
   index: number;
 }) {
+  const [expanded, setExpanded] = useState(index === 0);
   const isNpi = tab.panel_style === 'npi';
+
+  const addStep = () => {
+    onChange({
+      ...tab,
+      steps: [...tab.steps, { step_number: String(tab.steps.length + 1), title: '', desc: '', href: '' }]
+    });
+  };
+
+  const addCard = () => {
+    onChange({ ...tab, cards: [...tab.cards, { label: '', href: '' }] });
+  };
 
   return (
     <Card>
-      <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm">Tab {index + 1}: {tab.tab_label || '(未命名)'}</CardTitle>
-        <Button variant="secondary" size="sm" className="text-[var(--admin-danger)]" onClick={onRemove}>删除 Tab</Button>
+      <CardHeader
+        className="flex-row items-center justify-between space-y-0 pb-2 cursor-pointer select-none"
+        onClick={() => setExpanded(!expanded)}
+      >
+        <div className="flex items-center gap-2">
+          <span className={cn("text-sm transition-transform duration-200", expanded && "rotate-90")}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3.5 h-3.5 text-[var(--admin-fg-muted)]">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </span>
+          <CardTitle className="text-sm">Tab {index + 1}: {tab.tab_label || '(未命名)'}</CardTitle>
+        </div>
+        <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+          {onMoveUp && (
+            <Button variant="secondary" size="sm" className="text-xs px-1.5" onClick={onMoveUp} title="上移">↑</Button>
+          )}
+          {onMoveDown && (
+            <Button variant="secondary" size="sm" className="text-xs px-1.5" onClick={onMoveDown} title="下移">↓</Button>
+          )}
+          <Button variant="secondary" size="sm" className="text-[var(--admin-danger)]" onClick={onRemove}>删除 Tab</Button>
+        </div>
       </CardHeader>
+      {expanded && (
       <CardBody className="space-y-3 pt-0">
         {/* 基础字段 */}
         <div className="grid grid-cols-2 gap-3">
@@ -102,7 +140,7 @@ function TabEditor({ tab, onChange, onRemove, index }: {
           <div>
             <div className="flex items-center justify-between mb-2">
               <div className="text-xs font-medium text-[var(--admin-fg-muted)]">Steps ({tab.steps.length})</div>
-              <Button variant="secondary" size="sm" onClick={() => onChange({ ...tab, steps: [...tab.steps, { step_number: String(tab.steps.length + 1), title: '', desc: '' }] })}>添加 Step</Button>
+              <Button variant="secondary" size="sm" onClick={addStep}>添加 Step</Button>
             </div>
             <div className="space-y-2">
               {tab.steps.map((step, si) => (
@@ -121,7 +159,7 @@ function TabEditor({ tab, onChange, onRemove, index }: {
           <div>
             <div className="flex items-center justify-between mb-2">
               <div className="text-xs font-medium text-[var(--admin-fg-muted)]">服务卡片 ({tab.cards.length})</div>
-              <Button variant="secondary" size="sm" onClick={() => onChange({ ...tab, cards: [...tab.cards, { label: '', href: '' }] })}>添加卡片</Button>
+              <Button variant="secondary" size="sm" onClick={addCard}>添加卡片</Button>
             </div>
             <div className="space-y-2">
               {tab.cards.map((card, ci) => (
@@ -164,6 +202,7 @@ function TabEditor({ tab, onChange, onRemove, index }: {
           <Input value={tab.image_url} onChange={(e) => onChange({ ...tab, image_url: e.target.value })} placeholder="右侧联动图片 URL" />
         </label>
       </CardBody>
+      )}
     </Card>
   );
 }
@@ -175,6 +214,13 @@ export default function MegaMenuEditorSolutions({ navItem, onChange }: Props) {
       ...navItem,
       tabs: [...navItem.tabs, { tab_label: '', panel_style: 'npi', panel_desc: '', steps: [], cards: [], cta1_label: '', cta1_href: '', cta2_href: '', image_url: '' }]
     });
+  };
+
+  const moveTab = (from: number, to: number) => {
+    const tabs = [...navItem.tabs];
+    const [moved] = tabs.splice(from, 1);
+    tabs.splice(to, 0, moved);
+    onChange({ ...navItem, tabs });
   };
 
   return (
@@ -190,6 +236,8 @@ export default function MegaMenuEditorSolutions({ navItem, onChange }: Props) {
       <div className="space-y-3">
         {navItem.tabs.map((tab, ti) => (
           <TabEditor key={ti} tab={tab} index={ti}
+            onMoveUp={ti > 0 ? () => moveTab(ti, ti - 1) : undefined}
+            onMoveDown={ti < navItem.tabs.length - 1 ? () => moveTab(ti, ti + 1) : undefined}
             onChange={(next) => { const tabs = [...navItem.tabs]; tabs[ti] = next; onChange({ ...navItem, tabs }); }}
             onRemove={() => { const tabs = navItem.tabs.filter((_, i) => i !== ti); onChange({ ...navItem, tabs }); }}
           />

@@ -38,93 +38,121 @@ function CardEditor({ card, onChange, onRemove, index }: {
 }
 
 // ── Tab 编辑器 ──
-function TabEditor({ tab, onChange, onRemove, index }: {
+function TabEditor({ tab, onChange, onRemove, onMoveUp, onMoveDown, index }: {
   tab: CapTabData;
   onChange: (next: CapTabData) => void;
   onRemove: () => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
   index: number;
 }) {
+  const [expanded, setExpanded] = useState(index === 0);
+
   const addCard = () => {
     onChange({ ...tab, cards: [...tab.cards, { label: '', href: '' }] });
   };
 
   return (
     <Card>
-      <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm">Tab {index + 1}: {tab.tab_label || '(未命名)'}</CardTitle>
-        <Button variant="secondary" size="sm" className="text-[var(--admin-danger)]" onClick={onRemove}>
-          删除 Tab
-        </Button>
+      <CardHeader
+        className="flex-row items-center justify-between space-y-0 pb-2 cursor-pointer select-none"
+        onClick={() => setExpanded(!expanded)}
+      >
+        <div className="flex items-center gap-2">
+          <span className={cn("text-sm transition-transform duration-200", expanded && "rotate-90")}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3.5 h-3.5 text-[var(--admin-fg-muted)]">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </span>
+          <CardTitle className="text-sm">Tab {index + 1}: {tab.tab_label || '(未命名)'}</CardTitle>
+        </div>
+        <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+          {onMoveUp && (
+            <Button variant="secondary" size="sm" className="text-xs px-1.5" onClick={onMoveUp} title="上移">↑</Button>
+          )}
+          {onMoveDown && (
+            <Button variant="secondary" size="sm" className="text-xs px-1.5" onClick={onMoveDown} title="下移">↓</Button>
+          )}
+          <Button variant="secondary" size="sm" className="text-[var(--admin-danger)]" onClick={onRemove}>
+            删除 Tab
+          </Button>
+        </div>
       </CardHeader>
-      <CardBody className="space-y-3 pt-0">
-        <div className="grid grid-cols-2 gap-3">
-          <label className="block">
-            <div className="text-xs font-medium text-[var(--admin-fg-muted)] mb-1">Tab Label（同时作为右侧面板标题）</div>
-            <Input
-              value={tab.tab_label}
-              onChange={(e) => onChange({ ...tab, tab_label: e.target.value })}
-              placeholder="e.g. Machining"
-            />
-          </label>
-          <label className="block">
-            <div className="text-xs font-medium text-[var(--admin-fg-muted)] mb-1">Image URL</div>
-            <Input
-              value={tab.image_url}
-              onChange={(e) => onChange({ ...tab, image_url: e.target.value })}
-              placeholder="右侧联动图片 URL"
-            />
-          </label>
-        </div>
-        <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={tab.is_muted}
-            onChange={(e) => onChange({ ...tab, is_muted: e.target.checked })}
-            className="h-4 w-4 rounded border-[var(--admin-border)] text-[var(--admin-primary)]"
-          />
-          <span className="text-sm text-[var(--admin-fg)]">灰显（Muted Tab）</span>
-        </label>
-
-        {/* 服务卡片列表 */}
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <div className="text-xs font-medium text-[var(--admin-fg-muted)]">服务卡片 ({tab.cards.length})</div>
-            <Button variant="secondary" size="sm" onClick={addCard}>添加卡片</Button>
-          </div>
-          <div className="space-y-2">
-            {tab.cards.map((card, ci) => (
-              <CardEditor
-                key={ci}
-                card={card}
-                index={ci}
-                onChange={(next) => {
-                  const cards = [...tab.cards];
-                  cards[ci] = next;
-                  onChange({ ...tab, cards });
-                }}
-                onRemove={() => {
-                  const cards = tab.cards.filter((_, i) => i !== ci);
-                  onChange({ ...tab, cards });
-                }}
+      {expanded && (
+        <CardBody className="space-y-3 pt-0">
+          <div className="grid grid-cols-2 gap-3">
+            <label className="block">
+              <div className="text-xs font-medium text-[var(--admin-fg-muted)] mb-1">Tab Label（同时作为右侧面板标题）</div>
+              <Input
+                value={tab.tab_label}
+                onChange={(e) => onChange({ ...tab, tab_label: e.target.value })}
+                placeholder="e.g. Machining"
               />
-            ))}
-            {tab.cards.length === 0 && (
-              <div className="text-sm text-[var(--admin-fg-muted)] py-3 text-center">暂无服务卡片，点击上方按钮添加</div>
-            )}
+            </label>
+            <label className="block">
+              <div className="text-xs font-medium text-[var(--admin-fg-muted)] mb-1">Image URL</div>
+              <Input
+                value={tab.image_url}
+                onChange={(e) => onChange({ ...tab, image_url: e.target.value })}
+                placeholder="右侧联动图片 URL"
+              />
+            </label>
           </div>
-        </div>
-      </CardBody>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={tab.is_muted}
+              onChange={(e) => onChange({ ...tab, is_muted: e.target.checked })}
+              className="h-4 w-4 rounded border-[var(--admin-border)] text-[var(--admin-primary)]"
+            />
+            <span className="text-sm text-[var(--admin-fg)]">灰显（Muted Tab）</span>
+          </label>
+
+          {/* 服务卡片列表 */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-xs font-medium text-[var(--admin-fg-muted)]">服务卡片 ({tab.cards.length})</div>
+              <Button variant="secondary" size="sm" onClick={addCard}>添加卡片</Button>
+            </div>
+            <div className="space-y-2">
+              {tab.cards.map((card, ci) => (
+                <CardEditor
+                  key={ci}
+                  card={card}
+                  index={ci}
+                  onChange={(next) => {
+                    const cards = [...tab.cards];
+                    cards[ci] = next;
+                    onChange({ ...tab, cards });
+                  }}
+                  onRemove={() => {
+                    const cards = tab.cards.filter((_, i) => i !== ci);
+                    onChange({ ...tab, cards });
+                  }}
+                />
+              ))}
+              {tab.cards.length === 0 && (
+                <div className="text-sm text-[var(--admin-fg-muted)] py-3 text-center">暂无服务卡片，点击上方按钮添加</div>
+              )}
+            </div>
+          </div>
+        </CardBody>
+      )}
     </Card>
   );
 }
 
 // ── Section 编辑器 ──
-function SectionEditor({ section, onChange, onRemove, index }: {
+function SectionEditor({ section, onChange, onRemove, onMoveUp, onMoveDown, index }: {
   section: CapSectionData;
   onChange: (next: CapSectionData) => void;
   onRemove: () => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
   index: number;
 }) {
+  const [expanded, setExpanded] = useState(index === 0);
+
   const addTab = () => {
     onChange({
       ...section,
@@ -132,53 +160,82 @@ function SectionEditor({ section, onChange, onRemove, index }: {
     });
   };
 
+  const moveTab = (from: number, to: number) => {
+    const tabs = [...section.tabs];
+    const [moved] = tabs.splice(from, 1);
+    tabs.splice(to, 0, moved);
+    onChange({ ...section, tabs });
+  };
+
   return (
     <Card>
-      <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-base">Section {index + 1}: {section.section_label || '(未命名)'}</CardTitle>
-        <Button variant="secondary" size="sm" className="text-[var(--admin-danger)]" onClick={onRemove}>
-          删除 Section
-        </Button>
-      </CardHeader>
-      <CardBody className="space-y-4 pt-0">
-        <label className="block">
-          <div className="text-xs font-medium text-[var(--admin-fg-muted)] mb-1">Section Label（一级分类名）</div>
-          <Input
-            value={section.section_label}
-            onChange={(e) => onChange({ ...section, section_label: e.target.value })}
-            placeholder="e.g. Mechanical Manufacturing"
-          />
-        </label>
-
-        {/* Tabs 列表 */}
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <div className="text-xs font-medium text-[var(--admin-fg-muted)]">Tabs ({section.tabs.length})</div>
-            <Button variant="secondary" size="sm" onClick={addTab}>添加 Tab</Button>
-          </div>
-          <div className="space-y-3">
-            {section.tabs.map((tab, ti) => (
-              <TabEditor
-                key={ti}
-                tab={tab}
-                index={ti}
-                onChange={(next) => {
-                  const tabs = [...section.tabs];
-                  tabs[ti] = next;
-                  onChange({ ...section, tabs });
-                }}
-                onRemove={() => {
-                  const tabs = section.tabs.filter((_, i) => i !== ti);
-                  onChange({ ...section, tabs });
-                }}
-              />
-            ))}
-            {section.tabs.length === 0 && (
-              <div className="text-sm text-[var(--admin-fg-muted)] py-4 text-center">暂无 Tab，点击上方按钮添加</div>
-            )}
-          </div>
+      <CardHeader
+        className="flex-row items-center justify-between space-y-0 pb-2 cursor-pointer select-none"
+        onClick={() => setExpanded(!expanded)}
+      >
+        <div className="flex items-center gap-2">
+          <span className={cn("text-sm transition-transform duration-200", expanded && "rotate-90")}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3.5 h-3.5 text-[var(--admin-fg-muted)]">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </span>
+          <CardTitle className="text-base">Section {index + 1}: {section.section_label || '(未命名)'}</CardTitle>
         </div>
-      </CardBody>
+        <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+          {onMoveUp && (
+            <Button variant="secondary" size="sm" className="text-xs px-1.5" onClick={onMoveUp} title="上移">↑</Button>
+          )}
+          {onMoveDown && (
+            <Button variant="secondary" size="sm" className="text-xs px-1.5" onClick={onMoveDown} title="下移">↓</Button>
+          )}
+          <Button variant="secondary" size="sm" className="text-[var(--admin-danger)]" onClick={onRemove}>
+            删除 Section
+          </Button>
+        </div>
+      </CardHeader>
+      {expanded && (
+        <CardBody className="space-y-4 pt-0">
+          <label className="block">
+            <div className="text-xs font-medium text-[var(--admin-fg-muted)] mb-1">Section Label（一级分类名）</div>
+            <Input
+              value={section.section_label}
+              onChange={(e) => onChange({ ...section, section_label: e.target.value })}
+              placeholder="e.g. Mechanical Manufacturing"
+            />
+          </label>
+
+          {/* Tabs 列表 */}
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-xs font-medium text-[var(--admin-fg-muted)]">Tabs ({section.tabs.length})</div>
+              <Button variant="secondary" size="sm" onClick={addTab}>添加 Tab</Button>
+            </div>
+            <div className="space-y-3">
+              {section.tabs.map((tab, ti) => (
+                <TabEditor
+                  key={ti}
+                  tab={tab}
+                  index={ti}
+                  onMoveUp={ti > 0 ? () => moveTab(ti, ti - 1) : undefined}
+                  onMoveDown={ti < section.tabs.length - 1 ? () => moveTab(ti, ti + 1) : undefined}
+                  onChange={(next) => {
+                    const tabs = [...section.tabs];
+                    tabs[ti] = next;
+                    onChange({ ...section, tabs });
+                  }}
+                  onRemove={() => {
+                    const tabs = section.tabs.filter((_, i) => i !== ti);
+                    onChange({ ...section, tabs });
+                  }}
+                />
+              ))}
+              {section.tabs.length === 0 && (
+                <div className="text-sm text-[var(--admin-fg-muted)] py-4 text-center">暂无 Tab，点击上方按钮添加</div>
+              )}
+            </div>
+          </div>
+        </CardBody>
+      )}
     </Card>
   );
 }
@@ -224,6 +281,13 @@ export default function MegaMenuEditorCapabilities({ navItem, onChange }: Props)
     });
   };
 
+  const moveSection = (from: number, to: number) => {
+    const sections = [...navItem.sections];
+    const [moved] = sections.splice(from, 1);
+    sections.splice(to, 0, moved);
+    onChange({ ...navItem, sections });
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -243,6 +307,8 @@ export default function MegaMenuEditorCapabilities({ navItem, onChange }: Props)
             key={si}
             section={section}
             index={si}
+            onMoveUp={si > 0 ? () => moveSection(si, si - 1) : undefined}
+            onMoveDown={si < navItem.sections.length - 1 ? () => moveSection(si, si + 1) : undefined}
             onChange={(next) => {
               const sections = [...navItem.sections];
               sections[si] = next;

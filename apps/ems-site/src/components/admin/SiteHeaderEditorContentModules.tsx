@@ -138,7 +138,11 @@ export default function SiteHeaderEditorContentModules({
           <Card key={index}>
             <CardHeader className="cursor-pointer select-none flex items-center justify-between" onClick={() => toggleNavItem(index)}>
               <CardTitle>Nav Item {index + 1}: {item.label || '(未命名)'}</CardTitle>
-              <span className="text-sm text-[var(--admin-fg-muted)] transition-transform" style={{ transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)' }}>▶</span>
+              <span className={`inline-flex items-center justify-center w-6 h-6 rounded text-[var(--admin-fg-muted)] transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </span>
             </CardHeader>
             {isExpanded && (
               <CardBody className="space-y-3 pt-0">

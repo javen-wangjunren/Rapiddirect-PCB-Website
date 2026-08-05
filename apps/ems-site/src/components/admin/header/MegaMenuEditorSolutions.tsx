@@ -17,18 +17,12 @@ function StepEditor({ step, onChange, onRemove, index }: {
 }) {
   return (
     <div className="flex items-start gap-2 rounded border border-[var(--admin-border)] bg-[var(--admin-surface)] p-2">
-      <span className="mt-2 text-xs font-bold text-[var(--admin-fg-muted)] w-5 text-right">{step.step_number || index + 1}.</span>
+      <span className="mt-2 text-xs font-bold text-[var(--admin-fg-muted)] w-5 text-right">{index + 1}.</span>
       <div className="flex-1 space-y-1.5">
-        <div className="grid grid-cols-4 gap-2">
-          <label className="col-span-1">
-            <div className="text-[10px] text-[var(--admin-fg-muted)] mb-0.5">步号</div>
-            <Input value={step.step_number} onChange={(e) => onChange({ ...step, step_number: e.target.value })} placeholder="1" />
-          </label>
-          <label className="col-span-3">
-            <div className="text-[10px] text-[var(--admin-fg-muted)] mb-0.5">标题</div>
-            <Input value={step.title} onChange={(e) => onChange({ ...step, title: e.target.value })} placeholder="Design & Engineering" />
-          </label>
-        </div>
+        <label className="block">
+          <div className="text-[10px] text-[var(--admin-fg-muted)] mb-0.5">标题</div>
+          <Input value={step.title} onChange={(e) => onChange({ ...step, title: e.target.value })} placeholder="Design & Engineering" />
+        </label>
         <label className="block">
           <div className="text-[10px] text-[var(--admin-fg-muted)] mb-0.5">标题链接 (href)</div>
           <Input value={step.href} onChange={(e) => onChange({ ...step, href: e.target.value })} placeholder="/npi/design-engineering/" />
@@ -72,12 +66,14 @@ function TabEditor({ tab, onChange, onRemove, onMoveUp, onMoveDown, index }: {
   index: number;
 }) {
   const [expanded, setExpanded] = useState(index === 0);
-  const isNpi = tab.panel_style === 'npi';
+  // 兼容旧值：'npi' → timeline，'manufacturing' → card
+  const style = tab.panel_style as string;
+  const isTimeline = style === 'timeline' || style === 'npi';
 
   const addStep = () => {
     onChange({
       ...tab,
-      steps: [...tab.steps, { step_number: String(tab.steps.length + 1), title: '', desc: '', href: '' }]
+      steps: [...tab.steps, { title: '', desc: '', href: '' }]
     });
   };
 
@@ -121,11 +117,11 @@ function TabEditor({ tab, onChange, onRemove, onMoveUp, onMoveDown, index }: {
             <div className="text-xs font-medium text-[var(--admin-fg-muted)] mb-1">Panel Style</div>
             <select
               className="w-full rounded border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-fg)] outline-none focus:border-[var(--admin-primary)]"
-              value={tab.panel_style}
+              value={style === 'npi' ? 'timeline' : style === 'manufacturing' ? 'card' : style}
               onChange={(e) => onChange({ ...tab, panel_style: e.target.value as any })}
             >
-              <option value="npi">NPI（步骤时间轴）</option>
-              <option value="manufacturing">Manufacturing（服务卡片）</option>
+              <option value="timeline">Timeline（步骤时间轴）</option>
+              <option value="card">Card（服务卡片）</option>
             </select>
           </label>
         </div>
@@ -135,8 +131,8 @@ function TabEditor({ tab, onChange, onRemove, onMoveUp, onMoveDown, index }: {
           <Input value={tab.panel_desc} onChange={(e) => onChange({ ...tab, panel_desc: e.target.value })} placeholder="A one-stop product innovation service..." />
         </label>
 
-        {/* NPI 样式：步骤 */}
-        {isNpi && (
+        {/* Timeline 样式：步骤 */}
+        {isTimeline && (
           <div>
             <div className="flex items-center justify-between mb-2">
               <div className="text-xs font-medium text-[var(--admin-fg-muted)]">Steps ({tab.steps.length})</div>
@@ -154,8 +150,8 @@ function TabEditor({ tab, onChange, onRemove, onMoveUp, onMoveDown, index }: {
           </div>
         )}
 
-        {/* Manufacturing 样式：服务卡片 */}
-        {!isNpi && (
+        {/* Card 样式：服务卡片 */}
+        {!isTimeline && (
           <div>
             <div className="flex items-center justify-between mb-2">
               <div className="text-xs font-medium text-[var(--admin-fg-muted)]">服务卡片 ({tab.cards.length})</div>
@@ -212,7 +208,7 @@ export default function MegaMenuEditorSolutions({ navItem, onChange }: Props) {
   const addTab = () => {
     onChange({
       ...navItem,
-      tabs: [...navItem.tabs, { tab_label: '', panel_style: 'npi', panel_desc: '', steps: [], cards: [], cta1_label: '', cta1_href: '', cta2_href: '', image_url: '' }]
+      tabs: [...navItem.tabs, { tab_label: '', panel_style: 'timeline', panel_desc: '', steps: [], cards: [], cta1_label: '', cta1_href: '', cta2_href: '', image_url: '' }]
     });
   };
 

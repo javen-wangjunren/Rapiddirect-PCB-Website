@@ -82,7 +82,6 @@ const normalizeCapFooter = (input: unknown) => {
 const normalizeSolStep = (input: unknown) => {
   const obj = isObject(input) ? (input as any) : {};
   return {
-    step_number: asString(obj.step_number),
     title: asString(obj.title),
     desc: asString(obj.desc),
     href: asString(obj.href)
@@ -94,12 +93,20 @@ const normalizeSolSteps = (input: unknown) => {
   return input.map(normalizeSolStep);
 };
 
+// 兼容旧值：'npi' → 'timeline'，'manufacturing' → 'card'
+const normalizeSolPanelStyle = (value: unknown): 'timeline' | 'card' => {
+  const v = asString(value);
+  if (v === 'npi') return 'timeline';
+  if (v === 'manufacturing') return 'card';
+  return v === 'card' ? 'card' : 'timeline';
+};
+
 // ── Solutions Tab ──
 const normalizeSolTab = (input: unknown) => {
   const obj = isObject(input) ? (input as any) : {};
   return {
     tab_label: asString(obj.tab_label),
-    panel_style: asString(obj.panel_style),
+    panel_style: normalizeSolPanelStyle(obj.panel_style),
     panel_desc: asString(obj.panel_desc),
     steps: normalizeSolSteps(obj.steps),
     cards: normalizeCards(obj.cards),

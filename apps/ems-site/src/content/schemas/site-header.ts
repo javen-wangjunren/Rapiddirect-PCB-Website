@@ -63,10 +63,10 @@ const capFooterSchema = {
 // ════════════════════════════════════════════════════════════
 
 /**
- * Solutions 步骤（NPI 样式）
+ * Solutions 步骤（Timeline 样式）
+ * 步号不存储，按数组顺序渲染（step_number 已废弃）
  */
 const solStepSchema = {
-  step_number: 'string',
   title: 'string',
   desc: 'string',
   href: 'string'
@@ -74,18 +74,18 @@ const solStepSchema = {
 
 /**
  * Solutions 菜单：一个 tab 的结构
- * panel_style: 'npi' | 'manufacturing'
+ * panel_style: 'timeline' | 'card'
  */
 const solTabSchema = {
   tab_label: 'string',         // sidebar 按钮文案 & 右侧面板标题
-  panel_style: 'string',       // 'npi' | 'manufacturing'
+  panel_style: 'string',       // 'timeline' | 'card'
   panel_desc: 'string',        // 面板描述
-  // NPI 样式
+  // Timeline 样式
   steps: {
     type: 'array' as const,
     items: solStepSchema
   },
-  // Manufacturing 样式
+  // Card 样式
   cards: {
     type: 'array' as const,
     items: cardSchema
@@ -232,20 +232,19 @@ export interface CapFooterData {
 // ── Solutions ──
 
 export interface SolStepData {
-  step_number: string;
   title: string;
   desc: string;
   href: string;
 }
 
-export type SolPanelStyle = 'npi' | 'manufacturing';
+export type SolPanelStyle = 'timeline' | 'card';
 
 export interface SolTabData {
   tab_label: string;
   panel_style: SolPanelStyle;
   panel_desc: string;
-  steps: SolStepData[];       // NPI 样式
-  cards: CardData[];          // Manufacturing 样式
+  steps: SolStepData[];       // Timeline 样式（步号按数组顺序）
+  cards: CardData[];          // Card 样式
   cta1_label: string;
   cta1_href: string;
   cta2_href: string;

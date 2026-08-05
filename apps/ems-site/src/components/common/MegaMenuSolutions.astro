@@ -23,7 +23,9 @@ const { item } = Astro.props as { item: NavItemData };
 
     <div class="sol-panels min-w-0 w-full">
       {item.tabs?.map((tab, ti) => {
-        const isNpi = tab.panel_style === 'npi';
+        // 兼容旧值：'npi' → timeline，'manufacturing' → card
+        const style = tab.panel_style as string;
+        const isTimeline = style === 'timeline' || style === 'npi';
         return (
           <div class={`sol-panel${ti === 0 ? ' is-active' : ''}`} data-sol-panel={tab.tab_label.toLowerCase().replace(/\s+/g, '-')} style="display:none">
             <div class="sol-panel-top flex items-start justify-between gap-5 mb-3.5 pb-3 border-b border-[rgba(255,255,255,0.1)]">
@@ -33,13 +35,13 @@ const { item } = Astro.props as { item: NavItemData };
               <p class="text-sm leading-relaxed text-[#D2D2D2] max-w-[60ch] mb-3.5">{tab.panel_desc}</p>
             )}
 
-            {isNpi && tab.steps && tab.steps.length > 0 && (
+            {isTimeline && tab.steps && tab.steps.length > 0 && (
               <div class="sol-panel-body">
                 <ul class="sol-stage-list list-none m-0 p-0 grid gap-3 relative before:content-[''] before:absolute before:left-[13px] before:top-2 before:bottom-2 before:w-px before:bg-[rgba(255,255,255,0.1)]">
-                  {tab.steps.map((step) => (
+                  {tab.steps.map((step, si) => (
                     <li class="sol-stage-item relative grid grid-cols-[30px_minmax(0,1fr)] gap-2.5 pl-0 border-l-0">
                       <div class="sol-stage-index relative z-[1] flex items-start justify-center">
-                        <span class="w-[26px] h-[26px] rounded-full border border-[rgba(234,84,63,0.38)] bg-[#1C1C1C] text-[#EA543F] text-xs font-bold leading-6 text-center">{step.step_number}</span>
+                        <span class="w-[26px] h-[26px] rounded-full border border-[rgba(234,84,63,0.38)] bg-[#1C1C1C] text-[#EA543F] text-xs font-bold leading-6 text-center">{si + 1}</span>
                       </div>
                       <div class="sol-stage-content grid gap-[3px] pb-1.5">
                         <a href={step.href || '#'} class="sol-stage-link no-underline text-inherit">
@@ -53,7 +55,7 @@ const { item } = Astro.props as { item: NavItemData };
               </div>
             )}
 
-            {!isNpi && tab.cards && tab.cards.length > 0 && (
+            {!isTimeline && tab.cards && tab.cards.length > 0 && (
               <div class="sol-panel-body">
                 <ul class="sol-service-grid list-none m-0 p-0 grid grid-cols-2 gap-2.5">
                   {tab.cards.map((card) => (

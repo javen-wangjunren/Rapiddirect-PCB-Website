@@ -1,5 +1,7 @@
--- phase14: 更新 Header content_json 为新 Mega Menu 结构
--- 直接覆盖写入新 Schema 默认值（含 Capabilities + Solutions）
+-- phase14: 初始化 Header content_json 为新 Mega Menu 结构（含 Capabilities + Solutions）
+-- 注意：此文件仅用于"首次初始化"或"空库"场景。
+-- 严禁在线上已填写内容后重跑 —— content_json 为全量覆盖（on conflict do update），会清空后台已保存的数据。
+-- 若线上已存在数据，请改为手动增量更新缺失字段（如 steps.href），而非重跑本文件。
 
 with upsert_page as (
   insert into public.pages (slug, title, template_type, status)
@@ -151,14 +153,14 @@ upsert_content as (
       "tabs": [
         {
           "tab_label": "NPI Solutions",
-          "panel_style": "npi",
+          "panel_style": "timeline",
           "panel_desc": "A one-stop product innovation service covering design, prototyping, mass production, and packaging.",
           "steps": [
-            { "step_number": "1", "title": "Design & Engineering", "desc": "Turn concepts into precision parts.", "href": "" },
-            { "step_number": "2", "title": "Verification Phase", "desc": "Rigorous prototyping validation.", "href": "" },
-            { "step_number": "3", "title": "Mass Production", "desc": "Scale into high-volume production.", "href": "" },
-            { "step_number": "4", "title": "Packaging Phase", "desc": "Market-ready solutions.", "href": "" },
-            { "step_number": "5", "title": "Service Package", "desc": "Choose the ideal NPI package—from feasibility to mass production.", "href": "" }
+            { "title": "Design & Engineering", "desc": "Turn concepts into precision parts.", "href": "" },
+            { "title": "Verification Phase", "desc": "Rigorous prototyping validation.", "href": "" },
+            { "title": "Mass Production", "desc": "Scale into high-volume production.", "href": "" },
+            { "title": "Packaging Phase", "desc": "Market-ready solutions.", "href": "" },
+            { "title": "Service Package", "desc": "Choose the ideal NPI package—from feasibility to mass production.", "href": "" }
           ],
           "cards": [],
           "cta1_label": "Explore NPI solutions",
@@ -168,7 +170,7 @@ upsert_content as (
         },
         {
           "tab_label": "Manufacturing Solutions",
-          "panel_style": "manufacturing",
+          "panel_style": "card",
           "panel_desc": "A lighter entry point for teams that already know the manufacturing service they need and want to go straight to execution.",
           "steps": [],
           "cards": [

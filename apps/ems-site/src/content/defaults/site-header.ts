@@ -123,20 +123,20 @@ export const siteHeaderDefaults: SiteHeaderData = {
       footer: { browse_all_href: '', get_quote_href: '' },
       tabs: [
         {
-          tab_label: 'NPI Solutions', panel_style: 'npi',
+          tab_label: 'NPI Solutions', panel_style: 'timeline',
           panel_desc: 'A one-stop product innovation service covering design, prototyping, mass production, and packaging.',
           steps: [
-            { step_number: '1', title: 'Design & Engineering', desc: 'Turn concepts into precision parts.', href: '' },
-            { step_number: '2', title: 'Verification Phase', desc: 'Rigorous prototyping validation.', href: '' },
-            { step_number: '3', title: 'Mass Production', desc: 'Scale into high-volume production.', href: '' },
-            { step_number: '4', title: 'Packaging Phase', desc: 'Market-ready solutions.', href: '' },
-            { step_number: '5', title: 'Service Package', desc: 'Choose the ideal NPI package—from feasibility to mass production.', href: '' }
+            { title: 'Design & Engineering', desc: 'Turn concepts into precision parts.', href: '' },
+            { title: 'Verification Phase', desc: 'Rigorous prototyping validation.', href: '' },
+            { title: 'Mass Production', desc: 'Scale into high-volume production.', href: '' },
+            { title: 'Packaging Phase', desc: 'Market-ready solutions.', href: '' },
+            { title: 'Service Package', desc: 'Choose the ideal NPI package—from feasibility to mass production.', href: '' }
           ],
           cards: [],
           cta1_label: 'Explore NPI solutions', cta1_href: '#', cta2_href: '#', image_url: ''
         },
         {
-          tab_label: 'Manufacturing Solutions', panel_style: 'manufacturing',
+          tab_label: 'Manufacturing Solutions', panel_style: 'card',
           panel_desc: 'A lighter entry point for teams that already know the manufacturing service they need and want to go straight to execution.',
           steps: [],
           cards: [

@@ -124,11 +124,12 @@ const navItems: NavItemData[] = (data?.nav_items?.length ? data.nav_items : site
     transform: rotate(180deg);
   }
 
-  /* Mega Menu 展开 */
+  /* Mega Menu 展开（子组件用 Tailwind v4 独立 translate 属性，此处统一覆盖 translate 而非 transform，避免位移叠加） */
   .has-dropdown:hover .mega-menu {
     opacity: 1;
     visibility: visible;
-    transform: translateX(-50%) translateY(0);
+    translate: -50% 0;
+    transform: none;
     pointer-events: auto;
   }
 

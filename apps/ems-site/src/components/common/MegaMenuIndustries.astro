@@ -52,3 +52,11 @@ const { item } = Astro.props as { item: NavItemData };
     )}
   </div>
 </div>
+
+<style is:global>
+  /* Industries 图标默认主题橙色：存量 SVG 无 fill/stroke 时默认为黑色，强制跟随父级 color（span 已设 #EA543F） */
+  .menu-body-industries .industry-link svg {
+    fill: currentColor;
+    stroke: currentColor;
+  }
+</style>
